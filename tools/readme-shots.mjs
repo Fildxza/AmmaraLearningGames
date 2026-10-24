@@ -1,0 +1,47 @@
+// Takes the gameplay screenshots used in README.md (docs/screenshots/*.png).
+// Usage: node tools/readme-shots.mjs
+import puppeteer from 'puppeteer-core';
+import path from 'node:path';
+import fs from 'node:fs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { CHROME } from './lib/browsers.mjs';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const out = path.join(root, 'docs/screenshots');
+fs.mkdirSync(out, { recursive: true });
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const browser = await puppeteer.launch({ executablePath: CHROME, headless: true });
+const page = await browser.newPage();
+await page.setViewport({ width: 1280, height: 720, deviceScaleFactor: 1.5 });
+await page.goto(pathToFileURL(path.join(root, 'AmmaraGames.html')).href);
+await page.waitForFunction(() => window.AmmaraDebug && window.AmmaraDebug.state() === 'MAIN_MENU', { timeout: 40000 });
+await sleep(1500);
+await page.screenshot({ path: path.join(out, 'menu.png') });
+await page.click('[data-testid=menu-play]');
+await page.waitForFunction(() => window.AmmaraDebug.state() === 'PLAYROOM');
+await sleep(800);
+const skip = await page.$('[data-testid=tut-skip]'); if (skip) await skip.click();
+await page.evaluate(() => window.AmmaraDebug.teleport(-1.5, 2.6));
+await page.keyboard.down('ArrowLeft'); await sleep(350); await page.keyboard.up('ArrowLeft');
+await sleep(2200);
+await page.screenshot({ path: path.join(out, 'gameplay-hall.png') });
+await page.evaluate(() => window.AmmaraDebug.teleport(52.5, -9.6));
+await page.keyboard.down('ArrowUp'); await sleep(300); await page.keyboard.up('ArrowUp');
+await sleep(2200);
+await page.screenshot({ path: path.join(out, 'gameplay-playground.png') });
+await page.evaluate(() => window.AmmaraDebug.teleport(-17.6, 5.2));
+await page.keyboard.down('ArrowUp'); await sleep(250); await page.keyboard.up('ArrowUp');
+await sleep(2200);
+await page.screenshot({ path: path.join(out, 'gameplay-robots.png') });
+await page.keyboard.press('Escape'); await sleep(400);
+await page.click('[data-testid=pause-home]'); await sleep(300);
+const yes = await page.$('#dialog [data-answer=yes]'); if (yes) await yes.click();
+await page.waitForFunction(() => window.AmmaraDebug.state() === 'MAIN_MENU');
+await page.click('[data-testid=menu-arcade]'); await sleep(900);
+await page.screenshot({ path: path.join(out, 'arcade.png') });
+await page.click('[data-testid=arcade-back]'); await sleep(400);
+await page.click('[data-testid=menu-islamic]'); await sleep(500);
+await page.click('[data-testid=isl-surah-112]'); await sleep(700);
+await page.screenshot({ path: path.join(out, 'jom-mengaji.png') });
+await browser.close();
+console.log('screenshots written to', out);

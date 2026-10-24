@@ -1,0 +1,7 @@
+# Keep exact bytes: the Quran source file is verified by hash, and the built game is shipped as is.
+* text=auto eol=lf
+research/sources/tanzil/quran-uthmani.txt -text
+AmmaraGames.html -text
+dist/AmmaraGames.html -text
+*.png binary
+*.woff2 binary

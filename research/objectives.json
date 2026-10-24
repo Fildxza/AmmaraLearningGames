@@ -1,0 +1,1370 @@
+{
+ "_note": "Learning objectives used by the question bank. \"alignment.quote\" is copied word for word from the CDC page fetched on 2026-10-24; \"alignmentStrength\" says whether the milestone is directly the skill (\"direct\") or only related (\"related\"). Objectives with no alignment were designed from general early-learning practice and have NOT been checked against a source.",
+ "objectives": {
+  "letter-identify": {
+   "description": {
+    "en": "Recognise a named capital letter among three.",
+    "ms": "Kenal huruf besar yang disebut antara tiga."
+   },
+   "domain": "Literacy: letters",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-2y"
+   ],
+   "alignment": {
+    "source": "cdc-2y",
+    "quote": "Points to things in a book when you ask, like \"Where is the bear?\""
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "letter-match": {
+   "description": {
+    "en": "Match a capital letter to the same letter.",
+    "ms": "Padankan huruf besar dengan huruf yang sama."
+   },
+   "domain": "Literacy: letters",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "letter-case-match": {
+   "description": {
+    "en": "Match a capital letter with its lower-case form.",
+    "ms": "Padankan huruf besar dengan huruf kecil."
+   },
+   "domain": "Literacy: letters",
+   "recommendedAges": [
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "letter-word-intro": {
+   "description": {
+    "en": "Hear a letter paired with a familiar word (B for ball, A for ambulance).",
+    "ms": "Dengar huruf dipasangkan dengan perkataan biasa."
+   },
+   "domain": "Literacy: letters",
+   "recommendedAges": [
+    "2-3"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "First letters are checked per language by the validator."
+  },
+  "letter-sound": {
+   "description": {
+    "en": "Pick the picture whose name starts with the letter.",
+    "ms": "Pilih gambar yang namanya bermula dengan huruf itu."
+   },
+   "domain": "Literacy: letters",
+   "recommendedAges": [
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "The validator rejects any item where a distractor also starts with the letter in either language."
+  },
+  "count-small": {
+   "description": {
+    "en": "Count a small group (1 to 5) and match it to a quantity or numeral.",
+    "ms": "Kira kumpulan kecil (1 hingga 5)."
+   },
+   "domain": "Early maths: numbers",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "brightwheel-dc",
+    "elof-headstart"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "numeral-identify": {
+   "description": {
+    "en": "Recognise a numeral.",
+    "ms": "Kenal angka."
+   },
+   "domain": "Early maths: numbers",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-2y"
+   ],
+   "alignment": {
+    "source": "cdc-2y",
+    "quote": "Points to things in a book when you ask, like \"Where is the bear?\""
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "numeral-quantity": {
+   "description": {
+    "en": "Match a numeral or dot pattern with the group of that size.",
+    "ms": "Padankan angka dengan kumpulan yang sama banyak."
+   },
+   "domain": "Early maths: numbers",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "elof-headstart"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "compare-quantity": {
+   "description": {
+    "en": "Find the group with the most, fewest or the same number.",
+    "ms": "Cari kumpulan paling banyak, paling sedikit atau sama banyak."
+   },
+   "domain": "Early maths: numbers",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "elof-headstart"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "number-sequence": {
+   "description": {
+    "en": "Say the number that comes before or after.",
+    "ms": "Sebut nombor sebelum atau selepas."
+   },
+   "domain": "Early maths: numbers",
+   "recommendedAges": [
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-4y"
+   ],
+   "alignment": {
+    "source": "cdc-4y",
+    "quote": "Tells what comes next in a well-known story"
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "color-identify": {
+   "description": {
+    "en": "Find a common colour.",
+    "ms": "Kenal dan cari warna biasa."
+   },
+   "domain": "Colours",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-4y"
+   ],
+   "alignment": {
+    "source": "cdc-4y",
+    "quote": "Names a few colors of items"
+   },
+   "alignmentStrength": "direct",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "color-object": {
+   "description": {
+    "en": "Say what colour a familiar object is.",
+    "ms": "Beritahu warna benda yang biasa dilihat."
+   },
+   "domain": "Colours",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-4y"
+   ],
+   "alignment": {
+    "source": "cdc-4y",
+    "quote": "Names a few colors of items"
+   },
+   "alignmentStrength": "direct",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "color-match": {
+   "description": {
+    "en": "Match a crayon colour to an object of the same colour.",
+    "ms": "Padankan warna krayon dengan benda yang sama warna."
+   },
+   "domain": "Colours",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-4y"
+   ],
+   "alignment": {
+    "source": "cdc-4y",
+    "quote": "Names a few colors of items"
+   },
+   "alignmentStrength": "direct",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "color-mixing": {
+   "description": {
+    "en": "Predict the colour made by mixing two paints.",
+    "ms": "Teka warna campuran dua cat."
+   },
+   "domain": "Colours",
+   "recommendedAges": [
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Standard paint mixing (red+yellow=orange, blue+yellow=green, red+blue=purple, red+white=pink); not checked against a fetched source."
+  },
+  "color-intro": {
+   "description": {
+    "en": "Notice that some things have many colours (rainbow).",
+    "ms": "Sedar bahawa ada benda berwarna-warni."
+   },
+   "domain": "Colours",
+   "recommendedAges": [
+    "2-3",
+    "3-4"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "shape-identify": {
+   "description": {
+    "en": "Name or find circle, triangle, square.",
+    "ms": "Kenal bulatan, segi tiga, segi empat sama."
+   },
+   "domain": "Early maths: shapes",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "elof-headstart"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "shape-attribute-match": {
+   "description": {
+    "en": "Match shapes by shape, ignoring colour.",
+    "ms": "Padankan bentuk tanpa mengambil kira warna."
+   },
+   "domain": "Early maths: shapes",
+   "recommendedAges": [
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "elof-headstart"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "shape-special": {
+   "description": {
+    "en": "Identify star, heart, oval, crescent, rectangle, hexagon.",
+    "ms": "Kenal bintang, hati, bujur, bulan sabit, segi empat tepat, heksagon."
+   },
+   "domain": "Early maths: shapes",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "elof-headstart"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "shape-in-objects": {
+   "description": {
+    "en": "Link shapes to everyday objects (clock is a circle, door is a rectangle).",
+    "ms": "Kaitkan bentuk dengan benda harian."
+   },
+   "domain": "Early maths: shapes",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "elof-headstart"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "shape-properties": {
+   "description": {
+    "en": "Count sides and corners of simple shapes.",
+    "ms": "Kira sisi dan bucu bentuk mudah."
+   },
+   "domain": "Early maths: shapes",
+   "recommendedAges": [
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "elof-headstart"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Triangle 3 sides, square 4 equal sides, circle no corners: standard geometry."
+  },
+  "shape-3d-roll": {
+   "description": {
+    "en": "Notice that round things roll.",
+    "ms": "Sedar bahawa benda bulat boleh bergolek."
+   },
+   "domain": "Early maths: shapes",
+   "recommendedAges": [
+    "2-3",
+    "3-4"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "animal-sound": {
+   "description": {
+    "en": "Match an animal to the sound it makes.",
+    "ms": "Padankan haiwan dengan bunyinya."
+   },
+   "domain": "Science: animals",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "The sound word is shown as text in a speech bubble, so no audio is needed."
+  },
+  "animal-identify": {
+   "description": {
+    "en": "Recognise common animals.",
+    "ms": "Kenal haiwan biasa."
+   },
+   "domain": "Science: animals",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-2y",
+    "dbp-prpm"
+   ],
+   "alignment": {
+    "source": "cdc-2y",
+    "quote": "Points to things in a book when you ask, like \"Where is the bear?\""
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "animal-feature": {
+   "description": {
+    "en": "Link an animal to a body feature (trunk, shell, stripes, feathers).",
+    "ms": "Kaitkan haiwan dengan cirinya."
+   },
+   "domain": "Science: animals",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "dbp-prpm"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "animal-habitat": {
+   "description": {
+    "en": "Where animals live (water, nest, hive, barn).",
+    "ms": "Di mana haiwan tinggal."
+   },
+   "domain": "Science: animals",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "fruit-identify": {
+   "description": {
+    "en": "Recognise common fruits, including local ones (durian, rambutan).",
+    "ms": "Kenal buah biasa termasuk buah tempatan."
+   },
+   "domain": "Science: food and plants",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-2y"
+   ],
+   "alignment": {
+    "source": "cdc-2y",
+    "quote": "Points to things in a book when you ask, like \"Where is the bear?\""
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "veg-identify": {
+   "description": {
+    "en": "Recognise common vegetables.",
+    "ms": "Kenal sayur biasa."
+   },
+   "domain": "Science: food and plants",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-2y"
+   ],
+   "alignment": {
+    "source": "cdc-2y",
+    "quote": "Points to things in a book when you ask, like \"Where is the bear?\""
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "food-sort": {
+   "description": {
+    "en": "Sort food into fruit and vegetable.",
+    "ms": "Asingkan buah dan sayur."
+   },
+   "domain": "Science: food and plants",
+   "recommendedAges": [
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Everyday (kitchen) meaning of fruit and vegetable is used, not the botanical one; borderline items such as tomato are not used for sorting."
+  },
+  "produce-growth": {
+   "description": {
+    "en": "Where food grows (under the ground, on a tree).",
+    "ms": "Di mana makanan tumbuh."
+   },
+   "domain": "Science: food and plants",
+   "recommendedAges": [
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "food-nonfood": {
+   "description": {
+    "en": "Tell food from things that are not food.",
+    "ms": "Bezakan makanan dengan bukan makanan."
+   },
+   "domain": "Science: food and plants",
+   "recommendedAges": [
+    "2-3"
+   ],
+   "sources": [
+    "cdc-2y"
+   ],
+   "alignment": {
+    "source": "cdc-2y",
+    "quote": "Points to things in a book when you ask, like \"Where is the bear?\""
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "produce-attributes": {
+   "description": {
+    "en": "Describe fruit by colour, shape, taste or smell.",
+    "ms": "Perihal buah ikut warna, bentuk, rasa atau bau."
+   },
+   "domain": "Science: food and plants",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "vehicle-identify": {
+   "description": {
+    "en": "Recognise common vehicles.",
+    "ms": "Kenal kenderaan biasa."
+   },
+   "domain": "General knowledge: vehicles",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-2y"
+   ],
+   "alignment": {
+    "source": "cdc-2y",
+    "quote": "Points to things in a book when you ask, like \"Where is the bear?\""
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "vehicle-medium": {
+   "description": {
+    "en": "Land, water or air: where vehicles travel.",
+    "ms": "Darat, air atau udara."
+   },
+   "domain": "General knowledge: vehicles",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "vehicle-helpers": {
+   "description": {
+    "en": "Vehicles that help people (fire engine, ambulance, tractor).",
+    "ms": "Kenderaan penolong."
+   },
+   "domain": "General knowledge: vehicles",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-4y"
+   ],
+   "alignment": {
+    "source": "cdc-4y",
+    "quote": "Likes to be a \"helper\""
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "vehicle-parts": {
+   "description": {
+    "en": "Parts of vehicles (wheels, wings).",
+    "ms": "Bahagian kenderaan."
+   },
+   "domain": "General knowledge: vehicles",
+   "recommendedAges": [
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "vehicle-sounds": {
+   "description": {
+    "en": "Sounds linked to vehicles (siren, bell).",
+    "ms": "Bunyi kenderaan."
+   },
+   "domain": "General knowledge: vehicles",
+   "recommendedAges": [
+    "2-3",
+    "3-4"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "body-identify": {
+   "description": {
+    "en": "Point to named body parts.",
+    "ms": "Tunjuk anggota badan yang disebut."
+   },
+   "domain": "Body and senses",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-2y"
+   ],
+   "alignment": {
+    "source": "cdc-2y",
+    "quote": "Points to at least two body parts when you ask him to show you"
+   },
+   "alignmentStrength": "direct",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "senses": {
+   "description": {
+    "en": "Which body part we see, hear, smell, taste and touch with.",
+    "ms": "Pancaindera."
+   },
+   "domain": "Body and senses",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "body-function": {
+   "description": {
+    "en": "What a body part is used for.",
+    "ms": "Kegunaan anggota badan."
+   },
+   "domain": "Body and senses",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-4y"
+   ],
+   "alignment": {
+    "source": "cdc-4y",
+    "quote": "Answers simple questions like \"What is a coat for?\" or \"What is a crayon for?\""
+   },
+   "alignmentStrength": "direct",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "body-count": {
+   "description": {
+    "en": "How many eyes, ears, fingers and feet we have.",
+    "ms": "Berapa banyak anggota badan."
+   },
+   "domain": "Body and senses",
+   "recommendedAges": [
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "object-identify": {
+   "description": {
+    "en": "Recognise everyday objects.",
+    "ms": "Kenal benda harian."
+   },
+   "domain": "Everyday objects",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-2y"
+   ],
+   "alignment": {
+    "source": "cdc-2y",
+    "quote": "Points to things in a book when you ask, like \"Where is the bear?\""
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "object-function": {
+   "description": {
+    "en": "What an everyday object is for.",
+    "ms": "Kegunaan benda harian."
+   },
+   "domain": "Everyday objects",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-4y"
+   ],
+   "alignment": {
+    "source": "cdc-4y",
+    "quote": "Answers simple questions like \"What is a coat for?\" or \"What is a crayon for?\""
+   },
+   "alignmentStrength": "direct",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "object-pairs": {
+   "description": {
+    "en": "Objects that go together (sock and shoe, key and lock).",
+    "ms": "Benda yang berpasangan."
+   },
+   "domain": "Everyday objects",
+   "recommendedAges": [
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "visual-match": {
+   "description": {
+    "en": "Find the identical picture.",
+    "ms": "Cari gambar yang sama."
+   },
+   "domain": "Patterns and matching",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "object-odd-one-out": {
+   "description": {
+    "en": "Find the item that does not belong.",
+    "ms": "Cari yang lain daripada yang lain."
+   },
+   "domain": "Everyday objects",
+   "recommendedAges": [
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "object-category": {
+   "description": {
+    "en": "Name a category (toy).",
+    "ms": "Kenal kategori."
+   },
+   "domain": "Everyday objects",
+   "recommendedAges": [
+    "2-3"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "nature-identify": {
+   "description": {
+    "en": "Recognise nature things (tree, flower, rock, rainbow).",
+    "ms": "Kenal benda alam."
+   },
+   "domain": "Nature and plants",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-2y"
+   ],
+   "alignment": {
+    "source": "cdc-2y",
+    "quote": "Points to things in a book when you ask, like \"Where is the bear?\""
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "weather": {
+   "description": {
+    "en": "Weather and what we use or see in it.",
+    "ms": "Cuaca."
+   },
+   "domain": "Nature and plants",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "plant-needs": {
+   "description": {
+    "en": "What plants need to grow (water, sunlight).",
+    "ms": "Keperluan tumbuhan."
+   },
+   "domain": "Nature and plants",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Standard primary-science fact; not checked against a fetched source."
+  },
+  "plant-growth": {
+   "description": {
+    "en": "Seed, sprout, flower sequence.",
+    "ms": "Biji, anak pokok, bunga."
+   },
+   "domain": "Nature and plants",
+   "recommendedAges": [
+    "4+"
+   ],
+   "sources": [
+    "cdc-4y"
+   ],
+   "alignment": {
+    "source": "cdc-4y",
+    "quote": "Tells what comes next in a well-known story"
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "day-night": {
+   "description": {
+    "en": "Day and night: sun, moon, stars, sleeping.",
+    "ms": "Siang dan malam."
+   },
+   "domain": "Nature and plants",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "sky-identify": {
+   "description": {
+    "en": "Recognise moon, star, sun, rocket, telescope, comet.",
+    "ms": "Kenal benda di langit."
+   },
+   "domain": "Space",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-2y"
+   ],
+   "alignment": {
+    "source": "cdc-2y",
+    "quote": "Points to things in a book when you ask, like \"Where is the bear?\""
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "planets": {
+   "description": {
+    "en": "Earth, Mars, Saturn, Jupiter and the number of planets.",
+    "ms": "Planet."
+   },
+   "domain": "Space",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "nasa-planets",
+    "nasa-mars",
+    "nasa-saturn",
+    "dbp-prpm"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "astronaut": {
+   "description": {
+    "en": "Astronauts, spacesuits, rockets, telescopes and the Moon.",
+    "ms": "Angkasawan."
+   },
+   "domain": "Space",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "sun-moon": {
+   "description": {
+    "en": "The Sun is a star; the Moon goes around Earth; full moon.",
+    "ms": "Matahari dan bulan."
+   },
+   "domain": "Space",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Standard astronomy facts; not checked against a fetched source."
+  },
+  "handwashing": {
+   "description": {
+    "en": "When and how to wash hands.",
+    "ms": "Cuci tangan."
+   },
+   "domain": "Hygiene",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-handwashing"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "toothbrushing": {
+   "description": {
+    "en": "Brush teeth twice a day with a little toothpaste.",
+    "ms": "Gosok gigi."
+   },
+   "domain": "Hygiene",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "aap-toothbrushing"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "hair-care": {
+   "description": {
+    "en": "Washing, drying and combing hair.",
+    "ms": "Jaga rambut."
+   },
+   "domain": "Hygiene",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "body-cleanliness": {
+   "description": {
+    "en": "Bath, tissue, nails, clean clothes.",
+    "ms": "Kebersihan badan."
+   },
+   "domain": "Hygiene",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-handwashing"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "road-safety": {
+   "description": {
+    "en": "Red light means stop, hold an adult's hand, seat belt, helmet.",
+    "ms": "Keselamatan jalan raya."
+   },
+   "domain": "Safety",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-4y",
+    "safekids-pedestrian"
+   ],
+   "alignment": {
+    "source": "cdc-4y",
+    "quote": "Avoids danger, like not jumping from tall heights at the playground"
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "home-safety": {
+   "description": {
+    "en": "Hot pots, sharp knives, medicine, sockets, fire.",
+    "ms": "Keselamatan di rumah."
+   },
+   "domain": "Safety",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-3y"
+   ],
+   "alignment": {
+    "source": "cdc-3y",
+    "quote": "Avoids touching hot objects, like a stove, when you warn her"
+   },
+   "alignmentStrength": "direct",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "manners": {
+   "description": {
+    "en": "Thank you, sorry, sharing, tidying, taking turns.",
+    "ms": "Adab."
+   },
+   "domain": "Social skills",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Prosocial behaviours; no punishment framing."
+  },
+  "healthy-habits": {
+   "description": {
+    "en": "Sleep, water, vegetables, tidy books.",
+    "ms": "Tabiat sihat."
+   },
+   "domain": "Healthy habits",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "emotion-identify": {
+   "description": {
+    "en": "Recognise happy, sad, angry, scared, surprised, sleepy and calm faces.",
+    "ms": "Kenal wajah perasaan."
+   },
+   "domain": "Emotions",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-3y",
+    "msu-emotions"
+   ],
+   "alignment": {
+    "source": "cdc-3y",
+    "quote": "Says what action is happening in a picture or book when asked, like \"running,\" \"eating,\" or \"playing\""
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "emotion-situation": {
+   "description": {
+    "en": "Which feeling fits a simple situation.",
+    "ms": "Perasaan dalam situasi mudah."
+   },
+   "domain": "Emotions",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "msu-emotions"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Situations use \"might feel\" wording because children feel differently."
+  },
+  "emotion-regulation": {
+   "description": {
+    "en": "Calming strategies: deep breaths, hug, tell a grown-up.",
+    "ms": "Cara bertenang."
+   },
+   "domain": "Emotions",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "msu-emotions"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "friendship": {
+   "description": {
+    "en": "Kind responses to friends: hug, share, wave, get help, say thanks.",
+    "ms": "Berkawan."
+   },
+   "domain": "Emotions",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-4y"
+   ],
+   "alignment": {
+    "source": "cdc-4y",
+    "quote": "Comforts others who are hurt or sad, like hugging a crying friend"
+   },
+   "alignmentStrength": "direct",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "shadow-match": {
+   "description": {
+    "en": "Match an animal, object or fruit to its shadow.",
+    "ms": "Padankan dengan bayang-bayang."
+   },
+   "domain": "Patterns and matching",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "canva-worksheets"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "pattern-ab": {
+   "description": {
+    "en": "Continue a simple repeating pattern (AB, AAA).",
+    "ms": "Sambung corak mudah."
+   },
+   "domain": "Patterns and matching",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "cdc-4y",
+    "brightwheel-dc"
+   ],
+   "alignment": {
+    "source": "cdc-4y",
+    "quote": "Tells what comes next in a well-known story"
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "pattern-complex": {
+   "description": {
+    "en": "Continue a three-step or AAB pattern.",
+    "ms": "Sambung corak tiga langkah."
+   },
+   "domain": "Patterns and matching",
+   "recommendedAges": [
+    "4+"
+   ],
+   "sources": [
+    "cdc-4y",
+    "brightwheel-dc"
+   ],
+   "alignment": {
+    "source": "cdc-4y",
+    "quote": "Tells what comes next in a well-known story"
+   },
+   "alignmentStrength": "related",
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "size-compare": {
+   "description": {
+    "en": "Compare size and length (big, small, long).",
+    "ms": "Banding saiz dan panjang."
+   },
+   "domain": "Patterns and matching",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "brightwheel-dc"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  },
+  "size-real-world": {
+   "description": {
+    "en": "Compare real-life animal sizes when the pictures are the same size.",
+    "ms": "Banding saiz sebenar haiwan."
+   },
+   "domain": "Patterns and matching",
+   "recommendedAges": [
+    "3-4",
+    "4+"
+   ],
+   "sources": [],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": ""
+  }
+ }
+}

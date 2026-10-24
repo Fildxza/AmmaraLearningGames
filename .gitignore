@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+
+# local QA output (re-created by the test tools)
+qa/tmp/
+qa/screenshots/
+qa/*.json
+
+# safety copies of earlier releases (kept locally)
+backups/
+
+# editors / OS
+.vscode/
+.idea/
+*.log
+.DS_Store
+Thumbs.db
+
+# verification-only downloads that are not ours to redistribute
+research/sources/quran-com/
+research/sources/tanzil/ms.basmeih.txt
+research/sources/tanzil/trans-list.html
+research/sources/tanzil/trans-doc.html
+research/sources/tanzil/trans-doc2.html

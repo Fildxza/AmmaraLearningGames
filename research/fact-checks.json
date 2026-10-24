@@ -1,0 +1,211 @@
+{
+ "_note": "Claims that were compared with a page the build assistant actually read on 2026-10-24. 'supports' means the page says the same thing. 'consistent-with' means the page gives a definition that matches but does not name the thing outright. Questions not listed here have NOT been fact-checked against a source and are flagged 'needs-human-review' in questions.json where they contain a factual claim. 'evidenceType' says whether 'evidence' is the exact wording seen on the page ('exact-quote') or the assistant's summary of what the page said ('paraphrase-of-fetched-text').",
+ "checks": [
+  {
+   "questions": [
+    "spc-08"
+   ],
+   "claim": "Mars is called the red planet because of rusty iron in the ground.",
+   "source": "nasa-mars",
+   "result": "supports",
+   "evidence": "It's red because of rusty iron in the ground.",
+   "evidenceType": "exact-quote"
+  },
+  {
+   "questions": [
+    "spc-09"
+   ],
+   "claim": "Saturn has beautiful rings made of ice and rock.",
+   "source": "nasa-saturn",
+   "result": "supports",
+   "evidence": "They're made of chunks of ice and rock. / Saturn isn't the only planet to have rings, but it definitely has the most beautiful ones.",
+   "evidenceType": "exact-quote"
+  },
+  {
+   "questions": [
+    "spc-11"
+   ],
+   "claim": "There are eight planets in the solar system.",
+   "source": "nasa-planets",
+   "result": "supports",
+   "evidence": "Our solar system is home to eight amazing planets.",
+   "evidenceType": "exact-quote"
+  },
+  {
+   "questions": [
+    "spc-10"
+   ],
+   "claim": "Jupiter is the biggest planet.",
+   "source": "dbp-prpm",
+   "result": "consistent-with",
+   "evidence": "Musytari: planet terbesar, kelima dari matahari (as summarised from the DBP entry; the NASA Saturn page does not state this).",
+   "evidenceType": "paraphrase-of-fetched-text"
+  },
+  {
+   "questions": [
+    "spc-08",
+    "spc-09",
+    "spc-10"
+   ],
+   "claim": "Malay planet names Marikh (Mars), Zuhal (Saturn), Musytari (Jupiter).",
+   "source": "dbp-prpm",
+   "result": "consistent-with",
+   "evidence": "Marikh: fourth planet from the sun. Zuhal: sixth planet from the sun. Musytari: fifth planet from the sun.",
+   "evidenceType": "paraphrase-of-fetched-text"
+  },
+  {
+   "questions": [
+    "hyg-01"
+   ],
+   "claim": "Wash hands with soap and water.",
+   "source": "cdc-handwashing",
+   "result": "supports",
+   "evidence": "Wet your hands with clean, running water (warm or cold), turn off the tap, and apply soap.",
+   "evidenceType": "exact-quote"
+  },
+  {
+   "questions": [
+    "hyg-02"
+   ],
+   "claim": "Wash hands before eating.",
+   "source": "cdc-handwashing",
+   "result": "supports",
+   "evidence": "Before and after eating food",
+   "evidenceType": "exact-quote"
+  },
+  {
+   "questions": [
+    "hyg-03"
+   ],
+   "claim": "Wash hands after using the toilet.",
+   "source": "cdc-handwashing",
+   "result": "supports",
+   "evidence": "After using the toilet",
+   "evidenceType": "exact-quote"
+  },
+  {
+   "questions": [
+    "hyg-04"
+   ],
+   "claim": "Wash hands after sneezing or blowing the nose.",
+   "source": "cdc-handwashing",
+   "result": "supports",
+   "evidence": "After blowing your nose, coughing, or sneezing",
+   "evidenceType": "exact-quote"
+  },
+  {
+   "questions": [
+    "hyg-05"
+   ],
+   "claim": "Rinse hands under clean running water.",
+   "source": "cdc-handwashing",
+   "result": "supports",
+   "evidence": "Rinse your hands well under clean, running water.",
+   "evidenceType": "exact-quote"
+  },
+  {
+   "questions": [
+    "hyg-06"
+   ],
+   "claim": "Dry hands with a clean towel.",
+   "source": "cdc-handwashing",
+   "result": "supports",
+   "evidence": "Dry your hands using a clean towel or an air dryer.",
+   "evidenceType": "exact-quote"
+  },
+  {
+   "questions": [
+    "hyg-08"
+   ],
+   "claim": "Use a pea-sized amount of fluoride toothpaste from age 3 (rice-grain size from age 2). The question is only offered at ages 3-4 and 4+.",
+   "source": "aap-toothbrushing",
+   "result": "supports",
+   "evidence": "Ages 3 to 5: switch to a pea-sized amount of fluoride toothpaste.",
+   "evidenceType": "paraphrase-of-fetched-text"
+  },
+  {
+   "questions": [
+    "hyg-09"
+   ],
+   "claim": "Brush at least twice a day.",
+   "source": "aap-toothbrushing",
+   "result": "supports",
+   "evidence": "Brush at least twice a day, ideally after breakfast and before bedtime.",
+   "evidenceType": "paraphrase-of-fetched-text"
+  },
+  {
+   "questions": [
+    "hyg-10"
+   ],
+   "claim": "Brush before bedtime.",
+   "source": "aap-toothbrushing",
+   "result": "supports",
+   "evidence": "ideally after breakfast and before bedtime",
+   "evidenceType": "paraphrase-of-fetched-text"
+  },
+  {
+   "questions": [
+    "hyg-20"
+   ],
+   "claim": "A pengetip kuku trims nails.",
+   "source": "dbp-prpm",
+   "result": "supports",
+   "evidence": "pengetip: sj alat utk memotong atau mengerat kuku",
+   "evidenceType": "exact-quote"
+  },
+  {
+   "questions": [
+    "ani-22"
+   ],
+   "claim": "A kangaroo hops and the female carries her young in a pouch (spelling: kanggaru).",
+   "source": "dbp-prpm",
+   "result": "supports",
+   "evidence": "haiwan di Australia yang berkaki belakang panjang dan bergerak melompat; betina membawa anak dalam kantung di perutnya.",
+   "evidenceType": "paraphrase-of-fetched-text"
+  },
+  {
+   "questions": [
+    "ani-15",
+    "ani-18",
+    "pat-12",
+    "pat-25"
+   ],
+   "claim": "Zirafah (giraffe) is tall with a long neck and a spotted body (spelling: zirafah).",
+   "source": "dbp-prpm",
+   "result": "supports",
+   "evidence": "haiwan yang tinggi dan berleher panjang, badannya berbintik-bintik",
+   "evidenceType": "paraphrase-of-fetched-text"
+  },
+  {
+   "questions": [
+    "saf-05",
+    "saf-06"
+   ],
+   "claim": "Topi keledar / tali pinggang keledar are protective gear worn for safety.",
+   "source": "dbp-prpm",
+   "result": "supports",
+   "evidence": "topi (tali pinggang) yg dipakai utk keselamatan sbg persediaan menghadapi bahaya",
+   "evidenceType": "exact-quote"
+  },
+  {
+   "questions": [
+    "saf-03"
+   ],
+   "claim": "Young children cross the road with an adult.",
+   "source": "safekids-pedestrian",
+   "result": "supports",
+   "evidence": "Children under 10 need to cross the street with an adult. (search-result summary only; the PDF itself was not read)",
+   "evidenceType": "exact-quote"
+  },
+  {
+   "questions": [
+    "saf-07"
+   ],
+   "claim": "Children around 3 can avoid touching hot objects such as a stove when warned.",
+   "source": "cdc-3y",
+   "result": "supports",
+   "evidence": "Avoids touching hot objects, like a stove, when you warn her",
+   "evidenceType": "exact-quote"
+  }
+ ]
+}

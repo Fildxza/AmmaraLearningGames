@@ -1,0 +1,33 @@
+{
+  "name": "ammaragames",
+  "version": "2.0.0",
+  "private": true,
+  "description": "AmmaraGames - offline 3D preschool learning world: big preschool + garden, mini-game arcade, Jom Mengaji (Hijaiyah & short surahs), single HTML file",
+  "type": "module",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "test": "node --test tests/unit/*.test.mjs",
+    "e2e": "node tests/e2e/run-e2e.mjs",
+    "e2e:edge": "node tests/e2e/run-e2e.mjs edge",
+    "research": "node tools/export-research.mjs",
+    "preview": "node tools/serve.mjs 5500",
+    "report": "node tools/make-test-report.mjs",
+    "perf": "node tools/perf.mjs",
+    "icons": "node tools/icon-sheet.mjs",
+    "e2e:upgrade": "node tests/e2e/run-e2e-upgrade.mjs",
+    "e2e:upgrade:edge": "node tests/e2e/run-e2e-upgrade.mjs edge",
+    "e2e:all": "node tests/e2e/run-e2e.mjs && node tests/e2e/run-e2e-upgrade.mjs",
+    "play-games": "node tools/play-games.mjs",
+    "tour": "node tools/tour.mjs"
+  },
+  "devDependencies": {
+    "@fontsource-variable/fredoka": "5.3.0",
+    "@fontsource/amiri-quran": "^5.3.0",
+    "@fontsource/noto-naskh-arabic": "^5.3.0",
+    "@fontsource/scheherazade-new": "^5.3.0",
+    "esbuild": "0.28.2",
+    "puppeteer-core": "25.16.0",
+    "three": "0.186.1"
+  },
+  "license": "MIT"
+}

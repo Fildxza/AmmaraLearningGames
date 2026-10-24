@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="AmmaraGames — an offline 3D learning playroom for children aged 2 to 4+. Works without internet; progress stays on this computer.">
+<meta name="color-scheme" content="light">
+<title>AmmaraGames</title>
+<!--
+  ============================================================================
+  AmmaraGames — single-file offline game.
+  TEACHERS: everything you may want to change (game title, character, questions,
+  answers, rewards, sounds, classroom options) is in the FIRST <script> below,
+  in the object called AMMARA_CONFIG. Edit it with Notepad and save.
+  The large script at the bottom of the file is the game engine — no need to touch it.
+  ============================================================================
+-->
+<script id="ammara-config">
+/*@@CONFIG@@*/
+</script>
+<style>
+/*@@FONT@@*/
+/*@@CSS@@*/
+</style>
+</head>
+<body data-state="BOOT">
+<div id="app">
+  <div id="sky" aria-hidden="true">
+    <span class="cloud c1"></span><span class="cloud c2"></span><span class="cloud c3"></span><span class="cloud c4"></span>
+    <span class="floaty f1"></span><span class="floaty f2"></span><span class="floaty f3"></span><span class="floaty f4"></span><span class="floaty f5"></span><span class="floaty f6"></span>
+  </div>
+  <canvas id="scene" aria-label="3D playroom" tabindex="-1"></canvas>
+  <div id="paper" aria-hidden="true"></div>
+  <main id="ui">
+    <section id="loader" class="screen show" aria-live="polite">
+      <div class="loader-card">
+        <svg class="loader-star" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 8 L61 36 L92 38 L68 58 L76 88 L50 71 L24 88 L32 58 L8 38 L39 36 Z" fill="#ffd84f" stroke="#5b3f33" stroke-width="4" stroke-linejoin="round"/><circle cx="41" cy="52" r="4" fill="#3d3436"/><circle cx="59" cy="52" r="4" fill="#3d3436"/><path d="M44 61 Q50 66 56 61" fill="none" stroke="#5b3f33" stroke-width="3" stroke-linecap="round"/></svg>
+        <h1 id="loader-title">AmmaraGames</h1>
+        <div class="loader-track"><i id="loader-bar"></i></div>
+        <p id="loader-text">…</p>
+        <noscript><p>Sila hidupkan JavaScript. / Please enable JavaScript.</p></noscript>
+      </div>
+    </section>
+    <section id="menu" class="screen" hidden></section>
+    <section id="worlds" class="screen" hidden></section>
+    <section id="hud" class="screen" hidden></section>
+    <section id="arcade" class="screen" hidden></section>
+    <section id="minigame" class="screen" hidden></section>
+    <section id="islamic" class="screen" hidden></section>
+    <section id="collection" class="screen" hidden></section>
+    <section id="complete" class="screen" hidden></section>
+    <section id="cards" class="screen" hidden></section>
+    <section id="nogl" class="screen" hidden></section>
+  </main>
+  <div id="teacher" class="overlay" hidden></div>
+  <div id="quiz" class="modal" hidden></div>
+  <div id="pause" class="modal" hidden></div>
+  <div id="gate" class="modal" hidden></div>
+  <div id="map" class="modal" hidden></div>
+  <div id="audio" class="modal" hidden></div>
+  <div id="dialog" class="modal" hidden></div>
+  <div id="toasts" aria-live="polite"></div>
+  <svg id="ag-defs" width="0" height="0" style="position:absolute;width:0;height:0" aria-hidden="true" focusable="false"></svg>
+</div>
+<script id="ammara-engine">
+/*@@ENGINE@@*/
+</script>
+</body>
+</html>

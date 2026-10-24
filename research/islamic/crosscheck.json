@@ -1,0 +1,150 @@
+{
+ "source": "https://api.quran.com/api/v4/quran/verses/uthmani?chapter_number=N",
+ "purpose": "Independent check of the consonant skeleton (marks removed, alef/yeh/hamza variants merged). Not bundled.",
+ "checkedAt": "2026-10-24T16:16:21.952Z",
+ "surahs": [
+  {
+   "no": 1,
+   "tanzilAyahs": 7,
+   "otherAyahs": 7,
+   "ayahMismatches": [],
+   "exactMatches": 7
+  },
+  {
+   "no": 114,
+   "tanzilAyahs": 6,
+   "otherAyahs": 6,
+   "ayahMismatches": [],
+   "exactMatches": 6
+  },
+  {
+   "no": 113,
+   "tanzilAyahs": 5,
+   "otherAyahs": 5,
+   "ayahMismatches": [],
+   "exactMatches": 5
+  },
+  {
+   "no": 112,
+   "tanzilAyahs": 4,
+   "otherAyahs": 4,
+   "ayahMismatches": [],
+   "exactMatches": 4
+  },
+  {
+   "no": 111,
+   "tanzilAyahs": 5,
+   "otherAyahs": 5,
+   "ayahMismatches": [],
+   "exactMatches": 5
+  },
+  {
+   "no": 110,
+   "tanzilAyahs": 3,
+   "otherAyahs": 3,
+   "ayahMismatches": [],
+   "exactMatches": 3
+  },
+  {
+   "no": 109,
+   "tanzilAyahs": 6,
+   "otherAyahs": 6,
+   "ayahMismatches": [],
+   "exactMatches": 6
+  },
+  {
+   "no": 108,
+   "tanzilAyahs": 3,
+   "otherAyahs": 3,
+   "ayahMismatches": [],
+   "exactMatches": 3
+  },
+  {
+   "no": 107,
+   "tanzilAyahs": 7,
+   "otherAyahs": 7,
+   "ayahMismatches": [],
+   "exactMatches": 7
+  },
+  {
+   "no": 106,
+   "tanzilAyahs": 4,
+   "otherAyahs": 4,
+   "ayahMismatches": [],
+   "exactMatches": 4
+  },
+  {
+   "no": 105,
+   "tanzilAyahs": 5,
+   "otherAyahs": 5,
+   "ayahMismatches": [],
+   "exactMatches": 5
+  },
+  {
+   "no": 104,
+   "tanzilAyahs": 9,
+   "otherAyahs": 9,
+   "ayahMismatches": [],
+   "exactMatches": 9
+  },
+  {
+   "no": 103,
+   "tanzilAyahs": 3,
+   "otherAyahs": 3,
+   "ayahMismatches": [],
+   "exactMatches": 3
+  },
+  {
+   "no": 102,
+   "tanzilAyahs": 8,
+   "otherAyahs": 8,
+   "ayahMismatches": [],
+   "exactMatches": 8
+  },
+  {
+   "no": 101,
+   "tanzilAyahs": 11,
+   "otherAyahs": 11,
+   "ayahMismatches": [],
+   "exactMatches": 11
+  },
+  {
+   "no": 100,
+   "tanzilAyahs": 11,
+   "otherAyahs": 11,
+   "ayahMismatches": [],
+   "exactMatches": 10
+  },
+  {
+   "no": 99,
+   "tanzilAyahs": 8,
+   "otherAyahs": 8,
+   "ayahMismatches": [],
+   "exactMatches": 8
+  },
+  {
+   "no": 98,
+   "tanzilAyahs": 8,
+   "otherAyahs": 8,
+   "ayahMismatches": [],
+   "exactMatches": 8
+  },
+  {
+   "no": 97,
+   "tanzilAyahs": 5,
+   "otherAyahs": 5,
+   "ayahMismatches": [],
+   "exactMatches": 5
+  },
+  {
+   "no": 96,
+   "tanzilAyahs": 19,
+   "otherAyahs": 19,
+   "ayahMismatches": [],
+   "exactMatches": 19
+  }
+ ],
+ "totalAyahs": 137,
+ "exactMatches": 136,
+ "skeletonMismatches": 0
+}

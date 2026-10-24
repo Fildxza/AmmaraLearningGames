@@ -1,0 +1,153 @@
+{
+ "total": 392,
+ "perCategory": {
+  "abc": {
+   "questions": 29,
+   "distinctQuestionAnswerPairs": 29,
+   "objectives": 5,
+   "factChecked": 0,
+   "lowRiskVisual": 29,
+   "needsHumanReview": 0
+  },
+  "numbers": {
+   "questions": 28,
+   "distinctQuestionAnswerPairs": 28,
+   "objectives": 5,
+   "factChecked": 0,
+   "lowRiskVisual": 28,
+   "needsHumanReview": 0
+  },
+  "colors": {
+   "questions": 27,
+   "distinctQuestionAnswerPairs": 27,
+   "objectives": 5,
+   "factChecked": 0,
+   "lowRiskVisual": 16,
+   "needsHumanReview": 11
+  },
+  "shapes": {
+   "questions": 24,
+   "distinctQuestionAnswerPairs": 24,
+   "objectives": 6,
+   "factChecked": 0,
+   "lowRiskVisual": 20,
+   "needsHumanReview": 4
+  },
+  "animals": {
+   "questions": 30,
+   "distinctQuestionAnswerPairs": 30,
+   "objectives": 4,
+   "factChecked": 3,
+   "lowRiskVisual": 6,
+   "needsHumanReview": 21
+  },
+  "food": {
+   "questions": 28,
+   "distinctQuestionAnswerPairs": 28,
+   "objectives": 6,
+   "factChecked": 0,
+   "lowRiskVisual": 16,
+   "needsHumanReview": 12
+  },
+  "vehicles": {
+   "questions": 25,
+   "distinctQuestionAnswerPairs": 25,
+   "objectives": 5,
+   "factChecked": 0,
+   "lowRiskVisual": 9,
+   "needsHumanReview": 16
+  },
+  "body": {
+   "questions": 25,
+   "distinctQuestionAnswerPairs": 25,
+   "objectives": 4,
+   "factChecked": 0,
+   "lowRiskVisual": 13,
+   "needsHumanReview": 12
+  },
+  "objects": {
+   "questions": 29,
+   "distinctQuestionAnswerPairs": 29,
+   "objectives": 6,
+   "factChecked": 0,
+   "lowRiskVisual": 16,
+   "needsHumanReview": 13
+  },
+  "nature": {
+   "questions": 24,
+   "distinctQuestionAnswerPairs": 24,
+   "objectives": 5,
+   "factChecked": 0,
+   "lowRiskVisual": 6,
+   "needsHumanReview": 18
+  },
+  "space": {
+   "questions": 23,
+   "distinctQuestionAnswerPairs": 23,
+   "objectives": 5,
+   "factChecked": 4,
+   "lowRiskVisual": 7,
+   "needsHumanReview": 12
+  },
+  "hygiene": {
+   "questions": 23,
+   "distinctQuestionAnswerPairs": 23,
+   "objectives": 4,
+   "factChecked": 10,
+   "lowRiskVisual": 0,
+   "needsHumanReview": 13
+  },
+  "safety": {
+   "questions": 25,
+   "distinctQuestionAnswerPairs": 25,
+   "objectives": 4,
+   "factChecked": 4,
+   "lowRiskVisual": 0,
+   "needsHumanReview": 21
+  },
+  "emotions": {
+   "questions": 25,
+   "distinctQuestionAnswerPairs": 25,
+   "objectives": 4,
+   "factChecked": 0,
+   "lowRiskVisual": 8,
+   "needsHumanReview": 17
+  },
+  "patterns": {
+   "questions": 27,
+   "distinctQuestionAnswerPairs": 27,
+   "objectives": 6,
+   "factChecked": 2,
+   "lowRiskVisual": 23,
+   "needsHumanReview": 2
+  }
+ },
+ "perAge": {
+  "2-3": 155,
+  "3-4": 263,
+  "4+": 199
+ },
+ "perDifficulty": {
+  "1": 155,
+  "2": 159,
+  "3": 78
+ },
+ "perInteractionType": {
+  "choose": 276,
+  "match": 47,
+  "count": 17,
+  "compare": 10,
+  "sequence": 4,
+  "sound": 12,
+  "sort": 6,
+  "odd-one-out": 5,
+  "shadow": 7,
+  "pattern": 8
+ },
+ "perVerificationStatus": {
+  "visual-identification-low-risk": 197,
+  "needs-human-review": 172,
+  "fact-checked-against-source": 23
+ },
+ "objectivesUsed": 72
+}
