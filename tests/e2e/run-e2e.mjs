@@ -366,7 +366,9 @@ await check(17, 'World selection works and loads that world’s stations and que
   await waitState(page, 'PLAYROOM');
   await sleep(1500);
   const g = await game(page);
-  assert(g.worldId === 'animals' && g.run.stations.every((s) => s.questionId.startsWith('ani-')), JSON.stringify(g.run.stations.map((s) => s.questionId)));
+  // every question picked belongs to one of the animal world's stations (whatever its id looks like)
+  const own = await page.evaluate((ids) => { const cfg = window.AMMARA_CONFIG; const w = cfg.worlds.find((x) => x.id === 'animals'); const byId = Object.fromEntries(cfg.questions.map((q) => [q.id, q])); return ids.every((id) => byId[id] && w.stations.includes(byId[id].station)); }, g.run.stations.map((s) => s.questionId));
+  assert(g.worldId === 'animals' && own, JSON.stringify(g.run.stations.map((s) => s.questionId)));
   await shot(page, 'animals-world');
   return `16 worlds listed; animals questions ${g.run.stations.map((s) => s.questionId).join(',')}`;
 });
@@ -666,11 +668,12 @@ await check(21.1, 'Settings and info tabs render (privacy text, diagnostics, sto
   await page.click('[data-testid=t-tab-info]');
   await sleep(200);
   const txt = await page.$eval('.t-body', (e) => e.textContent);
-  assert(/storan|storage/i.test(txt) && /392/.test(txt), 'info text');
+  const nq = await page.evaluate(() => window.AMMARA_CONFIG.questions.length);
   await shot(page, 'teacher-info');
-  await page.click('[data-testid=t-exit]');
+  await page.click('[data-testid=t-exit]');                       // leave first, so a failed check cannot strand later tests here
   await waitState(page, 'MAIN_MENU');
-  return 'info shows 392 valid questions and storage status';
+  assert(/storan|storage/i.test(txt) && new RegExp('\\b' + nq + '\\b').test(txt), `info text (expected ${nq} questions)`);
+  return `info shows ${nq} valid questions and storage status`;
 });
 await check(28, 'Window resizing keeps menus, HUD and quiz on screen', async () => {
   await page.click('[data-testid=menu-play]');

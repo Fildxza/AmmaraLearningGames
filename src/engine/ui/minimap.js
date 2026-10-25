@@ -4,6 +4,8 @@ import { MAP, BUILDING, DOOR, ZONES, POIS, SPAWN, YARD_SPAWN, zoneAt } from '../
 import { t, getLang } from '../i18n.js';
 import { tr } from '../core/labels.js';
 import { G } from './glyphs.js';
+import { drawTown, pickTown, landmarkArrival } from './townmap.js';
+import { LANDMARKS } from '../city/plan.js';
 
 const FONT = 'Fredoka, system-ui, sans-serif';
 const W = MAP.maxX - MAP.minX, H = MAP.maxZ - MAP.minZ;
@@ -96,29 +98,71 @@ export function drawMap(canvas, { player, stations = [], labels = false, lang = 
   return { k, ox, oz };
 }
 
-export function createMinimap({ onGo, onClose }) {
+const inSchool = (p) => !p || (p.x >= MAP.minX && p.x <= MAP.maxX && p.z >= MAP.minZ && p.z <= MAP.maxZ);
+
+export function createMinimap({ onGo, onClose, iconFor = () => '' }) {
   const small = $('#hud .minimap canvas');
   const root = $('#map');
-  let big = null, last = { player: null, stations: [] }, timer = null, geo = null;
+  let big = null, town = null, townGeo = null, tab = 'school', last = { player: null, stations: [] }, timer = null, geo = null;
+  const townCache = {};
 
   function render() {
-    root.innerHTML = `<div class="dialog-card map-card" role="dialog" aria-modal="true" aria-labelledby="map-title">
-      <div class="map-head"><h2 id="map-title">${esc(t('mapTitle'))}</h2><button class="icon-btn" data-act="close" data-testid="map-close" aria-label="${esc(t('close'))}">${G.close}</button></div>
-      <p class="map-hint">${esc(t('mapTapHint'))}</p>
+    const tabs = `<div class="map-tabs" role="tablist">
+        <button role="tab" class="map-tab${tab === 'school' ? ' on' : ''}" aria-selected="${tab === 'school'}" data-act="tab-school" data-testid="map-tab-school">${G.home}<span>${esc(t('mapSchoolTab'))}</span></button>
+        <button role="tab" class="map-tab${tab === 'town' ? ' on' : ''}" aria-selected="${tab === 'town'}" data-act="tab-town" data-testid="map-tab-town">${G.map}<span>${esc(t('mapTownTab'))}</span></button>
+      </div>`;
+    const body = tab === 'school'
+      ? `<p class="map-hint">${esc(t('mapTapHint'))}</p>
       <canvas class="map-big" width="1080" height="396" data-testid="map-canvas"></canvas>
       <div class="map-actions">
         <button class="btn btn-peach" data-act="start" data-testid="map-start">${G.star}<span>${esc(t('goStart'))}</span></button>
         <button class="btn btn-lav" data-act="door" data-testid="map-door">${G.home}<span>${esc(t('goDoor'))}</span></button>
-      </div></div>`;
+      </div>`
+      : `<p class="map-hint">${esc(t('townTapHint'))}</p>
+      <div class="town-wrap">
+        <canvas class="map-town" width="620" height="620" data-testid="map-town"></canvas>
+        <div class="town-list">
+          <button class="town-go home" data-go="home" data-testid="town-go-home"><span class="tg-ic">${iconFor('star')}</span><span>${esc(t('backToSchool'))}</span></button>
+          ${LANDMARKS.map((l) => `<button class="town-go" data-go="${l.id}" data-testid="town-go-${l.id}" style="--lc:${l.color}"><span class="tg-ic">${iconFor(l.icon)}</span><span>${esc(tr(l.name, getLang()))}</span></button>`).join('')}
+        </div>
+      </div>`;
+    root.innerHTML = `<div class="dialog-card map-card" role="dialog" aria-modal="true" aria-labelledby="map-title">
+      <div class="map-head"><h2 id="map-title">${esc(t(tab === 'school' ? 'mapTitle' : 'mapTownTitle'))}</h2><button class="icon-btn" data-act="close" data-testid="map-close" aria-label="${esc(t('close'))}">${G.close}</button></div>
+      ${tabs}${body}</div>`;
     big = $('.map-big', root);
+    town = $('.map-town', root);
     paintBig();
   }
-  function paintBig() { if (big) geo = drawMap(big, { player: last.player, stations: last.stations, labels: true, time: performance.now() / 1000 }); }
+  function paintBig() {
+    const time = performance.now() / 1000;
+    if (big) geo = drawMap(big, { player: inSchool(last.player) ? last.player : null, stations: last.stations, labels: true, time });
+    if (town) townGeo = drawTown(town, { player: last.player, time, cache: townCache });
+  }
+  function travelTo(id) {
+    if (id === 'home') { api.close(); onGo({ kind: 'home' }); return; }
+    const l = LANDMARKS.find((q) => q.id === id);
+    if (!l) return;
+    const a = landmarkArrival(l);
+    api.close();
+    onGo({ kind: 'travel', x: a.x, z: a.z, name: l.name, id: l.id });
+  }
 
   root.addEventListener('click', (e) => {
+    const go = e.target.closest('[data-go]');
+    if (go) { travelTo(go.dataset.go); return; }
+    if (e.target === town && townGeo) {
+      const r = town.getBoundingClientRect();
+      const hit = pickTown(townGeo, ((e.clientX - r.left) / r.width) * town.width, ((e.clientY - r.top) / r.height) * town.height, 18);
+      if (!hit) return;
+      if (hit.kind === 'home') travelTo('home');
+      else if (hit.kind === 'landmark') travelTo(hit.landmark.id);
+      else { api.close(); onGo({ kind: 'travel', x: hit.stop.x, z: hit.stop.z, name: hit.stop.label, id: hit.stop.id }); }
+      return;
+    }
     const b = e.target.closest('[data-act]');
     if (b) {
       if (b.dataset.act === 'close') api.close();
+      else if (b.dataset.act === 'tab-school' || b.dataset.act === 'tab-town') { tab = b.dataset.act.slice(4); render(); const f = $(`[data-act="${b.dataset.act}"]`, root); if (f) f.focus(); }
       else if (b.dataset.act === 'start') { api.close(); onGo({ x: SPAWN.x, z: SPAWN.z, kind: 'start' }); }
       else if (b.dataset.act === 'door') { api.close(); onGo({ x: DOOR.x + (last.player && last.player.x > DOOR.x ? 2.4 : -2.4), z: DOOR.z, kind: 'door' }); }
       return;
@@ -143,9 +187,13 @@ export function createMinimap({ onGo, onClose }) {
   const api = {
     update(player, stations, time) {
       last = { player, stations };
-      if (small) drawMap(small, { player, stations, labels: false, time });
+      if (!small) return;
+      // out in the town the corner map shows the streets around the child
+      if (inSchool(player)) drawMap(small, { player, stations, labels: false, time });
+      else drawTown(small, { player, view: { x: player.x, z: player.z, span: 420 }, time });
     },
     open() {
+      tab = inSchool(last.player) ? 'school' : 'town';
       render();
       show(root, true);
       timer = setInterval(paintBig, 200);

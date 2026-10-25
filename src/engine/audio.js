@@ -62,8 +62,18 @@ const SONGS = {
     drums: true, pad: false
   }
 };
+// the town: a bouncy, busy-street tune
+SONGS.town = {
+  bpm: 116,
+  chords: [[48, 52, 55], [53, 57, 60], [55, 59, 62], [48, 52, 55], [45, 48, 52], [53, 57, 60], [55, 59, 62], [48, 52, 55]],
+  melody: [
+    [[0, 79, 1], [1, 81, 1], [2, 84, 2], [4, 81, 1], [6, 79, 2]], [[0, 77, 1], [2, 81, 1], [4, 84, 2], [6, 81, 1]], [[0, 83, 1], [2, 86, 1], [4, 83, 1], [6, 79, 2]], [[0, 84, 3], [4, 79, 2]],
+    [[0, 76, 1], [1, 79, 1], [2, 81, 2], [4, 84, 1], [6, 81, 1]], [[0, 77, 1], [2, 81, 1], [4, 86, 2]], [[0, 86, 1], [1, 84, 1], [2, 83, 1], [4, 81, 2]], [[0, 84, 4]]
+  ],
+  drums: true, pad: false, soft: true
+};
 // Which song belongs to which scene. 'playroom' uses the style the teacher/child picked (cheerful or calm).
-const SCENE_SONG = { playroom: null, calm: 'calm', yard: 'yard', arcade: 'arcade', islamic: 'islamic', reward: 'reward' };
+const SCENE_SONG = { playroom: null, calm: 'calm', yard: 'yard', arcade: 'arcade', islamic: 'islamic', reward: 'reward', town: 'town' };
 
 export function createAudio(initial, onError = () => {}) {
   let ctx = null, master, musicBus, sfxBus, comp, noiseBuf;

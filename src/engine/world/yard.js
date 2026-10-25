@@ -3,7 +3,7 @@
 import { Group, Mesh, PlaneGeometry, InstancedMesh, Object3D, Color, SphereGeometry, CylinderGeometry, MeshBasicMaterial, DoubleSide } from 'three';
 import { box, ball, cyl, cone, torus, star3d, heart3d, group, at, cachedGeo, live, mergeStatic } from './kit.js';
 import { toon, lambert, basic, grassTexture, stonePathTexture, sandTexture, checkerTexture, tint, makeCanvas, canvasTexture, roundRect } from './paint.js';
-import { YARD, MAP, DOOR, BUILDING, ZONES, YARD_SOLIDS, POIS, zoneAt, zoneById, poiById } from './layout.js';
+import { YARD, MAP, DOOR, BUILDING, ZONES, YARD_SOLIDS, POIS, GATES, zoneAt, zoneById, poiById } from './layout.js';
 import { createRng } from '../core/rng.js';
 import { createSign, boardTexture } from './signs.js';
 import { poiMarker } from './zones.js';
@@ -82,9 +82,13 @@ export function buildYard(scene, { iconSvg }) {
       hedgeItems.push({ x: x0 + (x1 - x0) * t + (rng.next() - 0.5) * 0.3, z: z0 + (z1 - z0) * t + (rng.next() - 0.5) * 0.3, y, s: s * (0.9 + rng.next() * 0.3), c: HC[i % HC.length] });
     }
   };
+  // (the gaps are the two gates out to the town, see GATES in layout.js)
+  const [GS, GE] = GATES;
   addHedge(YARD.minX + 0.9, MAP.minZ - 0.45, YARD.maxX + 0.5, MAP.minZ - 0.45, 0.45, 1.05);
-  addHedge(YARD.maxX + 0.0, MAP.minZ, YARD.maxX + 0.0, MAP.maxZ, 0.45, 1.05);
-  addHedge(YARD.minX + 0.9, MAP.maxZ + 0.45, YARD.maxX + 0.5, MAP.maxZ + 0.45, 0.3, 0.8);
+  addHedge(YARD.maxX + 0.0, MAP.minZ, YARD.maxX + 0.0, GE.z0 - 1.0, 0.45, 1.05);
+  addHedge(YARD.maxX + 0.0, GE.z1 + 1.0, YARD.maxX + 0.0, MAP.maxZ, 0.45, 1.05);
+  addHedge(YARD.minX + 0.9, MAP.maxZ + 0.45, GS.x0 - 1.0, MAP.maxZ + 0.45, 0.3, 0.8);
+  addHedge(GS.x1 + 1.0, MAP.maxZ + 0.45, YARD.maxX + 0.5, MAP.maxZ + 0.45, 0.3, 0.8);
   const hedge = new InstancedMesh(cachedGeo('hedgeball', () => new SphereGeometry(1, 12, 8)), toon('#ffffff'), hedgeItems.length);
   const tmp = new Object3D(), col = new Color();
   hedgeItems.forEach((h, i) => { tmp.position.set(h.x, h.y, h.z); tmp.scale.set(h.s, h.s * 0.85, h.s); tmp.rotation.set(0, rng.next() * 6, 0); tmp.updateMatrix(); hedge.setMatrixAt(i, tmp.matrix); hedge.setColorAt(i, col.set(h.c)); });
@@ -104,7 +108,12 @@ export function buildYard(scene, { iconSvg }) {
   common.add(hedgeFl);
   // lamp posts stand inside the hedge line, so nobody can walk into them
   for (const x of [20, 34, 48, 58]) { common.add(at(lampPost(), x, 0, MAP.minZ - 0.4)); }
-  for (const z of [-14, -2, 10, 18]) common.add(at(lampPost(), YARD.maxX + 0.2, 0, z));
+  for (const z of [-14, -9, 10, 18]) common.add(at(lampPost(), YARD.maxX + 0.2, 0, z));
+  // rainbow arches over the two gates
+  const arch = (w) => group(cyl(0.25, 0.25, 3.4, '#ff8fc0', { x: -w / 2, y: 1.7, seg: 10, outline: 0.02 }), cyl(0.25, 0.25, 3.4, '#ff8fc0', { x: w / 2, y: 1.7, seg: 10, outline: 0.02 }),
+    torus(w / 2, 0.22, '#ffd23f', { y: 3.4, arc: Math.PI, outline: 0.02 }), torus(w / 2 - 0.4, 0.18, '#7fcbff', { y: 3.4, arc: Math.PI, outline: 0.015 }), star3d(0.45, 0.16, '#ffffff', { y: 3.4 + w / 2 + 0.3, outline: 0.02 }));
+  common.add(at(arch(GS.x1 - GS.x0 + 1), (GS.x0 + GS.x1) / 2, 0, MAP.maxZ + 0.3));
+  common.add(at(arch(GE.z1 - GE.z0 + 1.2), YARD.maxX + 0.2, 0, (GE.z0 + GE.z1) / 2, Math.PI / 2));
 
   // ---------- trees, each standing in a little tree bed that fills the collider ----------------------------------------------------
   YARD_SOLIDS.trees.forEach(([x, z, r], i) => {
@@ -294,12 +303,7 @@ export function buildYard(scene, { iconSvg }) {
   stems.userData.keep = true; heads.userData.keep = true;
   common.add(stems, heads);
 
-  // ---------- far hills and clouds -----------------------------------------------------------------------------------------------------------------------------
-  const hills = [[18, -48, 30, 9, '#8fd27a'], [58, -52, 36, 12, '#7cc76c'], [96, -34, 28, 10, '#9be082'], [92, 4, 22, 8, '#86cd74'], [90, 38, 26, 9, '#8fd27a'], [-24, -56, 34, 11, '#86cd74'], [-70, -40, 30, 9, '#9be082']];
-  for (const [x, z, r, h, c] of hills) {
-    const m = new Mesh(cachedGeo('hill', () => new SphereGeometry(1, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2)), toon(c));
-    m.scale.set(r, h, r * 0.8); m.position.set(x, -0.1, z); m.receiveShadow = false; common.add(m);
-  }
+  // ---------- clouds (the far hills are part of the town now)
   const clouds = [];
   const cloudMat = new MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.92, depthWrite: false });
   for (let i = 0; i < 6; i++) {

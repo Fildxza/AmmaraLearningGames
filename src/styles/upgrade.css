@@ -46,6 +46,23 @@
 .map-big { width: 100%; height: auto; display: block; background: #eaf7ff; border: 3px solid var(--brown); border-radius: 22px; cursor: pointer; touch-action: manipulation; }
 .map-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 14px; }
 .map-actions .btn { min-height: 58px; font-size: 22px; padding: 0 24px; }
+.map-tabs { display: flex; gap: 10px; justify-content: center; margin: 2px 0 6px; }
+.map-tab { display: inline-flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 22px; border-radius: 999px; border: 3px solid var(--brown); background: #fffdf8; font: 700 21px var(--font); color: var(--ink); cursor: pointer; box-shadow: 0 4px 0 #e3d2bf; }
+.map-tab svg { width: 26px; height: 26px; }
+.map-tab.on { background: var(--butter); }
+.town-wrap { display: flex; gap: 14px; align-items: flex-start; }
+.map-town { width: min(560px, 52vw); aspect-ratio: 1; height: auto; flex: none; display: block; background: #cfeec0; border: 3px solid var(--brown); border-radius: 22px; cursor: pointer; touch-action: manipulation; }
+.town-list { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(178px, 1fr)); gap: 8px; max-height: min(560px, 62vh); overflow: auto; padding: 2px; }
+.town-go { display: flex; align-items: center; gap: 8px; min-height: 54px; padding: 4px 10px 4px 6px; border-radius: 16px; border: 3px solid var(--lc, var(--brown)); background: #fffdf8; font: 600 17px var(--font); color: var(--ink); text-align: left; cursor: pointer; line-height: 1.1; }
+.town-go.home { border-color: #ff8fc0; background: #fff0f6; }
+.town-go:active { transform: translateY(2px); }
+.town-go .tg-ic { width: 40px; height: 40px; flex: none; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--lc, #ff8fc0) 22%, #fff); }
+.town-go .tg-ic svg { width: 32px; height: 32px; }
+@media (max-width: 760px) {
+  .town-wrap { flex-direction: column; align-items: stretch; }
+  .map-town { width: 100%; }
+  .town-list { max-height: none; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
 /* ---------- voice & sound panel ---------- */
 #audio { z-index: 24; }

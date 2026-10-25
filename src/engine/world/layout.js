@@ -118,6 +118,14 @@ export const YARD_SOLIDS = {
   chalkboard: { x0: 50.6, z0: 2.4, x1: 53.4, z1: 3.2 }
 };
 
+// Gates in the garden hedge (to the town). The strips here are 'novehicle' barriers: open for children only.
+export const GATES = [{ x0: 36, z0: 21.2, x1: 44, z1: 23.2, side: 'south' }, { x0: 61.2, z0: -4, x1: 64.2, z1: 2, side: 'east' }];
+/** Barriers that only unicorns and cars bump into: the doorway and the garden gates (children walk through). */
+export function addVehicleBarriers(w) {
+  addBox(w, BUILDING.maxX - 0.5, DOOR.z - DOOR.width / 2, BUILDING.maxX + 0.5, DOOR.z + DOOR.width / 2, 'novehicle');
+  for (const g of GATES) addBox(w, g.x0, g.z0, g.x1, g.z1, 'novehicle');
+  addBox(w, BUILDING.minX - 1, BUILDING.maxZ, BUILDING.maxX + WALL_T / 2, BUILDING.maxZ + 0.6, 'novehicle');
+}
 // Hedges close the yard on three sides and trim the far edge of the front gate.
 function hedge(w, x0, z0, x1, z1) { addBox(w, x0, z0, x1, z1, 'static'); }
 
@@ -149,8 +157,11 @@ export function addStaticColliders(w) {
   addBox(w, BUILDING.minX - 1, BUILDING.maxZ, BUILDING.maxX + T2, MAP.maxZ + 1, 'static');        // south of the open front (foam fence)
   addBox(w, BUILDING.maxX - T2, BUILDING.minZ, BUILDING.maxX + T2, DOOR.z - DOOR.width / 2, 'static'); // east wall, north of the door
   addBox(w, BUILDING.maxX - T2, DOOR.z + DOOR.width / 2, BUILDING.maxX + T2, BUILDING.maxZ, 'static'); // east wall, south of the door
+  // ----- the west wall (the edge of the old map used to stand in for it; the town is outside now)
+  addBox(w, BUILDING.minX - 1, BUILDING.minZ, BUILDING.minX, BUILDING.maxZ, 'static');
   // ----- the door leaves (removed by the door while it is open)
   addBox(w, BUILDING.maxX - T2, DOOR.z - DOOR.width / 2, BUILDING.maxX + T2, DOOR.z + DOOR.width / 2, 'door');
+
 
   // ----- dividers of the west wing (low walls with doorways)
   for (const d of dividerBoxes()) addBox(w, d.x0, d.z0, d.x1, d.z1, 'static');
@@ -215,9 +226,13 @@ export function addStaticColliders(w) {
   for (const b of [Y.slide, Y.swing, Y.seesaw, Y.sandbox, Y.schoolSign, Y.chalkboard, ...Y.benches, ...Y.gardenBeds]) addBox(w, b.x0, b.z0, b.x1, b.z1, 'static');
   addCircle(w, Y.climber.x, Y.climber.z, Y.climber.r, 'static');
   // hedges / fences around the yard
-  hedge(w, YARD.maxX - 0.5, MAP.minZ - 1, YARD.maxX + 2, MAP.maxZ + 1);          // east
+  // hedges around the garden, with two gates out to the town (south: to the bus stop; east: to the unicorn stable)
+  const [S, E] = GATES;
+  hedge(w, YARD.maxX - 0.5, MAP.minZ - 1, YARD.maxX + 2, E.z0);                   // east, north of the gate
+  hedge(w, YARD.maxX - 0.5, E.z1, YARD.maxX + 2, MAP.maxZ + 1);                   // east, south of the gate
   hedge(w, BUILDING.maxX + T2, MAP.minZ - 1, YARD.maxX + 2, MAP.minZ + 0.5);     // north
-  hedge(w, BUILDING.maxX + T2, MAP.maxZ - 0.5, YARD.maxX + 2, MAP.maxZ + 1);     // south
+  hedge(w, BUILDING.maxX + T2, MAP.maxZ - 0.5, S.x0, MAP.maxZ + 1);              // south, west of the gate
+  hedge(w, S.x1, MAP.maxZ - 0.5, YARD.maxX + 2, MAP.maxZ + 1);                   // south, east of the gate
 }
 // The foam fence along the front of the building is at z = 8.1 (see BUILDING.maxZ).
 const WALK_FRONT = BUILDING.maxZ;

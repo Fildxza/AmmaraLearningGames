@@ -20,6 +20,7 @@ import { normaliseNarrator } from './narrator.js';
 import { resumeUsable } from './kidlock.js';
 import { canInstall, promptInstall, isHttp } from './pwa.js';
 import { DOOR, zoneById } from './world/layout.js';
+import { landmarkById } from './city/plan.js';
 
 export const S = {
   MAIN_MENU: 'MAIN_MENU', WORLD_SELECT: 'WORLD_SELECT', PLAYROOM: 'PLAYROOM', QUIZ: 'QUIZ', STATION_COMPLETE: 'STATION_COMPLETE',
@@ -249,11 +250,24 @@ export function createGame(deps) {
       const near = world.nearStation(gap);
       const canPlay = near >= 0 && r && progress.canPlayStation(r, near);
       // a place to use (arcade, door, a game, a robot friend...) when no station is close
-      const poi = !canPlay && near < 0 ? world.nearPoi(gap + 0.5) : null;
+      const ride = world.ride;
+      const auto = !!ride && (ride.kind === 'bus' || ride.kind === 'train');      // the bus and the train drive themselves
+      const poi = !canPlay && near < 0 && !auto ? world.nearPoi(gap + 0.5) : null;
       cur.poi = poi;
-      hud.setInteract(canPlay || !!poi, poi ? tr(poi.cue, set.lang) : null);
+      // in the town: a unicorn or car to get on, a school child to greet, or getting off again
+      const mount = !ride && !canPlay && !poi ? world.nearRide(gap + 0.8) : null;
+      const kid = !ride && !canPlay && !poi && !mount ? world.nearKid(2.4) : null;
+      let label = poi ? tr(poi.cue, set.lang) : null, can = canPlay || !!poi;
+      if (ride) { can = !!poi || !auto || !!ride.atStop; label = poi ? tr(poi.cue, set.lang) : t(auto ? 'getOffHere' : 'getOff'); }
+      else if (mount) { can = true; label = t(mount.kind === 'car' ? 'driveCar' : 'rideUnicorn'); }
+      else if (kid !== null) { can = true; label = t('sayHi'); }
+      hud.setInteract(can, label);
       const say = cur.say && cur.say.until > performance.now() ? cur.say : null;
       if (say) hud.setHint(say.text, 'info');
+      else if (ride && ride.kind === 'bus') hud.setHint(ride.atStop ? t('busAtStop', { name: tr(ride.atStop.name, set.lang) }) : t('onBus'), 'info');
+      else if (ride && ride.kind === 'train') hud.setHint(ride.atStop ? t('trainAtStop', { name: tr(ride.atStop.name, set.lang) }) : t('onTrain'), 'info');
+      else if (world.waitingBus) hud.setHint(t('busComing'), 'info');
+      else if (world.waitingTrain) hud.setHint(t('trainComing'), 'info');
       else if (poi) hud.setHint(tr(poi.label, set.lang), 'info');
       else if (near >= 0 && !canPlay && r) {
         if (r.stations[near].completed) hud.setHint(t('stationDone'), 'done');
@@ -263,7 +277,8 @@ export function createGame(deps) {
       else if (act >= 0 && world.distanceToStation(act) > 2.5) hud.setHint(t('followHint'), 'info');
       else hud.setHint(act < 0 ? t('allDoneHint') : '', 'info');
       // the yellow arrow leads to the next station indoors, and back to the front door when outside
-      if (world.outdoor) world.guide(true, { x: DOOR.x + 1.2, z: DOOR.z });
+      if (ride) world.guide(false);
+      else if (world.outdoor) world.guide(true, { x: DOOR.x + 1.2, z: DOOR.z });
       else world.guide(act >= 0 && !canPlay && !poi);
       hud.setReturn(world.outdoor);
       if (clock - mapAt > 0.15) { mapAt = clock; minimap.update(world.player(), world.stationPositions(), clock); }
@@ -280,10 +295,23 @@ export function createGame(deps) {
   // ---------------------------------------------------------------- quiz
   function interact() {
     if (state !== S.PLAYROOM || !has3D) return;
-    const near = world.nearStation(config.movementSettings.interactDistance);
+    const gap = config.movementSettings.interactDistance;
+    const ride = world.ride;
+    if (ride) {
+      // on a unicorn or in a car a nearby game still opens; otherwise the button gets the child off
+      const auto = ride.kind === 'bus' || ride.kind === 'train';
+      const poi = !auto ? world.nearPoi(gap + 0.5) : null;
+      if (poi) { doPoi(poi); return; }
+      if (!auto || ride.atStop) { audio.play('tap'); world.dismount(); }
+      return;
+    }
+    const near = world.nearStation(gap);
     if (near >= 0) { openQuiz(near); return; }
-    const poi = world.nearPoi(config.movementSettings.interactDistance + 0.5);
-    if (poi) doPoi(poi);
+    const poi = world.nearPoi(gap + 0.5);
+    if (poi) { doPoi(poi); return; }
+    if (world.nearRide(gap + 0.8)) { audio.play('tap'); world.mount(); return; }
+    const kid = world.nearKid(2.4);
+    if (kid !== null) greetKid(kid);
   }
 
   // ---------------------------------------------------------------- places in the world (arcade, door, games, robot friends)
@@ -297,8 +325,30 @@ export function createGame(deps) {
       case 'npc': greetNpc(p); break;
       case 'game': startGame(p.game, { from: S.PLAYROOM, level: p.level }); break;
       case 'quiz': startFreeQuiz(p); break;
+      case 'bus': callBus(p); break;
+      case 'train': callTrain(p); break;
       default: break;
     }
+  }
+  // a bus stop: the bus comes down the road, stops, and the child gets on by themselves
+  function callBus(p) {
+    if (world.waitingBus || world.ride) return;
+    if (world.callBus(p.stop)) say(t('busComing'), 6000);
+  }
+  // a train station: a train comes along the line above, stops, and the child gets on by themselves
+  function callTrain(p) {
+    if (world.waitingTrain || world.ride) return;
+    if (world.callTrain(p.station)) say(t('trainComing'), 6000);
+  }
+  function say(text, ms = 5000) {
+    cur.say = { text, until: performance.now() + ms };
+    speech.speak(text, set.lang, { kind: 'ui', queue: false });
+  }
+  function greetKid(k) {
+    const lines = t('kidHi');
+    const line = lines[(k + cur.greetN++) % lines.length];
+    cur.say = { text: line, until: performance.now() + 4500 };
+    speech.speak(line, set.lang, { kind: 'greeting' });
   }
   function greetNpc(p) {
     const lines = t(p.npc === 'boy' ? 'greetBoy' : 'greetGirl');
@@ -310,11 +360,20 @@ export function createGame(deps) {
   async function walkToPlace(g) {
     audio.play('tap');
     if (state !== S.PLAYROOM) return;
+    // the town map: a quick trip to a landmark or a bus stop, or straight back to the preschool garden
+    if (g.kind === 'home') { world.resetPlayer('yard'); say(t('backToSchool'), 3000); return; }
+    if (g.kind === 'travel') { world.teleport(g.x, g.z); say(tr(g.name, set.lang), 3000); return; }
     world.walkTo(g.x, g.z, () => {
       if (g.kind === 'poi' && state === S.PLAYROOM) { const poi = world.nearPoi(config.movementSettings.interactDistance + 0.6); if (poi && poi.id === g.id) hud.setHint(tr(poi.label, set.lang), 'info'); }
     });
   }
-  function goInside() { const tg = world.doorTarget(); world.walkTo(tg.x, tg.z); audio.play('tap'); }
+  function goInside() {
+    audio.play('tap');
+    // far away in the town (or riding): back to the preschool garden in one hop, then walk in
+    const p = world.player();
+    if (world.ride || Math.hypot(p.x - DOOR.x, p.z - DOOR.z) > 60) { world.resetPlayer('yard'); say(t('backToSchool'), 3000); }
+    const tg = world.doorTarget(); world.walkTo(tg.x, tg.z);
+  }
 
   // ---------------------------------------------------------------- arcade, mini-games and Quran learning
   function openArcade(from) { cur.hubFrom = from || state; go(S.ARCADE); }
@@ -861,7 +920,7 @@ export function createGame(deps) {
   const quiz = createQuiz({ iconSvg, onAnswer: (id) => safe(() => answer(id)), onClose: closeQuiz, onContinue: () => (cur.free ? finishFree() : finishStation()), onListen: () => { const qq = cur.free ? cur.free.q : cur.quiz ? cur.quiz.q : null; if (qq) speech.speak(tr(qq.prompt, set.lang), set.lang, { force: true }); } });
   const teacher = createTeacher(teacherApi);
 
-  const minimap = createMinimap({ onGo: (g) => safe(() => walkToPlace(g)) });
+  const minimap = createMinimap({ onGo: (g) => safe(() => walkToPlace(g)), iconFor: (k) => iconSvg(k, '', null, true) });
   const audioPanel = createAudioPanel({
     vm: audioVm,
     close: () => { audioPanel.close(); },
@@ -929,6 +988,7 @@ export function createGame(deps) {
     const canvas = world.renderer.domElement;
     canvas.addEventListener('pointerdown', (e) => {
       if (state !== S.PLAYROOM || !config.movementSettings.tapToWalk) return;
+      if (world.ride && (world.ride.kind === 'bus' || world.ride.kind === 'train')) return;           // the bus and the train drive themselves
       const hit = world.pick(e.clientX, e.clientY);
       if (!hit) return;
       if (hit.type === 'station') {
@@ -943,10 +1003,20 @@ export function createGame(deps) {
         world.walkTo(a.x, a.z, (arrived) => { if (arrived && state === S.PLAYROOM) { const n = world.nearPoi(config.movementSettings.interactDistance + 0.6); if (n && n.id === hit.id) doPoi(n); } });
       } else world.walkTo(hit.x, hit.z);
     });
+    world.onRide((ev, info, kind) => {
+      if (state !== S.PLAYROOM) return;
+      if (ev === 'board') say(t(kind === 'train' ? 'trainBoard' : 'busBoard'), 6000);
+      else if (ev === 'off') say(t('rideOff'), 2500);
+    });
     // walking into a new area: a banner with its name, the right music, and (once) its name spoken
+    let townBannerAt = -99;
     world.onZoneChange((zone) => {
       if (state !== S.PLAYROOM) return;
       syncScene();
+      // ordinary town streets change often when driving: their banner shows at most every 12 s (landmarks always)
+      const plain = zone.id.startsWith('city-') && !landmarkById[zone.id.slice(5)];
+      if (plain && clock - townBannerAt < 12) return;
+      if (plain) townBannerAt = clock;
       hud.zoneBanner(iconSvg(zone.icon, '', null, true), tr(zone.name, set.lang), zone.color);
       if (!cur.zoneSpoken[zone.id]) { cur.zoneSpoken[zone.id] = true; speech.speak(tr(zone.name, set.lang), set.lang, { kind: 'ui', queue: false }); }
     });

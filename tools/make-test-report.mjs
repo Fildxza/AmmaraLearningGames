@@ -13,6 +13,10 @@ const upChrome = read('qa/e2e-upgrade-chrome.json');
 const upEdge = read('qa/e2e-upgrade-edge.json');
 const lkChrome = read('qa/e2e-lock-chrome.json');
 const lkEdge = read('qa/e2e-lock-edge.json');
+const ctChrome = read('qa/e2e-city-chrome.json');
+const ctEdge = read('qa/e2e-city-edge.json');
+const pics = read('qa/picture-audit.json');
+const ctRows = (ctChrome ? ctChrome.results : []).map((r) => { const e = ctEdge ? ctEdge.results.find((x) => x.id === r.id) : null; return `| ${r.id} | ${r.name} | ${r.ok ? 'PASS' : 'FAIL'} | ${e ? (e.ok ? 'PASS' : 'FAIL') : 'NOT TESTED'} | ${String(r.info || '').replace(/\|/g, '/').slice(0, 170)} |`; }).join('\n');
 const lkRows = (lkChrome ? lkChrome.results : []).map((r) => { const e = lkEdge ? lkEdge.results.find((x) => x.id === r.id) : null; return `| ${r.id} | ${r.name} | ${r.ok ? 'PASS' : 'FAIL'} | ${e ? (e.ok ? 'PASS' : 'FAIL') : 'NOT TESTED'} | ${String(r.info || '').replace(/\|/g, '/').slice(0, 170)} |`; }).join('\n');
 const upPass = (r) => (r ? `${r.results.filter((x) => x.ok).length} passed, ${r.results.filter((x) => !x.ok).length} failed` : 'NOT RUN');
 const upRows = (upChrome ? upChrome.results : []).map((r) => {
@@ -92,6 +96,9 @@ Generated ${new Date().toISOString()} by \`npm run report\` from the raw results
 | Upgrade checks (2.0), Edge | ${upPass(upEdge)} |
 | Kid Lock / web app checks, Chrome | ${upPass(lkChrome)} |
 | Kid Lock / web app checks, Edge | ${upPass(lkEdge)} |
+| Town checks (2.1), Chrome | ${upPass(ctChrome)} |
+| Town checks (2.1), Edge | ${upPass(ctEdge)} |
+| Picture audit (every picture the game can show) | ${pics ? `${pics.total} pictures, ${pics.problems.length} problems` : 'NOT RUN'} |
 
 ## Upgrade checks: 3D world, narrator, arcade, Jom Mengaji (2.0)
 
@@ -108,6 +115,14 @@ From \`tests/e2e/run-e2e-lock.mjs\`: the built \`dist/\` folder is served over h
 | Id | Check | Chrome | Edge | What was measured (Chrome) |
 |---|---|---|---|---|
 ${lkRows}
+
+## Town: Bandar Ceria, highway and train (2.1)
+
+From \`tests/e2e/run-e2e-city.mjs\` with real keyboard input: the child rides a unicorn, drives a car, calls and rides a bus to the next stop, waits for and rides the elevated train to the next station, greets a school child, opens landmark quizzes, travels with the town map, and comes home with one button. The plan itself (lots, colliders, routes, highway lanes, train line and pillars) is covered by \`tests/unit/city.test.mjs\`.
+
+| Id | Check | Chrome | Edge | What was measured (Chrome) |
+|---|---|---|---|---|
+${ctRows}
 
 ## Specification checklist (section 17)
 
@@ -146,6 +161,7 @@ Screenshots of every screen are in \`qa/screenshots/chrome\` and \`qa/screenshot
 * **Other browsers** (Firefox, Safari, older Chrome/Edge) and other operating systems.
 * **A slow school laptop with an integrated GPU older than the one used here**, and projector resolutions other than the sizes listed in test 28.
 * **Screen readers**, high-contrast mode and keyboard-only use of the child screens beyond the arrow/WASD/Enter/Esc/1-3 keys that were exercised.
+* **The town over a long time.** Each ride and trip was tested once per run; nobody drove around the whole 4.2 km town for an hour, and the town was only run on the laptop above.
 * **Long sessions** (hours) and very large classes (the class list was tested with 4 names; the limit is 60).
 * **Real children.** Nobody aged 2-4 has played the game or the ten mini-games; difficulty, wording and the length of the tutorial are unvalidated.
 * **Content review** by a teacher and a native Bahasa Melayu speaker (see \`research/RESEARCH-REPORT.md\`).

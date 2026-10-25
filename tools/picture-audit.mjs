@@ -9,6 +9,7 @@ import { CHROME } from './lib/browsers.mjs';
 import { validated } from '../tests/unit/helpers.mjs';
 import { iconSVG, SVG_DEFS } from '../src/engine/art/icons.js';
 import { POIS, ZONES } from '../src/engine/world/layout.js';
+import { LANDMARKS, DISTRICTS, cityPois } from '../src/engine/city/plan.js';
 import { MEMORY_KEYS, COUNT_ITEMS, FIND_THEMES, SHAPE_SETS, SORT_SETS } from '../src/engine/minigames/logic.js';
 import { GAMES } from '../src/engine/minigames/index.js';
 
@@ -29,6 +30,10 @@ Object.values(SHAPE_SETS).flat().forEach((k) => add('shape:' + k, 'shape puzzle'
 Object.values(SORT_SETS).flat().forEach((s) => [...s.bins, ...s.items].forEach((k) => add(k, 'sorting game')));
 POIS.forEach((p) => add(p.icon, `3D place ${p.id}`));
 ZONES.forEach((z) => add(z.icon, `3D area ${z.id}`));
+LANDMARKS.forEach((l) => add(l.icon, `town landmark ${l.id}`));
+Object.entries(DISTRICTS).forEach(([id, d]) => add(d.icon, `town district ${id}`));
+cityPois().forEach((p) => add(p.icon, `town place ${p.id}`));
+add('star', 'town map: back to preschool');
 const extra = process.env.AUDIT_EXTRA ? JSON.parse(fs.readFileSync(process.env.AUDIT_EXTRA, 'utf8')) : [];
 extra.forEach(([k, w]) => add(k, w));
 

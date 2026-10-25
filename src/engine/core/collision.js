@@ -8,16 +8,74 @@ export function createCollisionWorld(bounds) {
 export function addBox(world, minX, minZ, maxX, maxZ, tag = '') {
   const b = { minX: Math.min(minX, maxX), minZ: Math.min(minZ, maxZ), maxX: Math.max(minX, maxX), maxZ: Math.max(minZ, maxZ), tag };
   world.boxes.push(b);
+  if (world.index) indexItem(world, b, 'boxes');
   return b;
 }
 export function addCircle(world, x, z, r, tag = '') {
   const c = { x, z, r, tag };
   world.circles.push(c);
+  if (world.index) indexItem(world, c, 'circles');
   return c;
 }
 export function clearTagged(world, tag) {
   world.boxes = world.boxes.filter((b) => b.tag !== tag);
   world.circles = world.circles.filter((c) => c.tag !== tag);
+  if (world.index) rebuildIndex(world);
+}
+/** Removes these exact boxes/circles (used when a part of the city is unloaded). */
+export function removeItems(world, items) {
+  const gone = new Set(items);
+  world.boxes = world.boxes.filter((b) => !gone.has(b));
+  world.circles = world.circles.filter((c) => !gone.has(c));
+  if (world.index) for (const it of items) unindexItem(world, it);
+}
+
+// ---------- optional spatial index: a big world (the city) only tests the obstacles near the circle ----------
+export function enableIndex(world, cell = 24) {
+  world.index = { cell, map: new Map() };
+  rebuildIndex(world);
+  return world;
+}
+const rectOf = (it) => (it.r !== undefined ? [it.x - it.r, it.z - it.r, it.x + it.r, it.z + it.r] : [it.minX, it.minZ, it.maxX, it.maxZ]);
+function cellsOf(world, [x0, z0, x1, z1]) {
+  const c = world.index.cell, out = [];
+  for (let i = Math.floor(x0 / c); i <= Math.floor(x1 / c); i++) for (let j = Math.floor(z0 / c); j <= Math.floor(z1 / c); j++) out.push(i + ',' + j);
+  return out;
+}
+function indexItem(world, it, kind) {
+  for (const k of cellsOf(world, rectOf(it))) {
+    let cell = world.index.map.get(k);
+    if (!cell) world.index.map.set(k, (cell = { boxes: [], circles: [] }));
+    cell[kind].push(it);
+  }
+}
+function unindexItem(world, it) {
+  const kind = it.r !== undefined ? 'circles' : 'boxes';
+  for (const k of cellsOf(world, rectOf(it))) { const cell = world.index.map.get(k); if (cell) cell[kind] = cell[kind].filter((x) => x !== it); }
+}
+function rebuildIndex(world) {
+  world.index.map.clear();
+  world.boxes.forEach((b) => indexItem(world, b, 'boxes'));
+  world.circles.forEach((c) => indexItem(world, c, 'circles'));
+}
+const near = { boxes: [], circles: [] };
+const seen = new Set();
+/** The obstacles that can touch a circle at p with radius r (all of them when there is no index). Skips tags in world.skip. */
+function candidates(world, p, r) {
+  const skip = world.skip;
+  if (!world.index) {
+    if (!skip) return world;
+    near.boxes = world.boxes.filter((b) => !skip.has(b.tag)); near.circles = world.circles.filter((c) => !skip.has(c.tag));
+    return near;
+  }
+  near.boxes = []; near.circles = []; seen.clear();
+  for (const k of cellsOf(world, [p.x - r, p.z - r, p.x + r, p.z + r])) {
+    const cell = world.index.map.get(k);
+    if (!cell) continue;
+    for (const b of cell.boxes) if (!seen.has(b) && !(skip && skip.has(b.tag))) { seen.add(b); near.boxes.push(b); }
+    for (const c of cell.circles) if (!seen.has(c) && !(skip && skip.has(c.tag))) { seen.add(c); near.circles.push(c); }
+  }
+  return near;
 }
 
 function clampBounds(world, p, r) {
@@ -31,7 +89,8 @@ export function resolve(world, p, r, iterations = 4) {
   let moved = false;
   for (let it = 0; it < iterations; it++) {
     let any = false;
-    for (const b of world.boxes) {
+    const cand = candidates(world, p, r + 0.5);
+    for (const b of cand.boxes) {
       if (b.off) continue;
       const cx = Math.max(b.minX, Math.min(p.x, b.maxX));
       const cz = Math.max(b.minZ, Math.min(p.z, b.maxZ));
@@ -55,7 +114,7 @@ export function resolve(world, p, r, iterations = 4) {
       }
       any = true;
     }
-    for (const c of world.circles) {
+    for (const c of cand.circles) {
       const dx = p.x - c.x, dz = p.z - c.z;
       const min = r + c.r;
       const d2 = dx * dx + dz * dz;
@@ -77,7 +136,8 @@ export function penetration(world, p, r) {
   let worst = 0;
   const b = world.bounds;
   worst = Math.max(worst, b.minX + r - p.x, p.x - (b.maxX - r), b.minZ + r - p.z, p.z - (b.maxZ - r));
-  for (const box of world.boxes) {
+  const cand = candidates(world, p, r + 0.5);
+  for (const box of cand.boxes) {
     if (box.off) continue;
     const cx = Math.max(box.minX, Math.min(p.x, box.maxX));
     const cz = Math.max(box.minZ, Math.min(p.z, box.maxZ));
@@ -85,7 +145,7 @@ export function penetration(world, p, r) {
     const d = Math.hypot(p.x - cx, p.z - cz);
     worst = Math.max(worst, inside ? r + Math.min(p.x - box.minX, box.maxX - p.x, p.z - box.minZ, box.maxZ - p.z) : r - d);
   }
-  for (const c of world.circles) worst = Math.max(worst, r + c.r - Math.hypot(p.x - c.x, p.z - c.z));
+  for (const c of cand.circles) worst = Math.max(worst, r + c.r - Math.hypot(p.x - c.x, p.z - c.z));
   return Math.max(0, worst);
 }
 

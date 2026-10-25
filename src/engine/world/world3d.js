@@ -3,11 +3,15 @@
 // One instance for the whole visit.
 import {
   WebGLRenderer, Scene, PerspectiveCamera, HemisphereLight, DirectionalLight, Color, Vector3, Matrix4, Vector2, Raycaster,
-  PCFShadowMap, SRGBColorSpace, Mesh, PlaneGeometry, MeshBasicMaterial, MathUtils, NoToneMapping
+  PCFShadowMap, SRGBColorSpace, Mesh, PlaneGeometry, MeshBasicMaterial, MathUtils, NoToneMapping, Fog
 } from 'three';
-import { createCollisionWorld, moveCircle, penetration, findFreeSpot } from '../core/collision.js';
+import { createCollisionWorld, moveCircle, penetration, findFreeSpot, enableIndex } from '../core/collision.js';
 import { buildNavGrid, findPath } from '../core/navgrid.js';
-import { WALK, SPAWN, YARD_SPAWN, STATION_SLOTS, BUILDING, DOOR, MAP, POIS, YARD_SOLIDS, poiById, zoneAt, isOutdoor, addStaticColliders } from './layout.js';
+import { WALK, SPAWN, YARD_SPAWN, STATION_SLOTS, BUILDING, DOOR, MAP, POIS, YARD_SOLIDS, zoneAt, addStaticColliders, addVehicleBarriers, GATES } from './layout.js';
+import { CITY, districtAt, cityPois } from '../city/plan.js';
+import { createCity } from '../city/build.js';
+import { createTraffic, createPeople, createBuses, createHighway, createTrains } from '../city/life.js';
+import { animateUnicorn, spinWheels } from '../city/models.js';
 import { buildBuilding } from './building.js';
 import { buildRoom } from './room.js';
 import { buildYard } from './yard.js';
@@ -31,6 +35,12 @@ const tick = () => new Promise((r) => requestAnimationFrame(() => r()));
 const CULL_DISTANCE = 30;                 // areas farther than this (metres, from the player) are not drawn
 const SHADOW_DISTANCE = 15;               // areas farther than this do not cast shadows
 const SUN_OFFSET = new Vector3(-8, 16, 10);
+const WALK_SKIP = new Set(['novehicle']);          // children walk through doorways and garden gates; rides do not
+const inMap = (x, z) => x >= MAP.minX && x <= MAP.maxX && z >= MAP.minZ && z <= MAP.maxZ;
+const inBuilding = (x, z) => x > BUILDING.minX && x < BUILDING.maxX && z > BUILDING.minZ && z < BUILDING.maxZ;
+const angleTo = (a, b) => { let d = b - a; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; return d; };
+// the camera keeps further back on a ride
+const RIDE_CAM = { unicorn: { h: 1.2, b: 2.6 }, car: { h: 2.6, b: 5.5 }, bus: { h: 5, b: 9 }, train: { h: 4, b: 12, y: 9 } };     // y: the ride is up on the viaduct
 
 // Tall things that can hide the child from the camera (checked with simple geometry, no ray casting).
 const TALL = [
@@ -54,7 +64,8 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
 
   const scene = new Scene();
   const cam = config.cameraSettings;
-  const camera = new PerspectiveCamera(cam.fieldOfView, 16 / 9, 0.1, 240);
+  const camera = new PerspectiveCamera(cam.fieldOfView, 16 / 9, 0.1, 650);
+  scene.fog = new Fog('#d6eeff', 170, 560);           // the town fades softly into the sky far away
   camera.position.set(0, 9, 14);
 
   // lights: soft sky fill + warm sun with gentle shadows. The sun follows the child, so shadows stay sharp everywhere.
@@ -80,8 +91,10 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
 
   onStep(0);
   await tick();
-  const collision = createCollisionWorld(WALK);
+  const collision = enableIndex(createCollisionWorld(CITY), 24);
   addStaticColliders(collision);
+  addVehicleBarriers(collision);
+  collision.skip = WALK_SKIP;
   const doorBoxes = collision.boxes.filter((b) => b.tag === 'door');
   const building = buildBuilding(scene, collision, { iconSvg });
   await tick();
@@ -90,6 +103,16 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
   const yard = buildYard(scene, { iconSvg });
   const npcs = createNpcs(scene);
   onStep(1);
+  await tick();
+  // the town around the preschool (streamed in squares around the child), its traffic, children and buses
+  const city = createCity(scene, collision, { iconSvg });
+  city.preload(SPAWN.x, SPAWN.z);
+  const traffic = createTraffic(scene);
+  const people = createPeople(scene);
+  const buses = createBuses(scene);
+  const highway = createHighway(scene);
+  const trains = createTrains(scene);
+  const ALL_POIS = [...POIS, ...cityPois()];
   await tick();
   const stations = createStations(scene, collision);
   const effects = createEffects(scene);
@@ -109,7 +132,7 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
   scene.add(mascot.root);
   onStep(3);
 
-  const groundMeshes = [...building.groundMeshes, ...yard.groundMeshes];
+  const groundMeshes = [...building.groundMeshes, ...yard.groundMeshes, ...city.groundMeshes];
   const zoneEntries = [...building.zones, ...yard.zones];
   setSignLanguage(lang);
 
@@ -118,7 +141,8 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
     mode: 'menu', input: { x: 0, z: 0 }, walk: null, camPreset: cam.defaultDistance, reduced: false, quality,
     camPos: new Vector3(0, 9, 15), camLook: new Vector3(0, 1, 0), violations: 0, maxPenetration: 0,
     occlTimer: 0, occluded: false, frameTimes: [], lowFpsTime: 0, dpr: 1, shadows: true, fps: 60, lastDowngrade: 0,
-    outdoor: 0, doorPassable: false, cullTimer: 0, guideTarget: null, snapCamera: true, visibleZones: 0, zoneId: 'hall', walkFails: 0
+    outdoor: 0, doorPassable: false, cullTimer: 0, guideTarget: null, snapCamera: true, visibleZones: 0, zoneId: 'hall', walkFails: 0,
+    ride: null, waitBus: null, waitTrain: null, rideDist: 0
   };
   const tmpV = new Vector3();
   const targetPos = new Vector3();
@@ -129,7 +153,10 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
 
   // walking grid used by tap-to-walk: the front door counts as open
   let nav = null;
-  function rebuildNav() { nav = buildNavGrid(collision, r + 0.05, { cell: 0.4, ignoreTags: ['door'] }); }
+  function rebuildNav() {
+    const near = (b) => b.maxX > MAP.minX - 2 && b.minX < MAP.maxX + 2 && b.maxZ > MAP.minZ - 2 && b.minZ < MAP.maxZ + 2;
+    nav = buildNavGrid({ bounds: MAP, boxes: collision.boxes.filter(near), circles: collision.circles.filter((c) => inMap(c.x, c.z)) }, r + 0.05, { cell: 0.4, ignoreTags: ['door', 'novehicle'] });
+  }
   rebuildNav();
 
   function applyQuality(q) {
@@ -176,7 +203,7 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
         const d = Math.hypot(ex, ez);
         const last = w.idx >= w.path.length - 1;
         w.time += dt;
-        if (d < (last ? 0.3 : 0.5)) { if (last) finishWalk(true); else w.idx++; }
+        if (d < (state.ride && state.ride.kind === 'car' ? 2.5 : last ? 0.3 : 0.5)) { if (last) finishWalk(true); else w.idx++; }        // a car cannot turn on the spot
         else {
           dx = ex / d; dz = ez / d;
           if (w.time - w.lastCheck > 0.45) {
@@ -188,28 +215,60 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
     }
     const len = Math.hypot(dx, dz);
     if (len > 1) { dx /= len; dz /= len; }
-    const k = 1 - Math.exp(-ms.acceleration * dt);
-    player.vx += (dx * ms.walkSpeed - player.vx) * k;
-    player.vz += (dz * ms.walkSpeed - player.vz) * k;
-    if (state.mode !== 'play') { player.vx *= 0.8; player.vz *= 0.8; }
+    const ride = state.ride;
+    const rad = ride && ride.ud ? ride.ud.radius : r;
+    const auto = !!ride && (ride.kind === 'bus' || ride.kind === 'train');      // rides that drive themselves
+    if (ride && ride.kind === 'train') {
+      // in the train: the child sits in the middle car, up on the viaduct
+      const tr = ride.train;
+      player.x = tr.x; player.z = tr.z; player.yaw = tr.yaw; player.vx = player.vz = 0; player.speed = tr.speed;
+    } else if (ride && ride.kind === 'bus') {
+      // on the bus: the child sits inside; the bus drives the route
+      const b = buses.mine;
+      player.x = b.x; player.z = b.z; player.yaw = b.yaw; player.vx = player.vz = 0; player.speed = b.speed;
+    } else if (ride && ride.kind === 'car') {
+      // a toy car: the arrows say where to go, the car turns smoothly towards it and drives forwards
+      const want = Math.hypot(dx, dz);
+      let throttle = 0;
+      if (want > 0.1) {
+        const diff = angleTo(player.yaw, Math.atan2(dx, dz));
+        const turn = 2.4 * Math.min(1, 0.35 + ride.speed / 6);
+        player.yaw += MathUtils.clamp(diff, -turn * dt, turn * dt);
+        throttle = want * Math.max(0.3, Math.cos(Math.min(Math.abs(diff), Math.PI / 2)));
+      }
+      ride.speed += (ride.ud.speed * throttle - ride.speed) * Math.min(1, dt * (throttle > 0 ? 1.6 : 3));
+      player.vx = Math.sin(player.yaw) * ride.speed; player.vz = Math.cos(player.yaw) * ride.speed;
+      if (state.mode !== 'play') { ride.speed *= 0.8; player.vx *= 0.8; player.vz *= 0.8; }
+    } else {
+      const top = ride ? ride.ud.speed : ms.walkSpeed;
+      const k = 1 - Math.exp(-ms.acceleration * dt * (ride ? 0.8 : 1));
+      player.vx += (dx * top - player.vx) * k;
+      player.vz += (dz * top - player.vz) * k;
+      if (state.mode !== 'play') { player.vx *= 0.8; player.vz *= 0.8; }
+    }
     const sp2 = Math.hypot(player.vx, player.vz);
-    if (sp2 > 0.001) {
+    if (!auto && sp2 > 0.001) {
       const p = { x: player.x, z: player.z };
-      moveCircle(collision, p, r, player.vx * dt, player.vz * dt);
-      const pen = penetration(collision, p, r);
+      moveCircle(collision, p, rad, player.vx * dt, player.vz * dt);
+      // the child's car or unicorn does not drive through traffic
+      if (ride) for (const c of [...traffic.near(p.x, p.z, rad + 2.4), ...highway.near(p.x, p.z, rad + 2.4)]) { const ddx = p.x - c.x, ddz = p.z - c.z, dd = Math.hypot(ddx, ddz) || 1, need = rad + 1.6; if (dd < need) { p.x = c.x + (ddx / dd) * need; p.z = c.z + (ddz / dd) * need; } }
+      const pen = penetration(collision, p, rad);
       state.maxPenetration = Math.max(state.maxPenetration, pen);
-      if (pen > 0.01) { state.violations++; const f = findFreeSpot(collision, p, r); p.x = f.x; p.z = f.z; }
-      const actual = Math.hypot(p.x - player.x, p.z - player.z) / Math.max(dt, 1e-4);
+      if (pen > 0.01) { state.violations++; const f = findFreeSpot(collision, p, rad); p.x = f.x; p.z = f.z; }
+      const moved = Math.hypot(p.x - player.x, p.z - player.z);
+      const actual = moved / Math.max(dt, 1e-4);
       player.x = p.x; player.z = p.z;
       player.speed = Math.min(actual, sp2);
-      if (sp2 > 0.25) {
+      state.rideDist += moved;
+      if (ride && ride.kind === 'car' && actual < sp2 * 0.3) ride.speed *= 0.5;          // bumped into something: slow down
+      if (!(ride && ride.kind === 'car') && sp2 > 0.25) {
         const targetYaw = Math.atan2(player.vx, player.vz);
         let diff = targetYaw - player.yaw;
         while (diff > Math.PI) diff -= Math.PI * 2;
         while (diff < -Math.PI) diff += Math.PI * 2;
         player.yaw += diff * Math.min(1, ms.turnSpeed * dt);
       }
-    } else player.speed = 0;
+    } else if (!auto) player.speed = 0;
 
     // the front door opens as the child comes near and closes again when they have gone
     updateDoor(dt);
@@ -222,7 +281,16 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
       player.yaw += (face - player.yaw) * Math.min(1, dt * 4);
     }
     root.rotation.y = player.yaw;
-    ch.update(dt, t, Math.min(1, player.speed / Math.max(1, ms.walkSpeed)), reduced);
+    if (ride && !auto) {
+      const o = ride.obj, ud = ride.ud;
+      o.position.set(player.x, 0, player.z); o.rotation.y = player.yaw;
+      const sz = ud.seatZ || 0;
+      root.position.set(player.x + Math.sin(player.yaw) * sz, ud.seatY, player.z + Math.cos(player.yaw) * sz);
+      ch.update(dt, t, 0, reduced);
+      if (ride.kind === 'unicorn') animateUnicorn(o, t, player.speed, reduced); else spinWheels(o, state.rideDist);
+    } else ch.update(dt, t, Math.min(1, player.speed / Math.max(1, ms.walkSpeed)), reduced);
+    ch.root.visible = !auto;
+    blob.visible = !ride;
     blob.position.set(player.x, 0.03, player.z);
 
     // mascot follows over the shoulder
@@ -232,7 +300,7 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
     mascot.update(dt, t, mascotTarget, reduced);
 
     // 0 = inside, 1 = in the garden (eases through the doorway)
-    const want = MathUtils.smoothstep(player.x, BUILDING.maxX - 2.5, BUILDING.maxX + 2.5);
+    const want = inBuilding(player.x, player.z) ? MathUtils.smoothstep(player.x, BUILDING.maxX - 2.5, BUILDING.maxX + 2.5) : 1;
     state.outdoor += (want - state.outdoor) * Math.min(1, dt * 4);
     hemi.intensity = 1.45 + state.outdoor * 0.2;
     sun.intensity = 1.65 + state.outdoor * 0.15;
@@ -244,19 +312,56 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
     room.update(t, reduced);
     yard.update(t, reduced);
     npcs.update(t, dt, reduced, player);
+    // the town: stream squares around the child, move traffic, children and buses
+    city.update(player.x, player.z, dt, t, reduced);
+    const me = { x: player.x, z: player.z, r: ride ? rad : 0.6 };
+    const hwNear = highway.near(player.x, player.z, 260).map((c) => ({ x: c.x, z: c.z, r: 1.0 }));
+    traffic.update(dt, player.x, player.z, auto ? hwNear : [me, ...hwNear]);
+    people.update(dt, t, player.x, player.z, reduced, !auto);
+    buses.update(dt, auto ? [] : [me], player.x, player.z);
+    highway.update(dt, player.x, player.z, auto ? [] : [me], traffic.near(player.x, player.z, 320));
+    trains.update(dt);
+    updateBusWait();
+    updateTrainWait();
     stations.update(t, reduced);
     effects.update(dt, t, reduced);
     occlusion(dt);
-    const zone = zoneAt(player.x, player.z);
+    const zone = zoneHere();
     if (zone.id !== state.zoneId) { state.zoneId = zone.id; if (onZoneChange) onZoneChange(zone); }
     const area = state.outdoor > 0.5 ? 'outdoor' : 'indoor';
     if (document.body.dataset.area !== area) document.body.dataset.area = area;
   }
   let onZoneChange = null;
+  function zoneHere() { return inMap(player.x, player.z) ? zoneAt(player.x, player.z) : districtAt(player.x, player.z); }
+  // waiting at a bus stop: board when the called bus stops here
+  function updateBusWait() {
+    const w = state.waitBus;
+    if (!w) return;
+    const b = buses.mine;
+    if (!b || Math.hypot(player.x - w.wait.x, player.z - w.wait.z) > 25) { state.waitBus = null; buses.dismiss(); return; }
+    if (b.dwell > 0 && b.atStop && b.atStop.id === w.id && state.mode === 'play') {
+      state.waitBus = null; finishWalk(false);
+      state.ride = { kind: 'bus', bus: b, ud: { radius: r } }; b.riding = true; b.dwell = 1.5;
+      if (onRide) onRide('board', w, 'bus');
+    }
+  }
+  // waiting at a train station: get on when a train stands at this station
+  function updateTrainWait() {
+    const w = state.waitTrain;
+    if (!w) return;
+    if (state.ride || Math.hypot(player.x - w.exit.x, player.z - w.exit.z) > 25) { state.waitTrain = null; return; }
+    const tr = trains.waitingAt(w.id);
+    if (tr && state.mode === 'play') {
+      state.waitTrain = null; finishWalk(false);
+      state.ride = { kind: 'train', train: tr, ud: { radius: r } }; tr.riding = true; tr.dwell = Math.max(tr.dwell, 2.5);
+      if (onRide) onRide('board', w, 'train');
+    }
+  }
+  let onRide = null;
 
   function updateDoor(dt) {
     const dd = Math.hypot(player.x - DOOR.x, player.z - DOOR.z);
-    const open = state.mode === 'play' && dd < (building.door.isOpen ? 4.4 : 3.2);
+    const open = state.mode === 'play' && !state.ride && dd < (building.door.isOpen ? 4.4 : 3.2);
     building.door.set(open || dd < 2.4);
     const passable = building.door.update(dt);
     if (passable !== state.doorPassable) { state.doorPassable = passable; for (const b of doorBoxes) b.off = passable; }
@@ -294,6 +399,7 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
     state.visibleZones = n;
   }
 
+  const camHead = new Vector3(), camFixed = new Vector3(), camWant = new Vector3(), camOff = new Vector3();
   function updateCamera(dt, t) {
     const preset = cam.distances[state.camPreset] || cam.distances.normal;
     const m = state.mode;
@@ -322,17 +428,28 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
         bz = MathUtils.clamp((state.activePos.z - player.z) * 0.62, -1.2, 5.5);
         if (m === 'play' && state.walk === null && Math.hypot(state.activePos.x - player.x, state.activePos.z - player.z) < 3.2) { bx = 0; bz = 0; }
       }
-      targetPos.set(player.x + bx, preset.height + out * 1.2, player.z + preset.back + bz + out * 1.8);
-      targetLook.set(player.x + bx, 0.9, player.z - 1.6 + bz);
-      targetPos.x = MathUtils.clamp(targetPos.x, MAP.minX + 7, MAP.maxX - 7);
-      targetLook.x = MathUtils.clamp(targetLook.x, MAP.minX + 4, MAP.maxX - 4);
+      const rc = state.ride ? RIDE_CAM[state.ride.kind] : null;
+      const town = inMap(player.x, player.z) ? 0 : 1;
+      targetPos.set(player.x + bx, preset.height + out * 1.2 + (rc ? rc.h + (rc.y || 0) : town * 0.8), player.z + preset.back + bz + out * 1.8 + (rc ? rc.b : town * 1.5));
+      targetLook.set(player.x + bx, 0.9 + (rc && rc.y ? rc.y : 0), player.z - 1.6 + bz - (rc ? rc.b * 0.25 : 0));
+      if (inMap(player.x, player.z)) { targetPos.x = MathUtils.clamp(targetPos.x, MAP.minX + 7, MAP.maxX + 40); targetLook.x = MathUtils.clamp(targetLook.x, MAP.minX + 4, MAP.maxX + 40); }
     }
-    targetPos.z = Math.min(targetPos.z, MAP.maxZ + 16);
+    targetPos.z = Math.min(targetPos.z, CITY.maxZ + 60);
     const k = state.snapCamera ? 1 : 1 - Math.exp(-cam.smoothing * dt * (m === 'menu' ? 0.5 : 1));
     state.snapCamera = false;
     state.camPos.lerp(targetPos, k);
     state.camLook.lerp(targetLook, k);
     camera.position.copy(state.camPos);
+    // in the town: never look through a tall building, a train deck or a platform
+    // (moving out of the way is immediate; coming back to the normal view is smooth)
+    if (!inMap(player.x, player.z)) {
+      const rc = state.ride ? RIDE_CAM[state.ride.kind] : null;
+      camHead.set(player.x, 1.4 + (rc && rc.y ? rc.y : 0), player.z);
+      camFixed.copy(camera.position); city.clipCamera(camHead, camFixed);
+      camWant.subVectors(camFixed, camera.position);
+      if (camWant.lengthSq() >= camOff.lengthSq() || k === 1) camOff.copy(camWant); else camOff.lerp(camWant, 1 - Math.exp(-5 * dt));
+      camera.position.add(camOff);
+    } else camOff.set(0, 0, 0);
     camera.lookAt(state.camLook);
   }
 
@@ -392,6 +509,33 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
     return { meshes, outlines, casters, instanced };
   }
   const poiGap = (p) => Math.hypot(p.x - player.x, p.z - player.z) - p.radius - r;
+  /** Gets off whatever the child rides; the unicorn or car stays where it is. */
+  function leaveRide() {
+    const rd = state.ride;
+    if (!rd) return false;
+    if (rd.kind === 'train') {
+      // down by the lift to the station's ticket spot (or straight down to the street if the trip is cut short)
+      const tr = rd.train, st = tr.dwell > 0 ? tr.atStop : null;
+      const spot = st ? st.exit : { x: player.x, z: player.z };
+      tr.riding = false; tr.dwell = Math.max(tr.dwell, 1.5);
+      state.ride = null; collision.skip = WALK_SKIP;
+      setPlayerPos(spot.x, spot.z);
+    } else if (rd.kind === 'bus') {
+      const b = buses.mine, st = b && b.atStop;
+      const spot = st ? st.wait : { x: player.x + 4, z: player.z };
+      b.riding = false; b.dwell = Math.max(b.dwell, 1.5);
+      state.ride = null; collision.skip = WALK_SKIP;
+      setPlayerPos(spot.x, spot.z);
+    } else {
+      city.leave(rd.entry, player.x, player.z, player.yaw);
+      const side = player.yaw + Math.PI / 2;
+      state.ride = null; collision.skip = WALK_SKIP;
+      setPlayerPos(player.x + Math.sin(side) * (rd.ud.radius + 1.2), player.z + Math.cos(side) * (rd.ud.radius + 1.2));
+    }
+    ch.root.visible = true;
+    if (onRide) onRide('off', rd.kind);
+    return rd.kind;
+  }
   // QA helper: which kinds of meshes make up the draw calls right now
   function breakdown() {
     const out = {};
@@ -419,18 +563,58 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
     /** Walk to a spot along a path that goes round furniture and through the front door. */
     walkTo(x, z, onDone) {
       if (state.walk) finishWalk(false);
-      let path = nav ? findPath(nav, { x: player.x, z: player.z }, { x, z }) : null;
+      let path = nav && inMap(player.x, player.z) && inMap(x, z) ? findPath(nav, { x: player.x, z: player.z }, { x, z }) : null;
       if (!path || path.length < 2) path = [{ x: player.x, z: player.z }, { x, z }];
       state.walk = { x, z, path, idx: 1, onDone, time: 0, lastCheck: 0, lastX: player.x, lastZ: player.z };
     },
     get walking() { return !!state.walk; },
     cancelWalk() { if (state.walk) finishWalk(false); },
     resetPlayer(where = 'start') {
+      leaveRide();
       const p = where === 'yard' ? YARD_SPAWN : SPAWN;
       setPlayerPos(p.x, p.z); player.yaw = where === 'yard' ? Math.PI / 2 : Math.PI;
     },
     /** Moves the child straight to a spot (used for "back to start", and by the automated tests). */
-    teleport(x, z) { if (state.walk) finishWalk(false); setPlayerPos(x, z); },
+    teleport(x, z) { if (state.walk) finishWalk(false); leaveRide(); city.preload(x, z); setPlayerPos(x, z); },
+    // ---- rides: unicorns, cars and the bus
+    get ride() {
+      const rd = state.ride;
+      if (!rd) return null;
+      const atStop = rd.kind === 'bus' ? (buses.mine && buses.mine.dwell > 0 ? buses.mine.atStop : null) : rd.kind === 'train' ? (rd.train.dwell > 0 ? rd.train.atStop : null) : null;
+      return { kind: rd.kind, atStop };
+    },
+    get waitingBus() { return state.waitBus; },
+    get waitingTrain() { return state.waitTrain; },
+    /** At a train station: a train comes (soon) and the child gets on when it stops. */
+    callTrain(id) {
+      if (state.ride) return null;
+      const st = trains.call(id, player.x, player.z);
+      if (st) state.waitTrain = st;
+      return st;
+    },
+    nearRide(gap) { return state.ride ? null : city.nearRide(player.x, player.z, gap); },
+    mount() {
+      if (state.ride || state.mode !== 'play') return false;
+      const rr = city.nearRide(player.x, player.z, 2.2);
+      if (!rr) return false;
+      if (state.walk) finishWalk(false);
+      city.take(rr);
+      state.ride = { kind: rr.kind, entry: rr, obj: rr.obj, ud: rr.obj.userData, speed: 0 };
+      collision.skip = null;
+      player.x = rr.obj.position.x; player.z = rr.obj.position.z; player.yaw = rr.obj.rotation.y; player.vx = player.vz = 0;
+      const f = findFreeSpot(collision, player, state.ride.ud.radius); player.x = f.x; player.z = f.z;
+      return rr.kind;
+    },
+    dismount() { return leaveRide(); },
+    callBus(stopId) {
+      const st = buses.call(stopId);
+      if (!st) return null;
+      state.waitBus = st;
+      return st;
+    },
+    onRide(fn) { onRide = fn; },
+    /** a school child walking close by (to say hello to) */
+    nearKid(d = 2.6) { return state.ride ? null : people.near(player.x, player.z, d); },
     player() { return { x: player.x, z: player.z, speed: player.speed, yaw: player.yaw, zone: state.zoneId, area: state.outdoor > 0.5 ? 'outdoor' : 'indoor' }; },
     setAppearance(a) { state.appearance = a; ch.setAppearance(a); },
     celebrate(index) {
@@ -465,12 +649,12 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
     /** The closest point of interest (arcade, games, door, robots...) within `gap` metres of its edge, or null. */
     nearPoi(gap) {
       let best = null, bd = Infinity;
-      for (const p of POIS) { const d = poiGap(p); if (d <= gap && d < bd) { best = p; bd = d; } }
+      for (const p of ALL_POIS) { const d = poiGap(p); if (d <= gap && d < bd) { best = p; bd = d; } }
       return best;
     },
-    poiDistance(id) { const p = poiById[id]; return p ? poiGap(p) : Infinity; },
+    poiDistance(id) { const p = ALL_POIS.find((q) => q.id === id); return p ? poiGap(p) : Infinity; },
     poiApproach(id) {
-      const p = poiById[id];
+      const p = ALL_POIS.find((q) => q.id === id);
       const dx = player.x - p.x, dz = player.z - p.z;
       const d = Math.hypot(dx, dz) || 1;
       return { x: p.x + (dx / d) * (p.radius + r + 0.5), z: p.z + (dz / d) * (p.radius + r + 0.5) };
@@ -480,7 +664,7 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
     get doorOpen() { return state.doorPassable; },
     greetNpc(id) { npcs.greet(id); },
     onZoneChange(fn) { onZoneChange = fn; },
-    zone() { return zoneAt(player.x, player.z); },
+    zone() { return zoneHere(); },
     get outdoor() { return state.outdoor > 0.5; },
     distanceToStation(i) { const s = stations.positions()[i]; return s ? Math.hypot(s.x - player.x, s.z - player.z) - s.radius - r : Infinity; },
     approachPoint(i) {
@@ -510,7 +694,7 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
       if (f) {
         // a tap on or near a point of interest (its coloured ring) selects that place
         let best = null, bd = Infinity;
-        for (const p of POIS) { const d = Math.hypot(f.point.x - p.x, f.point.z - p.z) - p.radius; if (d < 1.0 && d < bd) { best = p; bd = d; } }
+        for (const p of ALL_POIS) { const d = Math.hypot(f.point.x - p.x, f.point.z - p.z) - p.radius; if (d < 1.0 && d < bd) { best = p; bd = d; } }
         if (best) return { type: 'poi', id: best.id, x: f.point.x, z: f.point.z };
         return { type: 'floor', x: f.point.x, z: f.point.z };
       }
@@ -530,11 +714,15 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
       return { violations: state.violations, maxPenetration: state.maxPenetration, fps: Math.round(state.fps), quality: state.quality, dpr: state.dpr,
         shadows: state.shadows, autoMode: quality === 'auto', lowFpsTime: +state.lowFpsTime.toFixed(2), samples: state.frameTimes.length, calls: renderer.info.render.calls, triangles: renderer.info.render.triangles, occluded: state.occluded,
         camera: { x: camera.position.x, y: camera.position.y, z: camera.position.z }, walking: !!state.walk, mode: state.mode,
-        guideArrow: effects.arrowVisible, bounds: WALK, playerRadius: r, zone: state.zoneId, area: state.outdoor > 0.5 ? 'outdoor' : 'indoor', doorOpen: state.doorPassable,
+        guideArrow: effects.arrowVisible, bounds: CITY, school: WALK, playerRadius: r, zone: state.zoneId,
+        ride: state.ride ? state.ride.kind : null, waitingBus: state.waitBus ? state.waitBus.id : null, waitingTrain: state.waitTrain ? state.waitTrain.id : null, highway: highway.active,
+        trains: trains.trains.map((t) => ({ s: Math.round(t.s), x: Math.round(t.x), z: Math.round(t.z), speed: +t.speed.toFixed(1), dwell: +Math.max(0, t.dwell).toFixed(1), atStop: t.atStop ? t.atStop.id : null, riding: t.riding })), city: city.stats(), traffic: traffic.active, people: people.active, kids: people.kids.filter((k) => k.active).map((k) => ({ x: +k.x.toFixed(1), z: +k.z.toFixed(1) })),
+        buses: buses.buses.map((b) => ({ route: b.rid, x: Math.round(b.x), z: Math.round(b.z), visible: b.model.visible })), myBus: buses.mine ? { x: buses.mine.x, z: buses.mine.z, dwell: +buses.mine.dwell.toFixed(1), atStop: buses.mine.atStop ? buses.mine.atStop.id : null, riding: !!buses.mine.riding } : null,
+        player: { x: +player.x.toFixed(2), z: +player.z.toFixed(2), speed: +player.speed.toFixed(2) }, area: state.outdoor > 0.5 ? 'outdoor' : 'indoor', doorOpen: state.doorPassable,
         visibleZones: state.visibleZones, totalZones: zoneEntries.length,
         npcs: Object.fromEntries(Object.entries(npcs.list).map(([k, n]) => [k, { x: n.root.position.x, z: n.root.position.z }])),
         character: state.appearance ? { hair: state.appearance.hairStyle, outfit: state.appearance.outfitColor, accessories: Object.fromEntries(Object.entries(state.appearance.accessories || {}).map(([k, v]) => [k, v.model])), meshes: (() => { let n = 0; ch.root.traverse((o) => { if (o.isMesh) n++; }); return n; })() } : null, boxes: collision.boxes.length, circles: collision.circles.length, ...sceneCounts() };
     }
   };
 }
-void isOutdoor; void Color;
+void Color; void GATES;

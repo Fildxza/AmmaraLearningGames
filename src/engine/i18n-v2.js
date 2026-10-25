@@ -4,6 +4,7 @@
 export const UPGRADE_STRINGS = {
   ms: {
     // map and walking
+    mapSchoolTab: 'Tadika', mapTownTab: 'Bandar', mapTownTitle: 'Peta Bandar Ceria', townTapHint: 'Ketik satu tempat untuk pergi ke sana dengan pantas!',
     map: 'Peta', mapTitle: 'Peta Tadika', mapTapHint: 'Ketik tempat untuk berjalan ke sana.', goStart: 'Balik ke Mula', goDoor: 'Ke Pintu Depan',
     returnInside: 'Masuk ke Tadika', youAreHere: 'Kamu di sini', close: 'Tutup', walkingThere: 'Sedang berjalan…', outdoorsNow: 'Kamu di taman!', indoorsNow: 'Kamu di dalam tadika!',
     areaIndoor: 'Dalam tadika', areaOutdoor: 'Di taman',
@@ -36,9 +37,17 @@ export const UPGRADE_STRINGS = {
     kidLockNote: 'Menyekat sentuhan di tepi skrin, cubit-zum, muat semula (F5) dan butang Back. Jika halaman dimuat semula, permainan menyambung di tempat yang sama. Tidak boleh menyekat Alt+F4, Ctrl+W atau butang rumah peranti: gunakan Screen Pinning (Android) atau Guided Access (iPad).',
     leaveFullscreen: 'Keluar skrin penuh', fsLeft: 'Skrin penuh ditamatkan sehingga halaman dimuat semula.', installApp: 'Pasang sebagai aplikasi',
     installHintWeb: 'Buka menu pelayar dan pilih Install / Add to Home Screen untuk pasang sebagai aplikasi tanpa bar URL.', installHintFile: 'Fail ini dibuka terus dari komputer. Versi web (HTTPS) boleh dipasang sebagai aplikasi.',
-    freeQuizDone: 'Bagus! Kamu tahu jawapannya!', stars: 'bintang'
+    freeQuizDone: 'Bagus! Kamu tahu jawapannya!', stars: 'bintang',
+    // town: rides, buses, school children
+    rideUnicorn: 'Tunggang unicorn!', driveCar: 'Pandu kereta!', getOff: 'Turun', getOffHere: 'Turun di sini',
+    rideOff: 'Turun dengan selamat!',
+    busComing: 'Bas sedang datang… tunggu di sini ya!', busBoard: 'Naik bas! Tekan "Turun di sini" di hentian yang kamu suka.', onBus: 'Dalam bas… ke hentian seterusnya', busAtStop: 'Hentian: {name}',
+    sayHi: 'Kata hai!', kidHi: ['Hai! Saya nak pergi sekolah!', 'Jom main sama-sama!', 'Selamat pagi, kawan!', 'Hati-hati melintas jalan ya!', 'Saya suka belajar!', 'Jom pergi ke zoo!'],
+    backToSchool: 'Balik ke tadika!',
+    trainComing: 'Kereta api sedang datang… tunggu di sini ya!', trainBoard: 'Naik kereta api! Tekan "Turun di sini" di stesen yang kamu suka.', onTrain: 'Dalam kereta api… ke stesen seterusnya', trainAtStop: 'Stesen: {name}'
   },
   en: {
+    mapSchoolTab: 'Preschool', mapTownTab: 'Town', mapTownTitle: 'Happy Town Map', townTapHint: 'Tap a place to go there quickly!',
     map: 'Map', mapTitle: 'Preschool Map', mapTapHint: 'Tap a place to walk there.', goStart: 'Back to Start', goDoor: 'To the Front Door',
     returnInside: 'Back into the Preschool', youAreHere: 'You are here', close: 'Close', walkingThere: 'Walking there…', outdoorsNow: 'You are in the garden!', indoorsNow: 'You are inside the preschool!',
     areaIndoor: 'Inside', areaOutdoor: 'Garden',
@@ -66,6 +75,12 @@ export const UPGRADE_STRINGS = {
     kidLockNote: 'Blocks touches on the screen edge, pinch zoom, refresh (F5) and the Back button. If the page is reloaded, the game carries on in the same place. It cannot block Alt+F4, Ctrl+W or the device home button: use Screen Pinning (Android) or Guided Access (iPad).',
     leaveFullscreen: 'Leave full screen', fsLeft: 'Full screen is off until the page is reloaded.', installApp: 'Install as an app',
     installHintWeb: 'Use the browser menu: Install / Add to Home Screen, to get an app without an address bar.', installHintFile: 'This file is opened straight from the computer. The web version (HTTPS) can be installed as an app.',
-    freeQuizDone: 'Well done! You know the answer!', stars: 'stars'
+    freeQuizDone: 'Well done! You know the answer!', stars: 'stars',
+    rideUnicorn: 'Ride the unicorn!', driveCar: 'Drive the car!', getOff: 'Get off', getOffHere: 'Get off here',
+    rideOff: 'Off you get, safely!',
+    busComing: 'The bus is coming… wait here!', busBoard: 'On the bus! Press "Get off here" at any stop you like.', onBus: 'On the bus… to the next stop', busAtStop: 'Stop: {name}',
+    sayHi: 'Say hi!', kidHi: ["Hi! I'm going to school!", "Let's play together!", 'Good morning, friend!', 'Be careful crossing the road!', 'I love learning!', "Let's go to the zoo!"],
+    backToSchool: 'Back to the preschool!',
+    trainComing: 'The train is coming… wait here!', trainBoard: 'On the train! Press "Get off here" at any station you like.', onTrain: 'On the train… to the next station', trainAtStop: 'Station: {name}'
   }
 };

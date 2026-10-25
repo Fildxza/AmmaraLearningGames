@@ -1,5 +1,5 @@
 {
- "total": 392,
+ "total": 453,
  "perCategory": {
   "abc": {
    "questions": 29,
@@ -10,52 +10,52 @@
    "needsHumanReview": 0
   },
   "numbers": {
-   "questions": 28,
-   "distinctQuestionAnswerPairs": 28,
+   "questions": 35,
+   "distinctQuestionAnswerPairs": 35,
    "objectives": 5,
    "factChecked": 0,
-   "lowRiskVisual": 28,
+   "lowRiskVisual": 35,
    "needsHumanReview": 0
   },
   "colors": {
-   "questions": 27,
-   "distinctQuestionAnswerPairs": 27,
+   "questions": 29,
+   "distinctQuestionAnswerPairs": 29,
    "objectives": 5,
    "factChecked": 0,
    "lowRiskVisual": 16,
-   "needsHumanReview": 11
+   "needsHumanReview": 13
   },
   "shapes": {
-   "questions": 24,
-   "distinctQuestionAnswerPairs": 24,
-   "objectives": 6,
-   "factChecked": 0,
-   "lowRiskVisual": 20,
-   "needsHumanReview": 4
-  },
-  "animals": {
-   "questions": 30,
-   "distinctQuestionAnswerPairs": 30,
-   "objectives": 4,
-   "factChecked": 3,
-   "lowRiskVisual": 6,
-   "needsHumanReview": 21
-  },
-  "food": {
    "questions": 28,
    "distinctQuestionAnswerPairs": 28,
    "objectives": 6,
    "factChecked": 0,
-   "lowRiskVisual": 16,
-   "needsHumanReview": 12
+   "lowRiskVisual": 24,
+   "needsHumanReview": 4
+  },
+  "animals": {
+   "questions": 36,
+   "distinctQuestionAnswerPairs": 36,
+   "objectives": 4,
+   "factChecked": 3,
+   "lowRiskVisual": 10,
+   "needsHumanReview": 23
+  },
+  "food": {
+   "questions": 36,
+   "distinctQuestionAnswerPairs": 36,
+   "objectives": 6,
+   "factChecked": 0,
+   "lowRiskVisual": 23,
+   "needsHumanReview": 13
   },
   "vehicles": {
-   "questions": 25,
-   "distinctQuestionAnswerPairs": 25,
+   "questions": 35,
+   "distinctQuestionAnswerPairs": 35,
    "objectives": 5,
    "factChecked": 0,
-   "lowRiskVisual": 9,
-   "needsHumanReview": 16
+   "lowRiskVisual": 13,
+   "needsHumanReview": 22
   },
   "body": {
    "questions": 25,
@@ -66,44 +66,44 @@
    "needsHumanReview": 12
   },
   "objects": {
-   "questions": 29,
-   "distinctQuestionAnswerPairs": 29,
+   "questions": 34,
+   "distinctQuestionAnswerPairs": 34,
    "objectives": 6,
    "factChecked": 0,
    "lowRiskVisual": 16,
-   "needsHumanReview": 13
-  },
-  "nature": {
-   "questions": 24,
-   "distinctQuestionAnswerPairs": 24,
-   "objectives": 5,
-   "factChecked": 0,
-   "lowRiskVisual": 6,
    "needsHumanReview": 18
   },
+  "nature": {
+   "questions": 27,
+   "distinctQuestionAnswerPairs": 27,
+   "objectives": 5,
+   "factChecked": 0,
+   "lowRiskVisual": 7,
+   "needsHumanReview": 20
+  },
   "space": {
-   "questions": 23,
-   "distinctQuestionAnswerPairs": 23,
+   "questions": 26,
+   "distinctQuestionAnswerPairs": 26,
    "objectives": 5,
    "factChecked": 4,
-   "lowRiskVisual": 7,
-   "needsHumanReview": 12
+   "lowRiskVisual": 8,
+   "needsHumanReview": 14
   },
   "hygiene": {
-   "questions": 23,
-   "distinctQuestionAnswerPairs": 23,
+   "questions": 26,
+   "distinctQuestionAnswerPairs": 26,
    "objectives": 4,
    "factChecked": 10,
    "lowRiskVisual": 0,
-   "needsHumanReview": 13
+   "needsHumanReview": 16
   },
   "safety": {
-   "questions": 25,
-   "distinctQuestionAnswerPairs": 25,
+   "questions": 35,
+   "distinctQuestionAnswerPairs": 35,
    "objectives": 4,
    "factChecked": 4,
    "lowRiskVisual": 0,
-   "needsHumanReview": 21
+   "needsHumanReview": 31
   },
   "emotions": {
    "questions": 25,
@@ -123,30 +123,30 @@
   }
  },
  "perAge": {
-  "2-3": 155,
-  "3-4": 263,
-  "4+": 199
+  "2-3": 170,
+  "3-4": 311,
+  "4+": 233
  },
  "perDifficulty": {
-  "1": 155,
-  "2": 159,
-  "3": 78
+  "1": 170,
+  "2": 195,
+  "3": 88
  },
  "perInteractionType": {
-  "choose": 276,
+  "choose": 328,
   "match": 47,
-  "count": 17,
-  "compare": 10,
+  "count": 23,
+  "compare": 12,
   "sequence": 4,
-  "sound": 12,
+  "sound": 13,
   "sort": 6,
   "odd-one-out": 5,
   "shadow": 7,
   "pattern": 8
  },
  "perVerificationStatus": {
-  "visual-identification-low-risk": 197,
-  "needs-human-review": 172,
+  "visual-identification-low-risk": 225,
+  "needs-human-review": 205,
   "fact-checked-against-source": 23
  },
  "objectivesUsed": 72

@@ -5,10 +5,11 @@
 **Langkah Kecil, Penemuan Besar! · Little Steps, Big Discoveries!**
 
 An offline 3D learning world for preschool children aged 2 to 4+:
-a whole preschool and garden to explore, 16 learning worlds, a 10-game arcade and a gentle *Jom Mengaji* Quran-learning corner.
+a whole preschool and garden inside a big friendly town (unicorns to ride, toy cars, buses, a highway and an elevated train),
+16 learning worlds, a 10-game arcade and a gentle *Jom Mengaji* Quran-learning corner.
 Bahasa Melayu first, English one tap away.
 
-![Version](https://img.shields.io/badge/version-2.0.0-ff7eb6)
+![Version](https://img.shields.io/badge/version-2.1.0-ff7eb6)
 ![Offline](https://img.shields.io/badge/works-100%25%20offline-3aa98f)
 ![Single file](https://img.shields.io/badge/deploy-one%20HTML%20file-9b6bff)
 ![Tests](https://img.shields.io/badge/tests-unit%20%2B%20Chrome%20%2B%20Edge-4a90e2)
@@ -26,24 +27,26 @@ Bahasa Melayu first, English one tap away.
 1. [Highlights](#highlights)
 2. [Quick start](#quick-start)
 3. [The world](#the-world)
-4. [Mini-Game Arcade](#mini-game-arcade)
-5. [Jom Mengaji](#jom-mengaji)
-6. [Narrator, music and sound](#narrator-music-and-sound)
-7. [For teachers and parents](#for-teachers-and-parents)
-8. [Privacy and safety](#privacy-and-safety)
-9. [Deployment](#deployment)
-10. [Development](#development)
-11. [Quality and testing](#quality-and-testing)
-12. [Known limitations](#known-limitations)
-13. [Credits and licences](#credits-and-licences)
+4. [The town: Bandar Ceria](#the-town-bandar-ceria)
+5. [Mini-Game Arcade](#mini-game-arcade)
+6. [Jom Mengaji](#jom-mengaji)
+7. [Narrator, music and sound](#narrator-music-and-sound)
+8. [For teachers and parents](#for-teachers-and-parents)
+9. [Privacy and safety](#privacy-and-safety)
+10. [Deployment](#deployment)
+11. [Development](#development)
+12. [Quality and testing](#quality-and-testing)
+13. [Known limitations](#known-limitations)
+14. [Credits and licences](#credits-and-licences)
 
 ## Highlights
 
 | | |
 |---|---|
-| **One file, no internet** | The whole game, including 3D engine, fonts, pictures and music, is `AmmaraGames.html` (about 1.5 MB). Double-click to play. |
+| **One file, no internet** | The whole game, including 3D engine, fonts, pictures and music, is `AmmaraGames.html` (about 1.7 MB). Double-click to play. |
 | **Big 3D preschool + garden** | 11 indoor corners and 6 garden areas (120 × 44 m), with a front door, playground, sandpit, hopscotch, flower garden and a gazebo Nature Station. |
-| **16 learning worlds, 392 questions** | Letters, numbers, colours, shapes, animals, fruit, vehicles, body, nature, space, hygiene, safety, feelings, patterns and more, in BM and English, chosen by age group. |
+| **A whole town around it** | *Bandar Ceria*: 4.2 × 4.2 km of streets, 1,000+ blocks and 4,600+ buildings, 22 landmarks with learning places, unicorns, toy cars, buses, a 4-lane highway, an elevated train with 4 stations, traffic and school children. |
+| **16 learning worlds, 453 questions** | Letters, numbers, colours, shapes, animals, fruit, vehicles, body, nature, space, hygiene, safety, feelings, patterns and more, in BM and English, chosen by age group. |
 | **10 mini-games** | Ruler & straight lines, X and O, connect the dots, trace letters/numbers/Hijaiyah, memory cards, shape puzzle, find it, bead patterns, count & sort, xylophone. |
 | **Jom Mengaji** | 28 Hijaiyah letters, original exercises, and 20 short surahs with verbatim Tanzil Uthmani text and an embedded Arabic font. |
 | **Friendly helpers** | A star mascot, two seated robot friends who say hello, and an optional narrator voice. |
@@ -72,6 +75,25 @@ If 3D graphics are not available, the game says so and offers **card mode** with
 * **West wing corners:** Jom Mengaji, ABC & Reading (with the robot friends Robo Danial and Robo Aisyah), Mini-Game Arcade, Art, Numbers, Colours & Shapes, Animals, Music, Wardrobe & Rewards, and a cosy Rest corner.
 * **Garden:** front gate and fountain, flower garden, playground (slide, swings, seesaw, climbing dome), sandpit, hopscotch lawn, picnic park with the Nature Station.
 * **Never lost:** a minimap, a big map where you tap a place to walk there, "Back to start", a "Back into the Preschool" button outside, and an arrow that always points the way. The whole map is checked by a path-finding test, so there are no dead ends.
+
+## The town: Bandar Ceria
+
+Walk out of the garden gate and the preschool is in the middle of a town, built in the same soft toy style.
+
+<div align="center">
+<img src="docs/screenshots/town-train.png" alt="Riding the elevated train above the town streets" width="49%"> <img src="docs/screenshots/town-highway.png" alt="The four-lane highway with the train line along its middle" width="49%">
+<img src="docs/screenshots/town-unicorn.png" alt="Riding a unicorn out of the stable next to the preschool" width="49%"> <img src="docs/screenshots/town-map.png" alt="The town map with a quick-trip button for every landmark" width="49%">
+</div>
+
+* **Size:** 4.2 km × 4.2 km (17.6 km²), about half the 6 × 6 km map square of GTA San Andreas. Streets every 120 m, more than 1,000 blocks and 4,600 buildings: a town centre with towers, shopping streets, flats, housing areas, parks, a little forest, green hills and a beach with the sea.
+* **22 landmarks, each with something to learn:** Lake Park, Happy Zoo, Fruit Market, Library, Mosque (Jom Mengaji), Fire Station, Police Station, Health Clinic, Theme Park, Mini Stadium, Primary School, Space Museum, Art House, Happy Farm, Toy Shop, Bus Station, Big Playground, Music Stage, and **four train stations**. Their quiz boards and games use the same questions and mini-games as the preschool.
+* **Ride things:** unicorns (stable next to the preschool, parks, the lake, the farm) and open toy cars (preschool car park, shopping-street car parks). Walk up and press the big yellow button; press it again to get off.
+* **Buses:** 3 routes and 11 stops. Press the button at a stop, the bus comes, the child gets on and can get off at any stop.
+* **Highway (Lebuhraya Ceria):** a 4-lane divided highway across the whole town, with a planted middle and barrier, lane markings, tall lamps, green signs and its own fast traffic. Every crossing has traffic lights.
+* **Elevated train (Kereta Api Ceria):** a 3.6 km loop on pillars about 9 m above the streets (part of it along the highway's middle, like a city LRT), with round corners and two 3-car trains. Each station has a hall, a lift tower, a raised platform with a canopy, a "take the train" spot and a quiz. If both trains are far away, one is brought round so no child waits long.
+* **People and traffic:** school children in uniform walk the pavements and wave; say hello and they answer. Cars keep left (as in Malaysia) and always stop for children.
+* **Never lost in town either:** the corner map shows the streets around the child; the big map has a **Town** tab with every landmark as a button for a quick trip, and "Back to the preschool" works from anywhere. Each area shows its name and has its own music.
+* **Smooth on school laptops:** only the part of town near the child is built (in 240 m squares) and removed again behind them, and the follow camera never looks through a building, the train deck or a platform.
 
 ## Mini-Game Arcade
 
@@ -176,6 +198,8 @@ npm test                 # unit tests (rules, records, layout, narrator, Quran t
 npm run e2e              # original 41 end-to-end checks in Chrome   (npm run e2e:edge for Edge)
 npm run e2e:upgrade      # 13 checks for the 3D world, narrator, arcade, Jom Mengaji (…:edge for Edge)
 npm run e2e:lock         # 9 checks for Kid Lock, resume after reload, offline web app over http (…:edge for Edge)
+npm run e2e:city         # 14 checks for the town: unicorn, car, bus, train and highway rides, map trips (…:edge for Edge)
+npm run city-tour        # screenshots of town places (landmarks, stations, highway, beach…)
 npm run icons:app        # re-renders the app icons in public/icons from the star mascot
 npm run play-games       # plays all ten mini-games with real mouse input and saves screenshots
 npm run tour             # screenshots of every corner of the 3D world
@@ -193,6 +217,8 @@ src/
   engine/
     core/                   validator, progress & CSV, collision, A* navigation grid (no browser needed)
     world/                  Three.js world: layout (single source of truth), building, zones, yard, NPCs, stations
+    city/                   the town: plan.js (pure data: streets, blocks, landmarks, buses, highway, train line),
+                            build.js (streamed 3D squares), life.js (traffic, children, buses, highway cars, trains), models.js
     minigames/              logic.js (pure, unit-tested rules) + the ten game screens
     ui/                     menus, HUD, map, voice & sound panel, arcade frame, Jom Mengaji
     narrator.js, audio.js   offline voice service, synthesised music and effects
@@ -209,7 +235,7 @@ licenses/                   third-party licences
 
 See [`TEST-REPORT.md`](TEST-REPORT.md) (generated from the real runs, not typed by hand) and [`research/UPGRADE-RESEARCH-REPORT.md`](research/UPGRADE-RESEARCH-REPORT.md).
 
-What is verified automatically: game rules, records and CSV, reachability of every place on the map, collisions, all ten games played to the end, Quran text identical to the source, narrator voice choice (with a stub speech engine), offline operation, no console errors, and layouts at phone, tablet and projector sizes, in Chrome and Edge.
+What is verified automatically: game rules, records and CSV, reachability of every place on the map, collisions, all ten games played to the end, Quran text identical to the source, narrator voice choice (with a stub speech engine), offline operation, no console errors, and layouts at phone, tablet and projector sizes, in Chrome and Edge. For the town: every building and collider stays inside its lot, nothing blocks a learning place, ride or bus stop, bus routes and the train line follow the streets, train pillars stay out of crossings and traffic lanes, and real rides on a unicorn, a car, the bus and the train (to the next station and off again) in the browser. Every picture the game can show (442) is rendered and checked for empty boxes.
 
 What is **not** verified: how the narrator voice actually sounds on your computer (nobody listened to it), the music on real speakers, physical touch screens, other browsers, slow school laptops, real children aged 2-4, and review by a qualified Quran teacher.
 
@@ -218,6 +244,7 @@ What is **not** verified: how the narrator voice actually sounds on your compute
 * The narrator depends on the voices installed on the computer; many computers have no offline Malay voice (the app then uses Indonesian if present, and says so, or shows text only).
 * Weak graphics chips may run the big world slowly; the game then lowers its graphics quality automatically (Teacher > Settings > Graphics also has a Light mode).
 * Tracing checks the shape, not the stroke order. Hijaiyah letter names have no audio.
+* In the town, traffic lights are decoration: cars give way to each other and always stop for children, but do not follow light phases. Getting on the train or bus is shown as a jump into the seat (no walking up the stairs). Between tall towers the camera view can be narrow.
 * Records are per browser and per file location.
 
 ## Credits and licences
