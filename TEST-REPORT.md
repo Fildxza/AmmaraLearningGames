@@ -1,6 +1,6 @@
 # AmmaraGames: test report
 
-Generated 2026-10-24T20:50:35.758Z by `npm run report` from the raw results of the last runs. Nothing in this file is typed by hand except the sections marked "(written by hand)".
+Generated 2026-10-25T03:14:39.674Z by `npm run report` from the raw results of the last runs. Nothing in this file is typed by hand except the sections marked "(written by hand)".
 
 ## Environment
 
@@ -13,11 +13,13 @@ Generated 2026-10-24T20:50:35.758Z by `npm run report` from the raw results of t
 
 | Suite | Result |
 |---|---|
-| Unit tests (`npm test`) | 62 of 62 passed, 0 failed |
+| Unit tests (`npm test`) | 65 of 65 passed, 0 failed |
 | End-to-end, Chrome | 41 passed, 0 failed |
 | End-to-end, Edge | 41 passed, 0 failed |
 | Upgrade checks (2.0), Chrome | 13 passed, 0 failed |
 | Upgrade checks (2.0), Edge | 13 passed, 0 failed |
+| Kid Lock / web app checks, Chrome | 9 passed, 0 failed |
+| Kid Lock / web app checks, Edge | 9 passed, 0 failed |
 
 ## Upgrade checks: 3D world, narrator, arcade, Jom Mengaji (2.0)
 
@@ -27,7 +29,7 @@ From `tests/e2e/run-e2e-upgrade.mjs`. The speech engine is replaced by a recordi
 |---|---|---|---|---|
 | U1 | Opens offline and shows the new menu buttons (arcade, Jom Mengaji, voice settings) | PASS | PASS | menu ok |
 | U2 | The 3D world is a whole preschool + garden: 17 areas, door, robot friends seated | PASS | PASS | 17 areas, map 120 x 44 m, robots stay seated |
-| U3 | Every indoor corner and garden area can be visited, with its own music | PASS | PASS | mengaji:islamic:42fps arcade:arcade:36fps music:playroom:36fps rest:calm:41fps gate:yard:44fps playground:yard:39fps |
+| U3 | Every indoor corner and garden area can be visited, with its own music | PASS | PASS | mengaji:islamic:46fps arcade:arcade:40fps music:playroom:39fps rest:calm:53fps gate:yard:46fps playground:yard:45fps |
 | U4 | Walking out of the front door and back in (door opens, "back inside" button, guide arrow) | PASS | PASS | out through the door and back, no collision problems |
 | U5 | Robot friend says hello with the narrator (Malay voice, offline only) | PASS | PASS | "Hai! Jom belajar bersama!" by Microsoft Rizwan - Malay (Malaysia), pitch 1.15 |
 | U6 | Voice & Sound panel: real voice list, honest labels, preview, sliders, mute | PASS | PASS | voices listed, preview used Zira, mute works |
@@ -38,6 +40,22 @@ From `tests/e2e/run-e2e-upgrade.mjs`. The speech engine is replaced by a recordi
 | U11 | Jom Mengaji exercises can be completed (letters, dots, marks) and are recorded | PASS | PASS | match, dots, harakat finished |
 | U12 | Phone-size screens: arcade, a game and the Islamic centre stay on screen | PASS | PASS | 390x844, 844x390, 1024x600 ok |
 | U13 | No JavaScript errors and no network requests during all of the above | PASS | PASS | console errors 0; external requests 0 |
+
+## Kid Lock and installable web app (2.0)
+
+From `tests/e2e/run-e2e-lock.mjs`: the built `dist/` folder is served over http under a sub-path (like GitHub Pages), the service worker caches it, then the network is switched off and the game still opens. Touch events are simulated with the browser's touch API, not a physical screen.
+
+| Id | Check | Chrome | Edge | What was measured (Chrome) |
+|---|---|---|---|---|
+| L1 | Served over http: manifest, icons and service worker are found and the worker takes control | PASS | PASS | manifest ok, cache ammaragames-449c6c3fd4 |
+| L2 | Offline: after one visit the game opens with the network switched off | PASS | PASS | opened offline from the service-worker cache |
+| L3 | Ghost touches: edge and palm touches are ignored, a normal tap works | PASS | PASS | 3 edge touches ignored ({"edge":3}), normal tap passed |
+| L4 | Zoom, refresh, print and long-press menu are blocked | PASS | PASS | F5, Ctrl+R, Ctrl+P, Ctrl+zoom, context menu, Ctrl+wheel blocked |
+| L5 | Full screen starts on the first tap (and the lock can be turned off by an adult) | PASS | PASS | full-screen requested 1x, active=true |
+| L6 | Reload in the middle of play carries on in the same place (no menu, same child, same spot) | PASS | PASS | back in art at -26.5, 1.9 as Pemain |
+| L7 | Reload inside the arcade returns to the arcade; going Home on purpose clears the resume | PASS | PASS | arcade resumed; menu stays menu after leaving on purpose |
+| L8 | Adult switch: turning Kid Lock off in Teacher > Settings stops the blocking and the resume | PASS | PASS | lock off: shortcuts free, resume cleared |
+| L9 | No JavaScript errors during the lock and web-app flows | PASS | PASS | console errors 0 |
 
 ## Specification checklist (section 17)
 
@@ -91,19 +109,19 @@ From `tests/e2e/run-e2e-upgrade.mjs`. The speech engine is replaced by a recordi
 
 | Id | Test | Result | What was measured |
 |---|---|---|---|
-| 1 | The HTML file opens locally (file://) and leaves the loading screen | PASS | ready in 5525 ms |
+| 1 | The HTML file opens locally (file://) and leaves the loading screen | PASS | ready in 10865 ms |
 | 3 | Main menu renders (logo, PLAY, worlds, teacher, sound, language, age) | PASS | title=AmmaraGames |
-| 4 | 3D scene initialises (WebGL renderer, meshes, draw calls) | PASS | meshes=421 calls=249 canvas=1366x768 |
+| 4 | 3D scene initialises (WebGL renderer, meshes, draw calls) | PASS | meshes=421 calls=247 canvas=1366x768 |
 | 20.1 | Audio waits for a user gesture (no autoplay before interaction) | PASS | {"state":"not-started","available":true,"music":false,"scene":"playroom","song":"cheerful"} |
 | 4.1 | PLAY starts the default adventure in the 3D playroom | PASS | run=R1 audio=running music=true |
 | 20.2 | Music starts after the first tap and plays through Web Audio | PASS | {"state":"running","available":true,"music":true,"scene":"playroom","song":"cheerful"} |
-| 5 | Character moves with arrow keys and WASD in all four directions | PASS | ArrowUp:2.03 ArrowDown:2.13 ArrowLeft:2.04 ArrowRight:2.04 KeyW:2.05 KeyS:2.05 KeyA:1.97 KeyD:1.97 |
-| 6 | On-screen D-pad buttons move the character (pointer press and hold) | PASS | up:2.05 down:2.04 left:1.96 right:2.05 |
+| 5 | Character moves with arrow keys and WASD in all four directions | PASS | ArrowUp:1.88 ArrowDown:2.35 ArrowLeft:1.89 ArrowRight:2.12 KeyW:2.06 KeyS:1.96 KeyA:2.14 KeyD:2.05 |
+| 6 | On-screen D-pad buttons move the character (pointer press and hold) | PASS | up:2.11 down:1.97 left:2.12 right:2.05 |
 | 7 | Collision: walls, furniture and stations cannot be walked through | PASS | left=-57.55 cabinet z>=-8.25 station gap ok, violations=0, maxPenetration=0.0000 |
-| 8 | Camera follows the player smoothly (no snapping, per-frame measurement) | PASS | 60 frames: camera moved 4.06 m, fastest 4.3 m/s (player 4.4), trailing 3.80 m |
+| 8 | Camera follows the player smoothly (no snapping, per-frame measurement) | PASS | 56 frames: camera moved 3.69 m, fastest 4.3 m/s (player 4.4), trailing 3.83 m |
 | 10 | INTERACT appears near station 1 and opens the correct quiz | PASS | quiz abc-01, header "Stesen 1" |
 | 11 | All three answer options are present, enabled and labelled with pictures | PASS | C / B / A |
-| 12 | Correct answer: celebration, quiz closes by itself in about 1 s, reward is worn | PASS | answer letter:A; quiz closed after ~1246 ms; bow worn; stars 1 |
+| 12 | Correct answer: celebration, quiz closes by itself in about 1 s, reward is worn | PASS | answer letter:A; quiz closed after ~1308 ms; bow worn; stars 1 |
 | 13 | Wrong answer keeps the quiz open, dims that choice, shows a gentle hint | PASS | hint: "Hampir! Cuba lagi 💛 Kira dengan jari: satu… dua!" |
 | 14 | No penalty: stars and progress unchanged by mistakes; attempts are counted | PASS | station 2: attempts=2, firstTry=false, stars 1→2 |
 | 9 | Every station is reachable (keyboard steering and tap-to-walk) | PASS | station 3 reached by tap-to-walk (auto-opened its quiz); station 4 by keyboard |
@@ -118,8 +136,8 @@ From `tests/e2e/run-e2e-upgrade.mjs`. The speech engine is replaced by a recordi
 | 22 | Teacher area behind a press-and-hold gate; class list session starts | PASS | 4 nama sedia. 2 baris kosong diabaikan. 0 nama berulang ditanda. / Sesi dimulakan untuk 4 murid. |
 | 23 | Learner list, switching learner, and accurate per-learner scores | PASS | learners: Ali, Siti, =CMD(), +evil; Ali station 1 attempts=2 |
 | 24 | Next learner via the decision screen; records never mix | PASS | Ali: 2 attempts, not first try, 1 star / Siti: 1 attempt, first try, 1 star |
-| 25 | CSV export downloads a real file (UTF-8 with BOM, 18 columns, all rows) | PASS | AmmaraGames_rekod_all_2026-10-25_0439.csv: 20 rows; "20 baris disimpan ke fail AmmaraGames_rekod_all_2026-10-25_0439.csv." |
-| 26 | CSV protects names starting with = + - @ (formula injection) and quotes fields | PASS | AmmaraGames_rekod_session_2026-10-25_0439.csv: '=CMD() exported as "'=CMD()", no cell starts with = + - @ |
+| 25 | CSV export downloads a real file (UTF-8 with BOM, 18 columns, all rows) | PASS | AmmaraGames_rekod_all_2026-10-25_1102.csv: 20 rows; "20 baris disimpan ke fail AmmaraGames_rekod_all_2026-10-25_1102.csv." |
+| 26 | CSV protects names starting with = + - @ (formula injection) and quotes fields | PASS | AmmaraGames_rekod_session_2026-10-25_1102.csv: '=CMD() exported as "'=CMD()", no cell starts with = + - @ |
 | 27 | Reset and delete-all ask for confirmation (cancel keeps data, confirm clears) | PASS | reset cancel ok; delete needs two confirmations; storage emptied |
 | 21.1 | Settings and info tabs render (privacy text, diagnostics, storage status) | PASS | info shows 392 valid questions and storage status |
 | 28 | Window resizing keeps menus, HUD and quiz on screen | PASS | 1920x1080: hud ok canvas ok; 1280x720: hud ok canvas ok; 1024x600: hud ok canvas ok; 800x1280: hud ok canvas ok; 844x390: hud ok canvas ok; 390x844: hud ok canv |
@@ -144,6 +162,7 @@ Screenshots of every screen are in `qa/screenshots/chrome` and `qa/screenshots/e
 
 ## NOT TESTED (written by hand)
 
+* **Kid Lock on real devices.** Android Screen Pinning, iPad Guided Access, Windows kiosk mode, installing the app on a phone/tablet, and a real palm on a real screen were not tried; edge/palm touches were simulated.
 * **Real touch screens and tablets.** Pointer presses and tap-to-walk were tested with a mouse. Pointer events are the same API, but no physical touch device was used.
 * **Real speakers.** The Web Audio graph was confirmed running (state "running", music playing) and the mute logic was tested, but nobody listened to the music or effects, so loudness, pleasantness and balance are unverified.
 * **The narrator's real voice.** Voice choice, settings, mute, queueing and the Arabic refusal were tested with a stub; nobody listened to a real voice, so whether it sounds cute, friendly or female is not verified. Choose a voice by ear in Voice & Sound.

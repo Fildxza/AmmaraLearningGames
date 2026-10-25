@@ -13,8 +13,7 @@ const upChrome = read('qa/e2e-upgrade-chrome.json');
 const upEdge = read('qa/e2e-upgrade-edge.json');
 const lkChrome = read('qa/e2e-lock-chrome.json');
 const lkEdge = read('qa/e2e-lock-edge.json');
-const lkRows = (lkChrome ? lkChrome.results : []).map((r) => { const e = lkEdge ? lkEdge.results.find((x) => x.id === r.id) : null; return `| ${r.id} | ${r.name} | ${r.ok ? 'PASS' : 'FAIL'} | ${e ? (e.ok ? 'PASS' : 'FAIL') : 'NOT TESTED'} | ${String(r.info || '').replace(/\|/g, '/').slice(0, 170)} |`; }).join('
-');
+const lkRows = (lkChrome ? lkChrome.results : []).map((r) => { const e = lkEdge ? lkEdge.results.find((x) => x.id === r.id) : null; return `| ${r.id} | ${r.name} | ${r.ok ? 'PASS' : 'FAIL'} | ${e ? (e.ok ? 'PASS' : 'FAIL') : 'NOT TESTED'} | ${String(r.info || '').replace(/\|/g, '/').slice(0, 170)} |`; }).join('\n');
 const upPass = (r) => (r ? `${r.results.filter((x) => x.ok).length} passed, ${r.results.filter((x) => !x.ok).length} failed` : 'NOT RUN');
 const upRows = (upChrome ? upChrome.results : []).map((r) => {
   const e = upEdge ? upEdge.results.find((x) => x.id === r.id) : null;
