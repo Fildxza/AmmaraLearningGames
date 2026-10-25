@@ -243,10 +243,10 @@ export function createCollection(actions) {
     render(vm) {
       const stickers = `<p class="col-count">${esc(t('stickersCount', { n: vm.stickerOwned, total: vm.stickers.length }))} · ${G.star} ${esc(t('starsTotal', { n: vm.stars }))}</p>
         <div class="sticker-grid">${vm.stickers.map((s) => `<div class="sticker ${s.owned ? 'owned' : 'locked'}" title="${esc(s.owned ? s.name : t('lockedItem'))}">
-          <span class="st-pic">${s.svg}</span><span class="st-name">${esc(s.owned ? s.name : '?')}</span></div>`).join('')}</div>`;
+          <span class="st-pic">${s.svg}${s.owned ? '' : `<span class="st-lock" aria-hidden="true">${G.lock}</span>`}</span><span class="st-name">${esc(s.name)}</span></div>`).join('')}</div>`;
       const slotTabs = vm.slots.map((s) => `<button class="slot-tab ${s.id === vm.slot ? 'on' : ''}" data-action="slot" data-arg="${s.id}" aria-pressed="${s.id === vm.slot}">${s.thumb}<span>${esc(s.label)}</span></button>`).join('');
       const items = vm.items.map((it) => `<button class="item ${it.owned ? '' : 'locked'} ${it.equipped ? 'equipped' : ''}" data-action="${it.owned ? 'equip' : 'locked'}" data-arg="${esc(it.id)}" data-testid="item-${esc(it.id)}" aria-pressed="${it.equipped}" aria-label="${esc(it.owned ? it.name : t('lockedItem'))}">
-          <span class="item-pic">${it.thumb}</span><span class="item-name">${esc(it.owned ? it.name : t('lockedItem'))}</span>${it.equipped ? `<span class="item-check">${G.check}</span>` : ''}${it.owned ? '' : `<span class="item-lock">${G.lock}</span>`}</button>`).join('');
+          <span class="item-pic">${it.thumb}</span><span class="item-name">${esc(it.name)}${it.owned ? '' : `<small>${esc(t('lockedItem'))}</small>`}</span>${it.equipped ? `<span class="item-check">${G.check}</span>` : ''}${it.owned ? '' : `<span class="item-lock">${G.lock}</span>`}</button>`).join('');
       root.innerHTML = `<div class="collection-panel">
         <header class="screen-head">
           <h2>${esc(t('myCollection'))}</h2>

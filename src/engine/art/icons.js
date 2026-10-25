@@ -31,6 +31,8 @@ export function parseKey(key) {
       const n = +parts[1];
       return parts.length === 2 && HAND[parts[0]] && Number.isInteger(n) && n >= 1 && n <= 10 ? { kind: 'count', item: parts[0], n } : null;
     }
+    // colour words (used for labels) also get a picture: a paint splash, or the rainbow ball
+    case 'color': return parts.length === 1 ? (COLORS[rest] ? { kind: 'paint', color: rest } : rest === 'rainbow' ? { kind: 'ball', color: 'rainbow' } : null) : null;
     case 'ball': case 'paint': case 'crayon':
       return parts.length === 1 && (COLORS[rest] || rest === 'rainbow') ? { kind: head, color: rest } : null;
     case 'shape': {

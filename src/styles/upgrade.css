@@ -73,3 +73,14 @@ html, body { overscroll-behavior: none; touch-action: manipulation; }
 body { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 #scene, .dpad .dir, .mu-xylo, .rl-board, .dt-board, .tr-ink, .pz-piece, .ct-piece { touch-action: none; }
 img, svg, canvas { -webkit-user-drag: none; user-drag: none; }
+
+/* ---------- locked stickers and clothes: show the real picture (faded) with a lock, never an empty box ---------- */
+.sticker.locked .st-pic { position: relative; background: #fbf6ee; border-style: dashed; }
+.sticker.locked .st-pic svg { filter: grayscale(.55) opacity(.5) !important; }
+.sticker.locked .st-name { color: #a8957f; font-size: 14px; font-weight: 600; }
+.st-lock { position: absolute; right: -4px; bottom: -4px; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: #fff; border: 2px solid #d9c9b4; color: #a8957f; }
+.st-lock .glyph { width: 18px; height: 18px; }
+.item.locked .thumb { filter: grayscale(.45) opacity(.65) !important; }
+.item-name small { display: block; font-size: 12px; font-weight: 500; opacity: .8; }
+.sticker .st-pic .st-lock svg.glyph { width: 18px !important; height: 18px !important; filter: none !important; position: static; }
+.sticker .st-pic .st-lock { width: 28px; height: 28px; right: 2px; bottom: 2px; z-index: 1; }
