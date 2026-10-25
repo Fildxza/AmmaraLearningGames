@@ -1,6 +1,6 @@
 # AmmaraGames: test report
 
-Generated 2026-10-25T03:14:39.674Z by `npm run report` from the raw results of the last runs. Nothing in this file is typed by hand except the sections marked "(written by hand)".
+Generated 2026-10-25T21:49:46.541Z by `npm run report` from the raw results of the last runs. Nothing in this file is typed by hand except the sections marked "(written by hand)".
 
 ## Environment
 
@@ -13,13 +13,16 @@ Generated 2026-10-25T03:14:39.674Z by `npm run report` from the raw results of t
 
 | Suite | Result |
 |---|---|
-| Unit tests (`npm test`) | 65 of 65 passed, 0 failed |
+| Unit tests (`npm test`) | 98 of 98 passed, 0 failed |
 | End-to-end, Chrome | 41 passed, 0 failed |
 | End-to-end, Edge | 41 passed, 0 failed |
 | Upgrade checks (2.0), Chrome | 13 passed, 0 failed |
 | Upgrade checks (2.0), Edge | 13 passed, 0 failed |
 | Kid Lock / web app checks, Chrome | 9 passed, 0 failed |
 | Kid Lock / web app checks, Edge | 9 passed, 0 failed |
+| Town checks (2.1–2.2), Chrome | 23 passed, 0 failed |
+| Town checks (2.1–2.2), Edge | 23 passed, 0 failed |
+| Picture audit (every picture the game can show) | 513 pictures, 0 problems |
 
 ## Upgrade checks: 3D world, narrator, arcade, Jom Mengaji (2.0)
 
@@ -28,8 +31,8 @@ From `tests/e2e/run-e2e-upgrade.mjs`. The speech engine is replaced by a recordi
 | Id | Check | Chrome | Edge | What was measured (Chrome) |
 |---|---|---|---|---|
 | U1 | Opens offline and shows the new menu buttons (arcade, Jom Mengaji, voice settings) | PASS | PASS | menu ok |
-| U2 | The 3D world is a whole preschool + garden: 17 areas, door, robot friends seated | PASS | PASS | 17 areas, map 120 x 44 m, robots stay seated |
-| U3 | Every indoor corner and garden area can be visited, with its own music | PASS | PASS | mengaji:islamic:46fps arcade:arcade:40fps music:playroom:39fps rest:calm:53fps gate:yard:46fps playground:yard:45fps |
+| U2 | The 3D world is a whole preschool + garden: 17 areas, door, robot friends seated | PASS | PASS | 17 areas, map 4200 x 4200 m, robots stay seated |
+| U3 | Every indoor corner and garden area can be visited, with its own music | PASS | PASS | mengaji:islamic:32fps arcade:arcade:29fps music:playroom:28fps rest:calm:24fps gate:yard:23fps playground:yard:22fps |
 | U4 | Walking out of the front door and back in (door opens, "back inside" button, guide arrow) | PASS | PASS | out through the door and back, no collision problems |
 | U5 | Robot friend says hello with the narrator (Malay voice, offline only) | PASS | PASS | "Hai! Jom belajar bersama!" by Microsoft Rizwan - Malay (Malaysia), pitch 1.15 |
 | U6 | Voice & Sound panel: real voice list, honest labels, preview, sliders, mute | PASS | PASS | voices listed, preview used Zira, mute works |
@@ -47,7 +50,7 @@ From `tests/e2e/run-e2e-lock.mjs`: the built `dist/` folder is served over http 
 
 | Id | Check | Chrome | Edge | What was measured (Chrome) |
 |---|---|---|---|---|
-| L1 | Served over http: manifest, icons and service worker are found and the worker takes control | PASS | PASS | manifest ok, cache ammaragames-449c6c3fd4 |
+| L1 | Served over http: manifest, icons and service worker are found and the worker takes control | PASS | PASS | manifest ok, cache ammaragames-9b56a39d0b |
 | L2 | Offline: after one visit the game opens with the network switched off | PASS | PASS | opened offline from the service-worker cache |
 | L3 | Ghost touches: edge and palm touches are ignored, a normal tap works | PASS | PASS | 3 edge touches ignored ({"edge":3}), normal tap passed |
 | L4 | Zoom, refresh, print and long-press menu are blocked | PASS | PASS | F5, Ctrl+R, Ctrl+P, Ctrl+zoom, context menu, Ctrl+wheel blocked |
@@ -56,6 +59,36 @@ From `tests/e2e/run-e2e-lock.mjs`: the built `dist/` folder is served over http 
 | L7 | Reload inside the arcade returns to the arcade; going Home on purpose clears the resume | PASS | PASS | arcade resumed; menu stays menu after leaving on purpose |
 | L8 | Adult switch: turning Kid Lock off in Teacher > Settings stops the blocking and the resume | PASS | PASS | lock off: shortcuts free, resume cleared |
 | L9 | No JavaScript errors during the lock and web-app flows | PASS | PASS | console errors 0 |
+
+## Town: Bandar Ceria, highway, train, shops and books (2.1–2.2)
+
+From `tests/e2e/run-e2e-city.mjs` with real keyboard input: the child rides a unicorn, drives a car, calls and rides a bus to the next stop, waits for and rides the elevated train to the next station, greets a school child, opens landmark quizzes, travels with the town map, comes home with one button, picks up a coin, buys and reads a picture book aloud to the end, buys clothes that are worn at once, is told kindly when coins are short, eats a lollipop (with a teeth tip), reads a fact board, rides the roller coaster, sees cars stop at red lights, reads the real-time clock and watches a story at the cinema. The plan itself (lots, colliders, routes, highway lanes, train line and pillars, pavement coins and trees, traffic-light phases, the roller-coaster track, the map groups) is covered by `tests/unit/city.test.mjs`, and the books, facts, shops and coin records by `tests/unit/town-content.test.mjs`.
+
+| Id | Check | Chrome | Edge | What was measured (Chrome) |
+|---|---|---|---|---|
+| C1 | The town is big (over 4 km x 4 km) and alive: traffic, school children and buses | PASS | PASS | 4200 x 4200 m (17.6 km²), 36 cars, 64 children, 4 buses, 10 squares loaded |
+| C2 | Out of the garden gate into the town: campus area, then a street with town music | PASS | PASS | city-shophouse with "town" music |
+| C3 | Ride a unicorn from the stable: it is faster than walking, and getting off is safe | PASS | PASS | rode 11.8 m in 1.8 s, got off |
+| C4 | Drive a car out of the car park onto the road | PASS | PASS | drove 25.3 m (to -83, 61) |
+| C5 | Call the bus at the preschool stop, ride it to the next stop and get off there | PASS | PASS | rode from tadika to pasar, got off at the stop |
+| C6 | Say hello to a school child walking on the pavement | PASS | PASS | they said "Hai! Saya nak pergi sekolah!" |
+| C7 | Landmarks: own area, music and learning place (mosque, zoo quiz) | PASS | PASS | mosque: islamic music; zoo: "Soalan haiwan!" opened a question |
+| C8 | Town map: opens on the town tab, lists every landmark, and a tap travels there | PASS | PASS | 49 places listed, trip to the theme park ok |
+| C9 | The "back to preschool" button brings the child home from anywhere in the town | PASS | PASS | home at 11.8, -1.0 (indoor) |
+| C10 | Streaming: far corners load and unload; frame cost stays bounded | PASS | PASS | city-park:13sq/123calls/29fps city-forest:11sq/122calls/51fps city-beach:9sq/115calls/53fps city-beach:11sq/128calls/51fps city-terrace:9sq/151calls/51fps city-campus:12s |
+| C12 | The highway: four lanes with fast cars, its own area, lamps and signs | PASS | PASS | 24 highway cars, area "city-highway" |
+| C13 | Train: wait at Stesen Tadika, the train comes, ride the elevated line to the next station, get off there | PASS | PASS | waited 29 s, rode to stn-barat, got off at its ticket spot |
+| C14 | The two trains keep going round and never run into each other | PASS | PASS | closest 611 m apart |
+| C15 | Coins on the pavement: arriving on one picks it up and the counter goes up | PASS | PASS | coins 5 -> 6; 186 coins near the child |
+| C16 | Bookshop: buy a picture book with coins, it opens, read it to the end (+1 coin), it is in My Bag | PASS | PASS | paid 2 coins, read 5 pages aloud, +1 coin, book kept in My Bag |
+| C17 | Boutique: clothes bought with coins are worn straight away | PASS | PASS | red cap bought and worn |
+| C18 | Sweet shop: not enough coins says so kindly; a lollipop can be bought and eaten (with a teeth tip) | PASS | PASS | "Manisnya! Makan sedikit sahaja, dan jangan lupa gosok gigi." |
+| C19 | Fact board: reading it the first time gives a coin, the second time not | PASS | PASS | coins 1 -> 2, then no more |
+| C20 | Roller coaster: get in at the station, ride one full lap up and down, get out by itself | PASS | PASS | highest point 11.2 m, back on the ground at 504, 223 |
+| C21 | Traffic lights change colour and town cars stop at red | PASS | PASS | 52 traffic lights nearby, up to 18 cars waiting at red |
+| C22 | Clock tower shows the real time; the cinema shows a story | PASS | PASS | clock 5:29; cinema story opened |
+| C23 | Busy streets: more cars, school children and grown-ups; the town map lists every place in groups | PASS | PASS | 36 cars, 64 people; map: 5 groups, 49 places |
+| C11 | No errors, no network requests, no collision violations | PASS | PASS | clean |
 
 ## Specification checklist (section 17)
 
@@ -109,37 +142,37 @@ From `tests/e2e/run-e2e-lock.mjs`: the built `dist/` folder is served over http 
 
 | Id | Test | Result | What was measured |
 |---|---|---|---|
-| 1 | The HTML file opens locally (file://) and leaves the loading screen | PASS | ready in 10865 ms |
+| 1 | The HTML file opens locally (file://) and leaves the loading screen | PASS | ready in 8166 ms |
 | 3 | Main menu renders (logo, PLAY, worlds, teacher, sound, language, age) | PASS | title=AmmaraGames |
-| 4 | 3D scene initialises (WebGL renderer, meshes, draw calls) | PASS | meshes=421 calls=247 canvas=1366x768 |
+| 4 | 3D scene initialises (WebGL renderer, meshes, draw calls) | PASS | meshes=1653 calls=470 canvas=1366x768 |
 | 20.1 | Audio waits for a user gesture (no autoplay before interaction) | PASS | {"state":"not-started","available":true,"music":false,"scene":"playroom","song":"cheerful"} |
 | 4.1 | PLAY starts the default adventure in the 3D playroom | PASS | run=R1 audio=running music=true |
 | 20.2 | Music starts after the first tap and plays through Web Audio | PASS | {"state":"running","available":true,"music":true,"scene":"playroom","song":"cheerful"} |
-| 5 | Character moves with arrow keys and WASD in all four directions | PASS | ArrowUp:1.88 ArrowDown:2.35 ArrowLeft:1.89 ArrowRight:2.12 KeyW:2.06 KeyS:1.96 KeyA:2.14 KeyD:2.05 |
-| 6 | On-screen D-pad buttons move the character (pointer press and hold) | PASS | up:2.11 down:1.97 left:2.12 right:2.05 |
-| 7 | Collision: walls, furniture and stations cannot be walked through | PASS | left=-57.55 cabinet z>=-8.25 station gap ok, violations=0, maxPenetration=0.0000 |
-| 8 | Camera follows the player smoothly (no snapping, per-frame measurement) | PASS | 56 frames: camera moved 3.69 m, fastest 4.3 m/s (player 4.4), trailing 3.83 m |
+| 5 | Character moves with arrow keys and WASD in all four directions | PASS | ArrowUp:2.13 ArrowDown:1.89 ArrowLeft:2.05 ArrowRight:2.06 KeyW:2.29 KeyS:2.04 KeyA:2.13 KeyD:1.97 |
+| 6 | On-screen D-pad buttons move the character (pointer press and hold) | PASS | up:2.05 down:2.04 left:2.04 right:2.04 |
+| 7 | Collision: walls, furniture and stations cannot be walked through | PASS | left=-2099.55 cabinet z>=-8.25 station gap ok, violations=0, maxPenetration=0.0000 |
+| 8 | Camera follows the player smoothly (no snapping, per-frame measurement) | PASS | 47 frames: camera moved 4.25 m, fastest 4.3 m/s (player 4.4), trailing 3.83 m |
 | 10 | INTERACT appears near station 1 and opens the correct quiz | PASS | quiz abc-01, header "Stesen 1" |
 | 11 | All three answer options are present, enabled and labelled with pictures | PASS | C / B / A |
-| 12 | Correct answer: celebration, quiz closes by itself in about 1 s, reward is worn | PASS | answer letter:A; quiz closed after ~1308 ms; bow worn; stars 1 |
+| 12 | Correct answer: celebration, quiz closes by itself in about 1 s, reward is worn | PASS | answer letter:A; quiz closed after ~1151 ms; bow worn; stars 1 |
 | 13 | Wrong answer keeps the quiz open, dims that choice, shows a gentle hint | PASS | hint: "Hampir! Cuba lagi 💛 Kira dengan jari: satu… dua!" |
 | 14 | No penalty: stars and progress unchanged by mistakes; attempts are counted | PASS | station 2: attempts=2, firstTry=false, stars 1→2 |
 | 9 | Every station is reachable (keyboard steering and tap-to-walk) | PASS | station 3 reached by tap-to-walk (auto-opened its quiz); station 4 by keyboard |
 | 15 | All four default stations can be completed | PASS | run R1 complete; attempts 1,2,1,1 |
 | 16 | Final celebration screen with stars and earned rewards | PASS | Syabas, Pemain!; 4 stars; rewards worn: partyHat, bow, starGlasses, backpack |
-| 17 | World selection works and loads that world’s stations and questions | PASS | 16 worlds listed; animals questions ani-01,ani-12,ani-21,ani-29 |
-| 17.1 | Age selection changes the question pool (4+ gets harder questions) | PASS | 2-3 run ok=true; 4+ numbers run: num-07,num-11,num-20,num-24 |
+| 17 | World selection works and loads that world’s stations and questions | PASS | 16 worlds listed; animals questions ani-01,ani-12,twn-27,ani-29 |
+| 17.1 | Age selection changes the question pool (4+ gets harder questions) | PASS | 2-3 run ok=true; 4+ numbers run: twn-20,num-11,num-20,num-24 |
 | 18 | Rewards inventory (sticker book) shows earned items | PASS | 0 daripada 52 pelekat ·  4 bintang |
-| 19 | Customisation really changes the 3D character | PASS | hat off/on, hijab/pigtails, sky dress — meshes 52→450 |
+| 19 | Customisation really changes the 3D character | PASS | hat off/on, hijab/pigtails, sky dress — meshes 52→1933 |
 | 20 | Sound and music can be muted and the choice is saved | PASS | mute + unmute + music toggle, saved in local storage |
 | 27.1 | Finish early asks for confirmation; cancel keeps playing; confirm saves partial score | PASS | run R3 saved as ended-early |
 | 22 | Teacher area behind a press-and-hold gate; class list session starts | PASS | 4 nama sedia. 2 baris kosong diabaikan. 0 nama berulang ditanda. / Sesi dimulakan untuk 4 murid. |
 | 23 | Learner list, switching learner, and accurate per-learner scores | PASS | learners: Ali, Siti, =CMD(), +evil; Ali station 1 attempts=2 |
 | 24 | Next learner via the decision screen; records never mix | PASS | Ali: 2 attempts, not first try, 1 star / Siti: 1 attempt, first try, 1 star |
-| 25 | CSV export downloads a real file (UTF-8 with BOM, 18 columns, all rows) | PASS | AmmaraGames_rekod_all_2026-10-25_1102.csv: 20 rows; "20 baris disimpan ke fail AmmaraGames_rekod_all_2026-10-25_1102.csv." |
-| 26 | CSV protects names starting with = + - @ (formula injection) and quotes fields | PASS | AmmaraGames_rekod_session_2026-10-25_1102.csv: '=CMD() exported as "'=CMD()", no cell starts with = + - @ |
+| 25 | CSV export downloads a real file (UTF-8 with BOM, 18 columns, all rows) | PASS | AmmaraGames_rekod_all_2026-10-26_0513.csv: 20 rows; "20 baris disimpan ke fail AmmaraGames_rekod_all_2026-10-26_0513.csv." |
+| 26 | CSV protects names starting with = + - @ (formula injection) and quotes fields | PASS | AmmaraGames_rekod_session_2026-10-26_0513.csv: '=CMD() exported as "'=CMD()", no cell starts with = + - @ |
 | 27 | Reset and delete-all ask for confirmation (cancel keeps data, confirm clears) | PASS | reset cancel ok; delete needs two confirmations; storage emptied |
-| 21.1 | Settings and info tabs render (privacy text, diagnostics, storage status) | PASS | info shows 392 valid questions and storage status |
+| 21.1 | Settings and info tabs render (privacy text, diagnostics, storage status) | PASS | info shows 513 valid questions and storage status |
 | 28 | Window resizing keeps menus, HUD and quiz on screen | PASS | 1920x1080: hud ok canvas ok; 1280x720: hud ok canvas ok; 1024x600: hud ok canvas ok; 800x1280: hud ok canvas ok; 844x390: hud ok canvas ok; 390x844: hud ok canv |
 | 2 | Works offline: page ran with network disabled; no external request attempted | PASS | offline mode on for the whole run; 0 external requests |
 | 29 | No uncaught JavaScript errors during the tested flows | PASS | console errors 0; warnings 0 |
@@ -153,7 +186,7 @@ From `tests/e2e/run-e2e-lock.mjs`: the built `dist/` folder is served over http 
 
 ## Performance (measured, Chrome headless on the machine above)
 
-* Idle playroom (`npm run perf`): about 43-47 fps at the default medium quality, 219 draw calls, about 216k triangles; about 47 fps at low quality (133 draw calls). During the e2e run the same machine dropped to 12-28 fps because the test runner, the browser and other programs competed for the CPU and GPU.
+* Idle playroom (`npm run perf`, headless Chrome and Edge, medium quality): about 38-39 fps, 362 draw calls, about 830k triangles (the 2.0 preschool alone was 219 calls and 216k triangles; the town around it adds the rest). In the middle of the busy town (shophouses, funfair, mall) the tours measured 190-340 draw calls, 0.5-0.85 million triangles and 43-60 fps. During the e2e runs the same machine dropped to 4-28 fps because the test runner, two browsers and other programs competed for the CPU and GPU, and the character wears dozens of accessories at that moment; the movement checks (test 5) are timing-based and failed once or twice under that load before passing again on a quiet machine.
 * Adaptive quality (`node tools/adaptive-check.mjs`): with the CPU slowed 6 times the game switched itself to low quality (shadows off) after about 19 seconds. It was not tested on a real slow school laptop.
 
 ## Visual review
@@ -170,6 +203,8 @@ Screenshots of every screen are in `qa/screenshots/chrome` and `qa/screenshots/e
 * **Other browsers** (Firefox, Safari, older Chrome/Edge) and other operating systems.
 * **A slow school laptop with an integrated GPU older than the one used here**, and projector resolutions other than the sizes listed in test 28.
 * **Screen readers**, high-contrast mode and keyboard-only use of the child screens beyond the arrow/WASD/Enter/Esc/1-3 keys that were exercised.
+* **Shopping and reading with real children.** Prices, coins and the book reader were tested by the automated session only; nobody aged 2-4 has used the shops or listened to the books, and the retold stories have not been reviewed by a teacher.
+* **The town over a long time.** Each ride and trip was tested once per run; nobody drove around the whole 4.2 km town for an hour, and the town was only run on the laptop above.
 * **Long sessions** (hours) and very large classes (the class list was tested with 4 names; the limit is 60).
 * **Real children.** Nobody aged 2-4 has played the game or the ten mini-games; difficulty, wording and the length of the tutorial are unvalidated.
 * **Content review** by a teacher and a native Bahasa Melayu speaker (see `research/RESEARCH-REPORT.md`).

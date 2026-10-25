@@ -5,8 +5,9 @@ import { animals } from './lib-animals.js';
 import { food } from './lib-food.js';
 import { vehicles, body, objects } from './lib-things.js';
 import { nature, space, hygiene, safety, actions, faces } from './lib-world.js';
+import { town } from './lib-town.js';
 
-const HAND = Object.assign({}, animals, food, vehicles, body, objects, nature, space, hygiene, safety, actions, faces);
+const HAND = Object.assign({}, animals, food, vehicles, body, objects, nature, space, hygiene, safety, actions, faces, town);
 export const HAND_KEYS = Object.keys(HAND);
 
 const SHAPES = ['circle', 'square', 'triangle', 'rectangle', 'star', 'heart', 'oval', 'crescent', 'hexagon'];

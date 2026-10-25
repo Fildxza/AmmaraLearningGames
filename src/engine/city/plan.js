@@ -8,6 +8,8 @@
 //   Ceria) with four stations runs above the streets, partly along the highway's middle.
 //   Traffic keeps LEFT (as in Malaysia). x grows east, z grows south.
 import { createRng } from '../core/rng.js';
+import { LANDMARKS_2, landmarkPlan2 } from './landmarks2.js';
+import { FACTS } from '../../data/facts.js';
 
 export const CITY = { minX: -2100, maxX: 2100, minZ: -2100, maxZ: 2100 };
 export const PITCH = 120;
@@ -45,6 +47,9 @@ export const DISTRICTS = {
   forest: { name: T('Hutan Kecil', 'Little Forest'), color: '#3f9c63', icon: 'tree', music: 'yard' },
   beach: { name: T('Pantai Ceria', 'Sunny Beach'), color: '#ffd86b', icon: 'sun', music: 'yard' },
   edge: { name: T('Bukit Hijau', 'Green Hills'), color: '#7cc76c', icon: 'mountain', music: 'yard' },
+  shophouse: { name: T('Deretan Kedai', 'Shophouse Street'), color: '#ff9a6a', icon: 'shopping_bag', music: 'town' },
+  terrace: { name: T('Taman Perumahan Teres', 'Terrace Houses'), color: '#ffb38a', icon: 'door', music: 'yard' },
+  kampung: { name: T('Kampung Ceria', 'Happy Village'), color: '#b07a52', icon: 'kampung_house', music: 'yard' },
   highway: { name: HIGHWAY.name, color: '#2f9e5a', icon: 'car', music: 'town' }
 };
 
@@ -74,6 +79,7 @@ export const LANDMARKS = [
   { id: 'stn-barat', x0: -480, z0: -420, name: T('Stesen Barat', 'West Station'), color: '#8a6cff', icon: 'train', station: 'w', quiz: ['veh-3', 'veh-4'] },
   { id: 'stn-timur', x0: 600, z0: -420, name: T('Stesen Timur', 'East Station'), color: '#8a6cff', icon: 'train', station: 'e', quiz: ['veh-2', 'saf-2'] }
 ];
+LANDMARKS.push(...LANDMARKS_2);                       // shops, food court, funfair, museums, parks… (landmarks2.js)
 export const landmarkById = Object.fromEntries(LANDMARKS.map((l) => [l.id, l]));
 const landmarkAt = new Map(LANDMARKS.map((l) => [`${l.x0},${l.z0}`, l]));
 
@@ -94,12 +100,15 @@ function blockType(i, j) {
   const cx = x0 + PITCH / 2, cz = z0 + PITCH / 2, d = Math.max(Math.abs(cx), Math.abs(cz));
   const r = rng.next();
   if (cz < -1680 || Math.abs(cx) > 1900) return { type: r < 0.75 ? 'forest' : 'park' };
-  if (d < 720) return { type: r < 0.5 ? 'tower' : r < 0.72 ? 'shops' : r < 0.86 ? 'plaza' : 'park' };
-  if (d < 1500) return { type: r < 0.6 ? 'houses' : r < 0.72 ? 'shops' : r < 0.86 ? 'park' : 'flats' };
-  return { type: r < 0.45 ? 'houses' : r < 0.8 ? 'forest' : 'park' };
+  if (d < 720) return { type: r < 0.32 ? 'tower' : r < 0.6 ? 'shophouse' : r < 0.72 ? 'shops' : r < 0.84 ? 'plaza' : r < 0.92 ? 'flats' : 'park' };
+  if (d < 1500) return { type: r < 0.38 ? 'terrace' : r < 0.55 ? 'shophouse' : r < 0.66 ? 'houses' : r < 0.76 ? 'flats' : r < 0.84 ? 'shops' : r < 0.93 ? 'park' : 'kampung' };
+  return { type: r < 0.3 ? 'kampung' : r < 0.45 ? 'terrace' : r < 0.55 ? 'houses' : r < 0.82 ? 'forest' : 'park' };
 }
 
 const PASTEL = ['#ffd1dc', '#ffe8a8', '#c9f0ff', '#d6f5d6', '#e7dcff', '#ffd9b8', '#fff3c4', '#d0f0ea', '#ffe0f0', '#e0ecff'];
+const SHOPHOUSE = ['#ffd1dc', '#ffe8a8', '#c9f0ff', '#d6f5d6', '#e7dcff', '#ffd9b8', '#fff3c4', '#ffe0f0', '#f6e1c8', '#d9f0ff'];
+const CARS = ['#ff8fc0', '#7fcbff', '#b79cff', '#ffa86b', '#6fdcb4', '#ffffff', '#ffd23f', '#c9c9d6'];
+export const SHOP_SIGNS = 40;                          // number of shop-sign pictures in the town sign atlas (build.js)
 const ROOFS = ['#ff7e7e', '#ff9a3c', '#4a90e2', '#3aa98f', '#9b6bff', '#e86fa8', '#8a6a5a'];
 
 /**
@@ -112,7 +121,8 @@ export function blockPlan(i, j) {
   const rng = createRng(`block:${i}:${j}`);
   const L = { x0: x0 + curbOf('z', x0), z0: z0 + curbOf('x', z0), x1: x1 - curbOf('z', x1), z1: z1 - curbOf('x', z1) };   // the lot inside the pavements
   const W = L.x1 - L.x0, D = L.z1 - L.z0, cx = (L.x0 + L.x1) / 2, cz = (L.z0 + L.z1) / 2;
-  const out = { i, j, x0, z0, x1, z1, lot: L, type: t.type, landmark: t.landmark || null, ground: 'grass', buildings: [], trees: [], props: [], parked: [], boxes: [], circles: [], pois: [], rides: [] };
+  const out = { i, j, x0, z0, x1, z1, lot: L, type: t.type, landmark: t.landmark || null, ground: 'grass', buildings: [], trees: [], props: [], parked: [], boxes: [], circles: [], pois: [], rides: [],
+    street: [], streetCircles: [], coins: [] };
   const pick = (a) => a[rng.int(a.length)];
   const building = (b) => { out.buildings.push(b); out.boxes.push([b.x - b.w / 2, b.z - b.d / 2, b.x + b.w / 2, b.z + b.d / 2]); };
   const tree = (x, z, s = 1) => { out.trees.push({ x, z, s }); out.circles.push([x, z, 0.55 * s]); };
@@ -155,6 +165,8 @@ export function blockPlan(i, j) {
       out.props.push({ kind: 'fountain', x: cx, z: cz }); out.circles.push([cx, cz, 3.2]);
       ringTrees(8, 14);
       [[-14, 0], [14, 0], [0, -14], [0, 14]].forEach(([dx, dz]) => out.props.push({ kind: 'bench', x: cx + dx, z: cz + dz, yaw: Math.atan2(dx, dz) }));
+      out.props.push({ kind: 'iceCreamCart', x: cx + 24, z: cz + 22 }); out.boxes.push([cx + 22.8, cz + 21.2, cx + 25.2, cz + 22.8]);
+      out.factSpot = { x: cx - 22, z: cz + 24 };
       break;
     }
     case 'flats': {
@@ -178,6 +190,64 @@ export function blockPlan(i, j) {
       else { out.props.push({ kind: 'playset', x: cx, z: cz }); out.boxes.push([cx - 4, cz - 3, cx + 4, cz + 3]); }
       [[-24, -24], [24, 24], [-24, 24]].forEach(([dx, dz]) => out.props.push({ kind: 'bench', x: cx + dx, z: cz + dz, yaw: 0 }));
       if (rng.next() < 0.35) out.rides.push({ kind: 'unicorn', x: cx + 22, z: cz - 22, yaw: rng.next() * 6 });
+      out.factSpot = { x: cx + 10, z: cz + 30 };
+      break;
+    }
+    case 'shophouse': {
+      // two rows of 2-3 storey shophouses facing the north and south streets: angle parking along the kerb, a covered
+      // five-foot way, the shops; behind them a quiet back lane with trees
+      out.ground = 'paved';
+      const n = 6, uw = (W - 4) / n;
+      for (const side of ['n', 's']) {
+        const sg = side === 's' ? 1 : -1, edge = side === 's' ? L.z1 : L.z0;
+        const zc = edge - sg * (6 + 2 + 7);
+        for (let k = 0; k < n; k++) {
+          building({ x: L.x0 + 2 + uw * (k + 0.5), z: zc, w: uw - 0.4, d: 14, h: 7 + rng.int(2) * 3, color: pick(SHOPHOUSE), roof: 'flat', kind: 'shophouse', face: side, signId: rng.int(SHOP_SIGNS), awning: pick(ROOFS) });
+        }
+        for (let k = 0; k < 8; k++) {
+          if (rng.next() < 0.4) continue;
+          const px = L.x0 + 8 + k * 12, pz = edge - sg * 3;
+          out.parked.push({ x: px, z: pz, yaw: 0, color: pick(CARS) }); out.circles.push([px, pz, 1.6]);
+        }
+      }
+      for (let x = L.x0 + 10; x <= L.x1 - 10; x += 16) tree(x, cz, 0.9 + rng.next() * 0.3);
+      if (rng.next() < 0.5) out.rides.push({ kind: 'car', x: cx + 8, z: cz + 6, yaw: Math.PI / 2, color: pick(['#ff6b6b', '#4a90e2', '#ffd23f', '#5cc46a']) });
+      else { out.props.push({ kind: 'recycleBins', x: cx + 8, z: cz + 6 }); out.boxes.push([cx + 5, cz + 5, cx + 11, cz + 7]); }
+      out.factSpot = { x: cx - 8, z: cz + 6 };
+      break;
+    }
+    case 'terrace': {
+      // two rows of terrace houses with small front yards (some with a car), a back lane; sometimes a surau
+      const n = 8, uw = (W - 4) / n;
+      for (const side of ['n', 's']) {
+        const sg = side === 's' ? 1 : -1, edge = side === 's' ? L.z1 : L.z0;
+        const zc = edge - sg * (7 + 6);
+        const col = pick(PASTEL), roof = pick(ROOFS);
+        for (let k = 0; k < n; k++) {
+          const hx = L.x0 + 2 + uw * (k + 0.5);
+          building({ x: hx, z: zc, w: uw - 0.3, d: 12, h: 6.2, color: k % 2 ? col : PASTEL[(PASTEL.indexOf(col) + 3) % PASTEL.length], roof: 'gable', roofColor: roof, kind: 'terrace', face: side, along: true });
+          if (rng.next() < 0.45) { const pz = edge - sg * 3.5; out.parked.push({ x: hx, z: pz, yaw: 0, color: pick(CARS) }); out.circles.push([hx, pz, 1.6]); }
+        }
+        out.props.push({ kind: 'fenceRow', x: cx, z: edge - sg * 0.6, w: W - 4 });
+      }
+      if (rng.next() < 0.18) { building({ x: cx, z: cz, w: 14, d: 10, h: 5, color: '#f4fbf8', roof: 'dome', roofColor: '#3aa98f', kind: 'civic', face: 's', surau: true }); for (const dx of [-24, 24]) tree(cx + dx, cz, 1); }
+      else for (let x = L.x0 + 8; x <= L.x1 - 8; x += 14) tree(x, cz + (rng.next() - 0.5) * 6, 0.85 + rng.next() * 0.35);
+      if (rng.next() < 0.3) out.rides.push({ kind: 'unicorn', x: cx + 6, z: cz + 8, yaw: rng.next() * 6 });
+      break;
+    }
+    case 'kampung': {
+      // wooden village houses on stilts among coconut palms and banana trees
+      const spots = [[-28, -26], [12, -30], [-6, 6], [30, 2], [-30, 28], [22, 30]];
+      for (const [dx, dz] of spots) {
+        if (rng.next() < 0.25) continue;
+        const hx = cx + dx + (rng.next() - 0.5) * 4, hz = cz + dz + (rng.next() - 0.5) * 4;
+        building({ x: hx, z: hz, w: 13, d: 11, h: 6.5, color: pick(['#d9a066', '#c98a52', '#e0b07a']), roof: 'kampung', kind: 'kampung' });
+      }
+      for (let k = 0; k < 10; k++) {
+        const x = L.x0 + 6 + rng.next() * (W - 12), z = L.z0 + 6 + rng.next() * (D - 12);
+        if (out.buildings.some((b) => Math.abs(b.x - x) < b.w / 2 + 2 && Math.abs(b.z - z) < b.d / 2 + 2)) continue;
+        out.trees.push({ x, z, s: 1.05, palm: true }); out.circles.push([x, z, 0.5]);
+      }
       break;
     }
     case 'forest': {
@@ -187,14 +257,87 @@ export function blockPlan(i, j) {
     case 'landmark': landmarkPlan(out, t.landmark, rng, { cx, cz, W, D, building, tree, ringTrees }); break;
     default: break;
   }
+  if (t.type !== 'campus') streetLife(out, rng, Math.max(Math.abs(cx), Math.abs(cz)));
   return out;
 }
+
+/**
+ * The pavement around a block: trees near the kerb, a fire hydrant, coins to collect; and a "Did you know?" board in
+ * plazas, parks and shophouse lanes near the middle of town. Pavement things keep clear of lamps, traffic lights,
+ * bus stops and corners.
+ */
+function streetLife(out, rng, d) {
+  const L = out.lot;
+  const sides = [
+    { axis: 'x', v: out.z0, a: out.x0, b: out.x1, n: [0, -1] }, { axis: 'x', v: out.z1, a: out.x0, b: out.x1, n: [0, 1] },
+    { axis: 'z', v: out.x0, a: out.z0, b: out.z1, n: [-1, 0] }, { axis: 'z', v: out.x1, a: out.z0, b: out.z1, n: [1, 0] }
+  ];
+  const lamps = pavementLamps(out.x0, out.z0, out.x1, out.z1);
+  const stops = cityStopsCache();
+  const light = hasTrafficLight(out.x0, out.z1) ? trafficLightSpot(out.x0, out.z1) : null;
+  const busy = (x, z, r) => lamps.some(([lx, lz]) => Math.hypot(lx - x, lz - z) < r + 1.5) || stops.some((st) => Math.hypot(st.x - x, st.z - z) < r + 5) ||
+    (light && Math.hypot(light.x - x, light.z - z) < r + 2) || out.streetCircles.some(([sx, sz, sr]) => Math.hypot(sx - x, sz - z) < r + sr + 1);
+  const at = (sd, u, off) => (sd.axis === 'x' ? { x: u, z: sd.v + (sd === sides[0] ? 1 : -1) * off } : { x: sd.v + (sd === sides[2] ? 1 : -1) * off, z: u });
+  const leafy = out.type !== 'forest' && d < 1500;
+  for (const sd of sides) {
+    const half = roadHalf(sd.axis, sd.v);
+    if (leafy && sd !== sides[0]) for (let u = sd.a + 18; u <= sd.b - 18; u += 20) {      // (the camera looks from the south)
+      const p = at(sd, u, half + 0.75);
+      if (busy(p.x, p.z, 0.45)) continue;
+      out.street.push({ kind: 'tree', x: p.x, z: p.z, s: 0.75 + rng.next() * 0.2 }); out.streetCircles.push([p.x, p.z, 0.42]);
+    }
+  }
+  // three coins on each block, spread round its pavement
+  if (leafy && d < 1000) {
+    const sd = sides[1], p = at(sd, out.x0 + 14, curbOf('x', sd.v) - 0.8);
+    if (!busy(p.x, p.z, 0.3)) { out.street.push({ kind: 'hydrant', x: p.x, z: p.z }); out.streetCircles.push([p.x, p.z, 0.25]); }
+  }
+  for (let k = 0, tries = 0; k < 3 && tries < 12; tries++) {
+    const sd = sides[rng.int(4)], curb = curbOf(sd.axis, sd.v);
+    const u = sd.a + 16 + rng.next() * (sd.b - sd.a - 32), p = at(sd, u, curb - 0.9);
+    if (busy(p.x, p.z, 0.6) || out.coins.some((c) => Math.hypot(c.x - p.x, c.z - p.z) < 6)) continue;
+    out.coins.push({ id: `${out.i}:${out.j}:${k}`, x: p.x, z: p.z }); k++;
+  }
+  if (out.factSpot && d < 1100) {
+    const f = FACTS[(out.i * 31 + out.j * 17) % FACTS.length], s = out.factSpot;
+    out.props.push({ kind: 'factboard', x: s.x, z: s.z - 1.7 }); out.circles.push([s.x, s.z - 1.7, 0.3]);
+    out.pois.push({ id: `fact-${out.i}-${out.j}`, x: s.x, z: s.z, radius: 1.1, action: 'fact', fact: f.id, zone: 'city', icon: f.icon, label: T('Tahukah Kamu?', 'Did you know?'), cue: T('Tahukah Kamu?', 'Did you know?') });
+  }
+}
+/**
+ * Fills the open front part of a landmark square with flower beds, benches, small trees and garden lamps, wherever
+ * they do not touch a building, a ride, another prop, a learning place or the central path from the street.
+ */
+function decorate(out, rng, cx, cz) {
+  const L = out.lot;
+  const free = (x0, z0, x1, z1) => {
+    const m = 1.4;
+    if (out.boxes.some(([a, b, c, d]) => a < x1 + m && c > x0 - m && b < z1 + m && d > z0 - m)) return false;
+    if (out.circles.some(([x, z, r]) => x + r > x0 - m && x - r < x1 + m && z + r > z0 - m && z - r < z1 + m)) return false;
+    if (out.props.some((q) => Math.abs(q.x - (x0 + x1) / 2) < 6 && Math.abs(q.z - (z0 + z1) / 2) < 6)) return false;
+    if (out.pois.some((q) => q.x > x0 - 3.2 && q.x < x1 + 3.2 && q.z > z0 - 3.2 && q.z < z1 + 3.2)) return false;
+    if (out.rides.some((q) => Math.abs(q.x - (x0 + x1) / 2) < 5 && Math.abs(q.z - (z0 + z1) / 2) < 5)) return false;
+    return x1 < cx - 4.5 || x0 > cx + 4.5;                                     // keep the path from the street clear
+  };
+  for (let z = cz + 6; z <= L.z1 - 5; z += 11) {
+    for (let x = L.x0 + 7; x <= L.x1 - 7; x += 12) {
+      const kind = rng.int(4);
+      if (kind === 0 && free(x - 5, z - 1.5, x + 5, z + 1.5)) { out.props.push({ kind: 'flowers', x, z, w: 10, d: 3 }); out.boxes.push([x - 5, z - 1.5, x + 5, z + 1.5]); }
+      else if (kind === 1 && free(x - 1.2, z - 0.6, x + 1.2, z + 0.6)) { out.props.push({ kind: 'bench', x, z, yaw: Math.PI }); out.boxes.push([x - 1.1, z - 0.45, x + 1.1, z + 0.45]); }
+      else if (kind === 2 && free(x - 0.8, z - 0.8, x + 0.8, z + 0.8)) { out.trees.push({ x, z, s: 0.8 }); out.circles.push([x, z, 0.45]); }
+      else if (kind === 3 && free(x - 0.4, z - 0.4, x + 0.4, z + 0.4)) { out.props.push({ kind: 'gardenLamp', x, z }); out.circles.push([x, z, 0.2]); }
+    }
+  }
+}
+let stopsCache = null;
+const cityStopsCache = () => stopsCache || (stopsCache = BUS_ROUTES.flatMap((r) => routePath(r).stops.map((st) => ({ x: st.wait.x, z: st.wait.z }))));
 
 // What stands on each landmark block, where its learning activity is, and what can be ridden there.
 const P = (lm, id, x, z, action, extra = {}) => Object.assign({ id: `${lm.id}-${id}`, x, z, radius: 1.4, action, zone: 'city', icon: lm.icon, label: lm.name }, extra);
 function landmarkPlan(out, lm, rng, { cx, cz, W, D, building, tree, ringTrees }) {
   out.ground = 'paved';
   if (lm.station) { stationPlan(out, lm, rng, { building, tree }); return; }
+  if (landmarkPlan2(out, lm, { cx, cz, building, tree, ringTrees, rng, P })) { decorate(out, rng, cx, cz); return; }
   const gate = { x: cx, z: out.lot.z1 - 4 };         // most landmarks face the street to the south
   switch (lm.id) {
     case 'lake':
@@ -223,6 +366,7 @@ function landmarkPlan(out, lm, rng, { cx, cz, W, D, building, tree, ringTrees })
       });
       out.pois.push(P(lm, 'find', cx - 12, gate.z - 6, 'game', { game: 'find', level: 'fruit', cue: T('Cari buah!', 'Find the fruit!'), icon: 'banana' }));
       out.pois.push(P(lm, 'quiz', cx + 12, gate.z - 6, 'quiz', { stations: ['fv-1', 'fv-2', 'fv-3', 'fv-4'], cue: T('Soalan buah & sayur!', 'Fruit & vegetable questions!'), icon: 'apple' }));
+      out.pois.push(P(lm, 'shop-grocery', cx + 36, gate.z - 6, 'shop', { shop: 'grocery', cue: T('Beli buah!', 'Buy some fruit!'), icon: 'apple' }));
       break;
     case 'library':
       building({ x: cx, z: cz - 12, w: 60, d: 36, h: 12, color: '#efe2ff', roof: 'dome', roofColor: '#9b6bff', kind: 'civic', sign: lm.name });
@@ -300,6 +444,7 @@ function landmarkPlan(out, lm, rng, { cx, cz, W, D, building, tree, ringTrees })
       out.props.push({ kind: 'bigteddy', x: cx + 30, z: cz + 14 }); out.circles.push([cx + 30, cz + 14, 2.5]);
       out.pois.push(P(lm, 'puzzle', cx - 8, cz + 22, 'game', { game: 'puzzle', cue: T('Teka-teki bentuk!', 'Shape puzzle!'), icon: 'shape:star:yellow' }));
       out.pois.push(P(lm, 'find', cx + 10, cz + 30, 'game', { game: 'find', level: 'toys', cue: T('Cari mainan!', 'Find the toy!'), icon: 'teddy' }));
+      out.pois.push(P(lm, 'shop-toys', cx - 24, cz + 30, 'shop', { shop: 'toys', cue: T('Masuk Kedai Mainan!', 'Visit the toy shop!'), icon: 'teddy' }));
       break;
     case 'busdepot':
       building({ x: cx, z: cz - 26, w: 70, d: 20, h: 8, color: '#fff0d6', roof: 'flat', kind: 'civic', trim: '#ffb43c', sign: lm.name });
@@ -516,7 +661,9 @@ export const BUS_STOPS = [
   { id: 'pantai', route: 'B', x: 540, z: 1740, name: T('Hentian Pantai', 'Beach Stop') },
   { id: 'selatan', route: 'B', x: 600, z: 960, name: T('Hentian Selatan', 'South Stop') },
   { id: 'zoo', route: 'C', x: -360, z: 120, name: T('Hentian Zoo', 'Zoo Stop') },
-  { id: 'ladang', route: 'C', x: -660, z: 300, name: T('Hentian Ladang', 'Farm Stop') }
+  { id: 'ladang', route: 'C', x: -660, z: 300, name: T('Hentian Ladang', 'Farm Stop') },
+  { id: 'pesta', route: 'B', x: 480, z: 240, name: T('Hentian Pesta Ria', 'Funfair Stop') },
+  { id: 'jogging', route: 'C', x: -420, z: 60, name: T('Hentian Taman Jogging', 'Jogging Park Stop') }
 ];
 /** A route as a closed path of lane points with the arc length (s) of each stop. */
 export function routePath(route) {
@@ -570,10 +717,7 @@ let allPois = null;
 export function cityPois() {
   if (allPois) return allPois;
   allPois = [];
-  for (let i = 0; i < BLOCK_COLS; i++) for (let j = 0; j < BLOCK_ROWS; j++) {
-    const key = `${XS[i]},${ZS[j]}`;
-    if (landmarkAt.has(key)) allPois.push(...blockPlan(i, j).pois);
-  }
+  for (let i = 0; i < BLOCK_COLS; i++) for (let j = 0; j < BLOCK_ROWS; j++) allPois.push(...blockPlan(i, j).pois);
   for (const r of BUS_ROUTES) for (const st of routePath(r).stops) {
     allPois.push({ id: 'bus-' + st.id, x: st.wait.x, z: st.wait.z, radius: 1.2, action: 'bus', stop: st.id, route: r.id, zone: 'city', icon: 'bus', label: st.name, cue: T('Naik bas!', 'Take the bus!') });
   }
@@ -583,12 +727,22 @@ export function cityPois() {
 /** The district at (x, z): a landmark, a block type, the campus, the beach or the hills. */
 /** Crossings with traffic lights: the busy middle of the town, and every crossing of the highway. */
 export const hasTrafficLight = (x, z) => Math.max(Math.abs(x), Math.abs(z)) < 700 || z === HIGHWAY.z;
+/**
+ * Traffic light colours at the crossing (x, z) at time t (seconds): an 18 s cycle, east-west traffic first, each
+ * crossing shifted a little so the town does not blink in step. Returns { ew, ns } as 'green' | 'yellow' | 'red'.
+ */
+export const LIGHT_CYCLE = 18;
+export function lightPhase(x, z, t) {
+  const off = ((((x * 7 + z * 13) / 10) % LIGHT_CYCLE) + LIGHT_CYCLE) % LIGHT_CYCLE;
+  const u = (((t + off) % LIGHT_CYCLE) + LIGHT_CYCLE) % LIGHT_CYCLE;
+  return { ew: u < 7 ? 'green' : u < 9 ? 'yellow' : 'red', ns: u < 9 ? 'red' : u < 16 ? 'green' : 'yellow' };
+}
 /** Where the traffic light of the crossing (x, z) stands (north-east corner pavement). */
 export const trafficLightSpot = (x, z) => ({ x: x + ROAD_HALF + 1.2, z: z - roadHalf('x', z) - 1.2 });
 /** Street lamps on the pavement ring of a block (corners and middles), leaving room at bus stops and traffic lights. */
 export function pavementLamps(rx0, rz0, rx1, rz1) {
   const o0 = [rx0 + roadHalf('z', rx0), rz0 + roadHalf('x', rz0), rx1 - roadHalf('z', rx1), rz1 - roadHalf('x', rz1)];
-  const stops = cityPois().filter((p) => p.action === 'bus');
+  const stops = cityStopsCache();                       // (straight from the routes: cityPois() builds blocks, which ask for lamps)
   const light = (x, z) => { const t = trafficLightSpot(rx0, rz1); return hasTrafficLight(rx0, rz1) && Math.hypot(t.x - x, t.z - z) < 1; };
   return [[o0[0] + 1.2, o0[1] + 1.2], [o0[2] - 1.2, o0[1] + 1.2], [o0[0] + 1.2, o0[3] - 1.2], [o0[2] - 1.2, o0[3] - 1.2], [(rx0 + rx1) / 2, o0[1] + 1.2], [(rx0 + rx1) / 2, o0[3] - 1.2]]
     .filter(([x, z]) => !stops.some((st) => Math.hypot(st.x - x, st.z - z) < 6) && !light(x, z));

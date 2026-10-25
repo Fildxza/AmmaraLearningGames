@@ -5,8 +5,11 @@ import { addStaticColliders, addVehicleBarriers } from '../../src/engine/world/l
 import {
   CITY, XS, ZS, PITCH, CURB, ROAD_HALF, BLOCK_COLS, BLOCK_ROWS, LANDMARKS, BUS_ROUTES, BUS_STOPS, CAMPUS, CAMPUS_PLAN,
   blockPlan, blockTypeAt, routePath, routeAt, cityPois, districtAt, onRoad, pavementLamps, isCampus,
-  HIGHWAY, roadHalf, curbOf, lanePoint, RAIL, railPath, railAt, railPillars, hasTrafficLight, trafficLightSpot
+  HIGHWAY, roadHalf, curbOf, lanePoint, RAIL, railPath, railAt, railPillars, hasTrafficLight, trafficLightSpot, lightPhase, LIGHT_CYCLE
 } from '../../src/engine/city/plan.js';
+import { coasterTrack } from '../../src/engine/city/landmarks2.js';
+import { SHOPS } from '../../src/data/shops.js';
+import { factById } from '../../src/data/facts.js';
 import { validated } from './helpers.mjs';
 import { GAMES } from '../../src/engine/minigames/index.js';
 
@@ -21,6 +24,7 @@ function blockWorld(bp) {
   bp.boxes.forEach((b) => addBox(w, ...b));
   bp.circles.forEach((c) => addCircle(w, ...c));
   for (const [x, z] of pavementLamps(bp.x0, bp.z0, bp.x1, bp.z1)) addCircle(w, x, z, 0.25);
+  bp.streetCircles.forEach((c) => addCircle(w, ...c));
   return w;
 }
 
@@ -30,7 +34,7 @@ test('the town is big: more than 4 km on each side, a thousand blocks, thousands
   assert.ok(plans.length > 1000, `blocks ${plans.length}`);
   const buildings = plans.reduce((n, p) => n + p.buildings.length, 0);
   assert.ok(buildings > 4000, `buildings ${buildings}`);
-  assert.equal(LANDMARKS.length, 22);
+  assert.equal(LANDMARKS.length, 48);
   assert.equal(LANDMARKS.filter((l) => l.station).length, 4);
 });
 
@@ -83,7 +87,9 @@ test('every learning place in the town opens something that exists and can be re
     if (p.action === 'game') assert.ok(games.has(p.game), `${p.id}: game ${p.game}`);
     if (p.action === 'bus') assert.ok(BUS_STOPS.some((s) => s.id === p.stop));
     if (p.action === 'train') assert.ok(railPath().stations.some((s) => s.id === p.station), `${p.id}: station ${p.station}`);
-    assert.ok(['quiz', 'game', 'bus', 'islamic', 'train'].includes(p.action), `${p.id}: action ${p.action}`);
+    if (p.action === 'shop') assert.ok(SHOPS[p.shop], `${p.id}: shop ${p.shop}`);
+    if (p.action === 'fact') assert.ok(factById[p.fact], `${p.id}: fact ${p.fact}`);
+    assert.ok(['quiz', 'game', 'bus', 'islamic', 'train', 'shop', 'fact', 'coaster', 'cinema', 'clock'].includes(p.action), `${p.id}: action ${p.action}`);
   }
   // nothing solid on a place, and the child can stand next to it
   for (const bp of plans) {
@@ -242,5 +248,78 @@ test('train stations: hall, platform legs and lift inside the lot; the platform 
     for (const p of bp.pois) assert.ok(penetration(w, p, R) < 1e-3, `${p.id} blocked`);
     assert.equal(bp.pois.filter((p) => p.action === 'train').length, 1);
     assert.equal(districtAt((bp.lot.x0 + bp.lot.x1) / 2, (bp.lot.z0 + bp.lot.z1) / 2).music, 'town');
+  }
+});
+
+// ---- the denser town (2.2): pavement things, coins, fact boards, traffic lights, the roller coaster
+const onPavement = (bp, x, z) => {
+  // inside the block's outer edge (half a road from each street line), outside its lot
+  const hx0 = bp.x0 + roadHalf('z', bp.x0), hx1 = bp.x1 - roadHalf('z', bp.x1), hz0 = bp.z0 + roadHalf('x', bp.z0), hz1 = bp.z1 - roadHalf('x', bp.z1);
+  const L = bp.lot;
+  const inBlock = x > hx0 && x < hx1 && z > hz0 && z < hz1, inLot = x > L.x0 && x < L.x1 && z > L.z0 && z < L.z1;
+  return inBlock && !inLot;
+};
+test('street trees, hydrants and coins are on the pavement, never on the road or in a lot', () => {
+  let n = 0;
+  for (const bp of plans) {
+    for (const t of bp.street) { assert.ok(onPavement(bp, t.x, t.z) && !onRoad(t.x, t.z), `${t.kind} at ${t.x},${t.z}`); n++; }
+    for (const c of bp.coins) { assert.ok(onPavement(bp, c.x, c.z) && !onRoad(c.x, c.z), `coin ${c.id}`); n++; }
+  }
+  assert.ok(n > 5000, `pavement things ${n}`);
+});
+test('every coin can be picked up: nothing solid on it', () => {
+  let n = 0;
+  for (const bp of plans) {
+    if (!bp.coins.length) continue;
+    const w = blockWorld(bp);
+    for (const c of bp.coins) { assert.ok(penetration(w, c, R) < 1e-3, `coin ${c.id} is inside something`); n++; }
+  }
+  assert.ok(n > 2500, `coins ${n}`);
+});
+test('the town is dense: thousands of buildings, shophouse streets, terrace houses, villages, 140+ fact boards, 10 shops', () => {
+  const buildings = plans.reduce((k, p) => k + p.buildings.length, 0);
+  const types = {};
+  for (const p of plans) types[p.type] = (types[p.type] || 0) + 1;
+  assert.ok(buildings > 6500, `buildings ${buildings}`);
+  for (const t of ['shophouse', 'terrace', 'kampung']) assert.ok(types[t] > 50, `${t}: ${types[t]}`);
+  const pois = cityPois();
+  assert.ok(pois.filter((p) => p.action === 'fact').length >= 140);
+  assert.ok(pois.filter((p) => p.action === 'shop').length >= 10);
+  for (const id of Object.keys(SHOPS)) assert.ok(pois.some((p) => p.action === 'shop' && p.shop === id), `no place sells ${id}`);
+});
+test('traffic lights: the two directions are never green or yellow at the same time', () => {
+  for (const [x, z] of [[0, 60], [120, -180], [-360, HIGHWAY.z], [480, 300]]) {
+    for (let t = 0; t < LIGHT_CYCLE * 2; t += 0.25) {
+      const ph = lightPhase(x, z, t);
+      assert.ok(ph.ew === 'red' || ph.ns === 'red', `both open at ${x},${z} t=${t}`);
+    }
+    const seen = new Set(); for (let t = 0; t < LIGHT_CYCLE; t += 0.5) { const ph = lightPhase(x, z, t); seen.add('ew' + ph.ew); seen.add('ns' + ph.ns); }
+    assert.equal(seen.size, 6, 'every colour is shown in one cycle');
+  }
+});
+test('the roller coaster: closed, smooth, inside the funfair, low enough to ride safely, flat at the station', () => {
+  const pts = coasterTrack();
+  for (let k = 0; k < pts.length; k++) {
+    const a = pts[k], b = pts[(k + 1) % pts.length];
+    assert.ok(Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z) < 3.5, `jump at ${k}`);
+    assert.ok(a.y >= 1.5 && a.y <= 14, `height ${a.y}`);
+    assert.ok(Math.abs(a.x) <= 40 && Math.abs(a.z) <= 20, 'inside its area');
+  }
+  const station = pts.filter((p) => p.x < -33);
+  assert.ok(station.every((p) => p.y === 1.6), 'the station part is flat');
+});
+
+test('the town map lists every place exactly once, in one of its five groups', async () => {
+  const { PLACE_GROUPS } = await import('../../src/engine/ui/townmap.js');
+  const ids = PLACE_GROUPS.flatMap(([, list]) => list);
+  assert.equal(PLACE_GROUPS.length, 5);
+  assert.equal(new Set(ids).size, ids.length, 'a place is listed twice');
+  assert.deepEqual([...ids].sort(), LANDMARKS.map((l) => l.id).sort());
+});
+
+test('every new place has something to do: a shop, a ride, a quiz, a game, a story or a fact board', () => {
+  for (const l of LANDMARKS) {
+    const bp = blockPlan(XS.indexOf(l.x0), ZS.indexOf(l.z0));
+    assert.ok(bp.pois.length >= 1, `${l.id} has nothing to do`);
   }
 });

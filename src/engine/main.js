@@ -14,7 +14,7 @@ import { initOverlays, loaderStep, toast } from './ui/overlays.js';
 import { RAINBOW_DEF } from './ui/thumbs.js';
 import { show } from './ui/dom.js';
 
-const VERSION = '2.1.0';
+const VERSION = '2.2.0';
 const perf = { on: false, update: 0, render: 0, frame: 16 };
 
 async function boot() {

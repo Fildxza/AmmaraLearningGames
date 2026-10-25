@@ -96,8 +96,8 @@ Generated ${new Date().toISOString()} by \`npm run report\` from the raw results
 | Upgrade checks (2.0), Edge | ${upPass(upEdge)} |
 | Kid Lock / web app checks, Chrome | ${upPass(lkChrome)} |
 | Kid Lock / web app checks, Edge | ${upPass(lkEdge)} |
-| Town checks (2.1), Chrome | ${upPass(ctChrome)} |
-| Town checks (2.1), Edge | ${upPass(ctEdge)} |
+| Town checks (2.1–2.2), Chrome | ${upPass(ctChrome)} |
+| Town checks (2.1–2.2), Edge | ${upPass(ctEdge)} |
 | Picture audit (every picture the game can show) | ${pics ? `${pics.total} pictures, ${pics.problems.length} problems` : 'NOT RUN'} |
 
 ## Upgrade checks: 3D world, narrator, arcade, Jom Mengaji (2.0)
@@ -116,9 +116,9 @@ From \`tests/e2e/run-e2e-lock.mjs\`: the built \`dist/\` folder is served over h
 |---|---|---|---|---|
 ${lkRows}
 
-## Town: Bandar Ceria, highway and train (2.1)
+## Town: Bandar Ceria, highway, train, shops and books (2.1–2.2)
 
-From \`tests/e2e/run-e2e-city.mjs\` with real keyboard input: the child rides a unicorn, drives a car, calls and rides a bus to the next stop, waits for and rides the elevated train to the next station, greets a school child, opens landmark quizzes, travels with the town map, and comes home with one button. The plan itself (lots, colliders, routes, highway lanes, train line and pillars) is covered by \`tests/unit/city.test.mjs\`.
+From \`tests/e2e/run-e2e-city.mjs\` with real keyboard input: the child rides a unicorn, drives a car, calls and rides a bus to the next stop, waits for and rides the elevated train to the next station, greets a school child, opens landmark quizzes, travels with the town map, comes home with one button, picks up a coin, buys and reads a picture book aloud to the end, buys clothes that are worn at once, is told kindly when coins are short, eats a lollipop (with a teeth tip), reads a fact board, rides the roller coaster, sees cars stop at red lights, reads the real-time clock and watches a story at the cinema. The plan itself (lots, colliders, routes, highway lanes, train line and pillars, pavement coins and trees, traffic-light phases, the roller-coaster track, the map groups) is covered by \`tests/unit/city.test.mjs\`, and the books, facts, shops and coin records by \`tests/unit/town-content.test.mjs\`.
 
 | Id | Check | Chrome | Edge | What was measured (Chrome) |
 |---|---|---|---|---|
@@ -144,7 +144,7 @@ ${details}
 
 ## Performance (measured, Chrome headless on the machine above)
 
-* Idle playroom (\`npm run perf\`): about 43-47 fps at the default medium quality, 219 draw calls, about 216k triangles; about 47 fps at low quality (133 draw calls). During the e2e run the same machine dropped to 12-28 fps because the test runner, the browser and other programs competed for the CPU and GPU.
+* Idle playroom (\`npm run perf\`, headless Chrome and Edge, medium quality): about 38-39 fps, 362 draw calls, about 830k triangles (the 2.0 preschool alone was 219 calls and 216k triangles; the town around it adds the rest). In the middle of the busy town (shophouses, funfair, mall) the tours measured 190-340 draw calls, 0.5-0.85 million triangles and 43-60 fps. During the e2e runs the same machine dropped to 4-28 fps because the test runner, two browsers and other programs competed for the CPU and GPU, and the character wears dozens of accessories at that moment; the movement checks (test 5) are timing-based and failed once or twice under that load before passing again on a quiet machine.
 * Adaptive quality (\`node tools/adaptive-check.mjs\`): with the CPU slowed 6 times the game switched itself to low quality (shadows off) after about 19 seconds. It was not tested on a real slow school laptop.
 
 ## Visual review
@@ -161,6 +161,7 @@ Screenshots of every screen are in \`qa/screenshots/chrome\` and \`qa/screenshot
 * **Other browsers** (Firefox, Safari, older Chrome/Edge) and other operating systems.
 * **A slow school laptop with an integrated GPU older than the one used here**, and projector resolutions other than the sizes listed in test 28.
 * **Screen readers**, high-contrast mode and keyboard-only use of the child screens beyond the arrow/WASD/Enter/Esc/1-3 keys that were exercised.
+* **Shopping and reading with real children.** Prices, coins and the book reader were tested by the automated session only; nobody aged 2-4 has used the shops or listened to the books, and the retold stories have not been reviewed by a teacher.
 * **The town over a long time.** Each ride and trip was tested once per run; nobody drove around the whole 4.2 km town for an hour, and the town was only run on the laptop above.
 * **Long sessions** (hours) and very large classes (the class list was tested with 4 names; the limit is 60).
 * **Real children.** Nobody aged 2-4 has played the game or the ten mini-games; difficulty, wording and the length of the tutorial are unvalidated.

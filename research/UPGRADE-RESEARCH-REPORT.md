@@ -1,6 +1,25 @@
-# AmmaraGames 2.0 / 2.1: upgrade research and design report
+# AmmaraGames 2.0 – 2.2: upgrade research and design report
 
 Written for: the project owner and future developers. It records what was decided, why, and what is still open.
+
+## 00. Change summary (2.1.0 → 2.2.0): a busy town
+
+* **Denser town:** new block kinds (shophouse streets with five-foot ways, angle parking and 40 shop signs from one texture atlas; terrace houses with yards, cars and an occasional surau; wooden village houses on stilts among coconut palms), street trees, fire hydrants and a decorator that fills open landmark squares with flower beds, benches, small trees and garden lamps. About 7,000 buildings and 24,000 trees.
+* **26 new places** (48 in all): shopping centre, food court, supermarket, funfair with a rideable roller coaster, bumper cars, drop tower and carousel, jogging park with joggers, grand mosque, hospital with a dentist, science centre, aquarium, dinosaur museum, butterfly park, recycling centre, post office, savings bank, cinema, clock-tower square, water park, sports courts, pet shop, hibiscus garden, heritage village, little airport, kite park, wind farm, jetty and lighthouse, bird park.
+* **Coins and shops:** coins on the pavements (3 per block, back after four minutes), coins for town quiz answers, fact boards and finished books; 8 shops with 73 items priced 1–6 coins (shown as coins to count); "My Bag" for books, food, toys and pet food; boutique clothes go into the wardrobe and are worn at once. All of it is saved per child; older records get 5 starting coins.
+* **Books:** 21 picture books (7 retold public-domain stories: six Aesop fables and Sang Kancil; 14 original knowledge books), read aloud page by page; reading one to the end is recorded as an activity.
+* **Knowledge:** 74 "Did you know?" facts on 145 boards; 10 town quiz topics with 60 new questions (513 in total) and 21 new learning objectives in `research/objectives.json`; a real-time clock tower and talking clock card; the cinema shows a story.
+* **Busy streets:** working traffic lights (an 18 s cycle, never green both ways; cars and highway cars stop at red), 36 town cars, 64 people (18 of them grown-ups who greet differently), 2 more bus stops.
+
+| Topic | Decision | Reason |
+|---|---|---|
+| Money | coins only, no real-money ideas beyond "count, save, share"; prices 1–6 so a 2–4 year old can count them | the curriculum topic is early counting and saving |
+| Sweets | allowed, but each sweet comes with a gentle teeth-brushing tip | matches the hygiene questions; no guilt messages |
+| Stories | only retold public-domain tales (Aesop, Sang Kancil), each with its source shown in the book | licences must be clear; the wording is ours |
+| Sky objects | not added | the game camera always looks down at the street, so balloons or planes in the sky would never be seen; detail was put at street level instead |
+| Traffic lights | one cycle per crossing, shifted per crossing; lamps lit on all four faces | the light boxes used to hide their lamps (a bug found while doing this) |
+| Shop signs | one texture atlas for all 40 sign pictures | one draw call per square of town instead of one per sign |
+| Roller coaster | gentle: 10.6 m top, chain lift at 3.2 m/s, gravity speed capped at 15 m/s, brakes into the station; one lap per ride | exciting but not scary for small children |
 
 ## 0. Change summary (2.0.0 → 2.1.0): the town
 
@@ -57,6 +76,7 @@ Written for: the project owner and future developers. It records what was decide
 * Unit tests: 62 (`npm test`), including the Quran verbatim checks, narrator ranking and Arabic refusal, game rules, layout reachability and icon XML validity.
 * End-to-end: the original 41 checks (unchanged) plus 13 upgrade checks (`tests/e2e/run-e2e-upgrade.mjs`), in Chrome 156 and Edge 156 on Windows 11, offline, with real mouse input. All ten games are played to the end automatically. See `TEST-REPORT.md` for the latest numbers.
 * Screenshots of every area and game were inspected by the developer (`tools/tour.mjs`, `tools/play-games.mjs`, `tools/islamic-tour.mjs`).
+* 2.2 (busy town): 7 more town-plan unit tests (pavement coins and trees, coins never inside anything, density, traffic-light phases never open both ways, the roller-coaster track, map groups, every place has something to do) and 9 content/economy unit tests (`tests/unit/town-content.test.mjs`: books, facts, shops, no Arabic script in narrated text, buying, owning, eating, clothes worn at once, coins only once per fact or book, old records). 9 more browser checks (C15–C23): coins, bookshop and reader, boutique, sweet shop, fact board, roller coaster lap, red lights, clock tower and cinema, busy streets and grouped town map. A picture audit of 513 pictures (every book page, shop item and shop sign). A performance pass cut the triangles near busy places from about 1.2 to 0.85 million (light flower beds in town, outlines only within 140 m).
 * 2.1 (town): 16 unit tests of the town plan (`tests/unit/city.test.mjs`: lots, colliders, landmarks, rides, bus routes and stops, districts, highway lanes and lights, train loop, pillars, stations) and 14 browser checks (`tests/e2e/run-e2e-city.mjs`: size, streaming, unicorn, car, bus and train rides, greeting a child, landmark music and quiz, town map trips, highway, two trains never meeting). Town screenshots from `tools/city-tour.mjs` were inspected; problems found and fixed that way: empty-looking pink landmark squares, a lamp and a traffic light on the same corner, a bus stop placed in a crossing, and the camera ending inside towers, the train deck or a station canopy. Two checks of the original 41-check suite had the 2.0 content written into them (animal-world question ids must start with `ani-`; the info page must say 392 questions); with the new town questions they now check the rule itself (the questions belong to that world's stations; the info page shows the real number of questions).
 
 ## 4. What was NOT verified
@@ -74,5 +94,6 @@ Written for: the project owner and future developers. It records what was decide
 3. Hijaiyah letter names have no audio; a teacher or parent should say them.
 4. In 3D, front-row corner signs are low boards at the open front; very small screens may show them cut at the bottom edge.
 5. Browser storage is per browser and per file location (unchanged from 1.0.0); download the CSV files after lessons.
-6. Town traffic lights do not change; cars simply give way and always stop for children. Highway cars are only simulated within about 500 m of the child.
+6. Buses do not stop at traffic lights (town and highway cars do). Highway cars are only simulated within about 500 m of the child.
+8. The town now draws about 0.6–1.0 million triangles near busy places (it was about 0.5 million); headless Chrome on the test laptop still ran at about 40–60 frames per second, and the automatic light mode remains the safety net on weaker machines.
 7. Between rows of tall towers the town camera can show a narrow street view; it never looks through walls.

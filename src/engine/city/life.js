@@ -4,7 +4,7 @@
 import { InstancedMesh, Object3D, Color, Matrix4, Quaternion, Vector3, SphereGeometry, CapsuleGeometry, ConeGeometry, BoxGeometry, Group, Mesh } from 'three';
 import { toon, toonVertexMaterial, outlineMaterial } from '../world/paint.js';
 import { createRng } from '../core/rng.js';
-import { XS, ZS, CITY, BEACH, neighbours, nearestNode, lanePoint, BUS_ROUTES, routePath, routeAt, blockIndexAt, blockTypeAt, curbOf, HIGHWAY, RAIL, railPath, railAt } from './plan.js';
+import { XS, ZS, CITY, BEACH, ROAD_HALF, neighbours, nearestNode, lanePoint, BUS_ROUTES, routePath, routeAt, blockIndexAt, blockTypeAt, curbOf, roadHalf, HIGHWAY, RAIL, railPath, railAt, hasTrafficLight, lightPhase } from './plan.js';
 import { trafficCarGeometries, PERSON_PARTS, KID_LOOKS, bus as busModel, spinWheels, trainCarGeometry, TRAIN_CAR } from './models.js';
 
 const rnd = createRng('town-life');
@@ -48,8 +48,8 @@ export function createTraffic(scene, N = 26) {
   }
   return {
     cars,
-    /** obstacles: [{x, z, r}] the cars must not drive into (the child, the child's car, buses) */
-    update(dt, px, pz, obstacles) {
+    /** obstacles: [{x, z, r}] the cars must not drive into (the child, the child's car, buses); t: town time (lights) */
+    update(dt, px, pz, obstacles, t = 0) {
       cars.forEach((c, k) => {
         if (!c.active || Math.hypot(c.x - px, c.z - pz) > 300) { if (!spawn(c, px, pz)) { hide(k); return; } }
         const lp = lanePoint(c.from, c.to, Math.min(c.s, c.len));
@@ -65,8 +65,15 @@ export function createTraffic(scene, N = 26) {
           const dx = o2.x - c.x, dz = o2.z - c.z, along = dx * fx + dz * fz, side = Math.abs(dx * fz - dz * fx);
           if (along > 0 && along < 7 && side < 1.6) { blocked = true; break; }
         }
-        const target = blocked ? 0 : (c.len - c.s < 14 ? 5 : 8.5);
-        c.speed += (target - c.speed) * Math.min(1, dt * (blocked ? 6 : 1.5));
+        let target = blocked ? 0 : (c.len - c.s < 14 ? 5 : 8.5);
+        // traffic lights: stop at the line on red (and on yellow when there is still room to stop)
+        c.redLight = false;
+        if (hasTrafficLight(c.to.x, c.to.z)) {
+          const ew = c.from.z === c.to.z, light = lightPhase(c.to.x, c.to.z, t)[ew ? 'ew' : 'ns'];
+          const line = c.len - ((ew ? roadHalf('z', c.to.x) : roadHalf('x', c.to.z)) + 3.5), rem = line - c.s;
+          if (light !== 'green' && rem > -0.3 && (light === 'red' || rem > 5) && rem < 30) { target = Math.min(target, Math.max(0, rem * 0.45)); c.redLight = true; if (rem < 0.4) target = 0; }
+        }
+        c.speed += (target - c.speed) * Math.min(1, dt * (blocked || c.redLight ? 6 : 1.5));
         c.s += c.speed * dt;
         if (c.s >= c.len) nextSegment(c);
         const p = lanePoint(c.from, c.to, c.s);
@@ -86,7 +93,7 @@ export function createTraffic(scene, N = 26) {
 }
 
 // ------------------------------------------------------------------------------------------------ children on the pavements
-export function createPeople(scene, N = 46) {
+export function createPeople(scene, N = 46, adults = 0) {
   const geos = {
     ball: (s) => new SphereGeometry(s[0], 12, 9),
     capsule: (s) => new CapsuleGeometry(s[0], s[1], 4, 8),
@@ -107,9 +114,13 @@ export function createPeople(scene, N = 46) {
   const cc = new Color();
   const kids = Array.from({ length: N }, (_, k) => {
     const r = createRng('kid' + k);
-    const look = { skin: KID_LOOKS.skin[r.int(5)], hair: r.next() < 0.3 ? (r.next() < 0.6 ? '#ffffff' : '#2f4a86') : KID_LOOKS.hair[r.int(4)], shirt: KID_LOOKS.shirt[r.int(5)], lower: KID_LOOKS.lower[r.int(5)], bag: KID_LOOKS.bag[r.int(6)] };
+    // the first N - adults are school children in uniform; the rest are grown-ups in bright clothes (some in a tudung)
+    const adult = k >= N - adults;
+    const look = adult
+      ? { skin: KID_LOOKS.skin[r.int(5)], hair: r.next() < 0.45 ? ['#ff8fc0', '#7fcbff', '#b79cff', '#ffffff', '#3aa98f'][r.int(5)] : KID_LOOKS.hair[r.int(4)], shirt: ['#ff6b6b', '#4a90e2', '#5cc46a', '#ffd23f', '#9b6bff', '#ff9a3c', '#3fc8d8'][r.int(7)], lower: ['#3d3436', '#4a5bb5', '#8a5a3c', '#2f7a5a', '#c9c4d6'][r.int(5)], bag: ['#b07a52', '#ff8fc0', '#4a4350'][r.int(3)] }
+      : { skin: KID_LOOKS.skin[r.int(5)], hair: r.next() < 0.3 ? (r.next() < 0.6 ? '#ffffff' : '#2f4a86') : KID_LOOKS.hair[r.int(4)], shirt: KID_LOOKS.shirt[r.int(5)], lower: KID_LOOKS.lower[r.int(5)], bag: KID_LOOKS.bag[r.int(6)] };
     parts.forEach((p) => p.mesh.setColorAt(k, cc.set(look[p.pt.color])));
-    return { active: false, x: 0, z: 0, yaw: 0, speed: 1.2, phase: r.next() * 6, pause: 0, wave: 0, look };
+    return { active: false, x: 0, z: 0, yaw: 0, speed: 1.2, phase: r.next() * 6, pause: 0, wave: 0, look, adult, scale: adult ? 1.34 : 1 };
   });
   const M = new Matrix4(), L = new Matrix4(), Q = new Quaternion(), E = new Vector3(), S = new Vector3(1, 1, 1), up = new Vector3(0, 1, 0), xa = new Vector3(1, 0, 0);
   const hideAll = (k) => { M.makeScale(0.001, 0.001, 0.001).setPosition(0, -50, 0); parts.forEach((p) => { p.mesh.setMatrixAt(k, M); if (p.ol) p.ol.setMatrixAt(k, M); }); };
@@ -162,7 +173,7 @@ export function createPeople(scene, N = 46) {
         const swing = moving && !reduced ? Math.sin(t * 8 + kd.phase) * 0.6 : 0;
         const bob = moving && !reduced ? Math.abs(Math.sin(t * 8 + kd.phase)) * 0.04 : 0;
         Q.setFromAxisAngle(up, kd.yaw); E.set(kd.x, bob, kd.z);
-        M.compose(E, Q, S);
+        S.setScalar(kd.scale); M.compose(E, Q, S);
         parts.forEach((p) => {
           const pt = p.pt;
           let rot = 0;
@@ -267,7 +278,7 @@ export function createHighway(scene, N = 24) {
   return {
     cars,
     /** obstacles: the child / the child's ride; others: town cars (they cross the highway at the junctions) */
-    update(dt, px, pz, obstacles, others = []) {
+    update(dt, px, pz, obstacles, others = [], t = 0) {
       if (Math.abs(pz - HIGHWAY.z) > 650) {
         if (shown) { cars.forEach((c, k) => { c.active = false; hide(k); }); shown = false; flush(); }
         return;
@@ -289,6 +300,12 @@ export function createHighway(scene, N = 24) {
           if (along > 0 && along < 18) target = Math.min(target, along < 9 ? 0 : o.speed);
         }
         for (const o of others) { const along = (o.x - c.x) * c.dir; if (along > 0 && along < 10 && Math.abs(o.z - c.z) < 1.6) { target = 0; break; } }
+        // the next crossing ahead: stop at its line on red
+        const nx = c.dir > 0 ? XS.find((X) => X - (ROAD_HALF + 3.5) > c.x - 0.3) : [...XS].reverse().find((X) => X + (ROAD_HALF + 3.5) < c.x + 0.3);
+        if (nx !== undefined && Math.abs(c.x) < XS[XS.length - 1]) {
+          const rem = (nx - c.dir * (ROAD_HALF + 3.5) - c.x) * c.dir, light = lightPhase(nx, HIGHWAY.z, t).ew;
+          if (light !== 'green' && rem > -0.3 && (light === 'red' || rem > 8) && rem < 40) target = Math.min(target, rem < 0.4 ? 0 : rem * 0.4);
+        }
         c.speed += (target - c.speed) * Math.min(1, dt * (target < c.speed ? 4 : 0.8));
         c.x += c.dir * c.speed * dt;
         d.position.set(c.x, 0, c.z); d.rotation.set(0, c.dir > 0 ? Math.PI / 2 : -Math.PI / 2, 0); d.scale.setScalar(1); d.updateMatrix();

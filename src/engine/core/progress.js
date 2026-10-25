@@ -5,6 +5,7 @@ import { tr, choiceLabel } from './labels.js';
 import { toCSV } from './csv.js';
 
 export const STORE_VERSION = 1;
+export const STARTING_COINS = 5;          // a new child can buy something small straight away
 export const EMPTY_EQUIP = { head: null, hair: null, face: null, back: null, hand: null };
 
 export function emptyStore() {
@@ -335,6 +336,77 @@ export function createProgress({ config, load, save, now = () => Date.now() }) {
       const isNew = !l.rewards.includes(rewardId);
       if (isNew) { l.rewards.push(rewardId); persist(); }
       return { ok: true, isNew };
+    },
+    // ---- the town: coins, shopping bag, books read, fact boards read (records from older versions get these on first use) ----
+    wallet(learnerId) {
+      const l = data.learners[learnerId];
+      if (!l) return null;
+      if (typeof l.coins !== 'number' || !(l.coins >= 0)) l.coins = STARTING_COINS;
+      if (!l.bag || typeof l.bag !== 'object') l.bag = {};
+      if (!Array.isArray(l.books)) l.books = [];
+      if (!Array.isArray(l.booksRead)) l.booksRead = [];
+      if (!Array.isArray(l.factsSeen)) l.factsSeen = [];
+      return l;
+    },
+    coins(learnerId) { const l = api.wallet(learnerId); return l ? l.coins : 0; },
+    addCoins(learnerId, n) {
+      const l = api.wallet(learnerId);
+      if (!l || !(n > 0)) return l ? l.coins : 0;
+      l.coins = Math.min(9999, l.coins + Math.floor(n));
+      persist();
+      return l.coins;
+    },
+    /**
+     * Buys a shop item: { id, kind: book|food|toy|pet|wear, price, book?, reward? }.
+     * Returns { ok, reason?: 'NO_COINS' | 'OWNED' | 'BAD_ITEM', coins }.
+     */
+    buy(learnerId, item) {
+      const l = api.wallet(learnerId);
+      if (!l || !item || !(item.price >= 0)) return { ok: false, reason: 'BAD_ITEM', coins: l ? l.coins : 0 };
+      if (api.owns(learnerId, item)) return { ok: false, reason: 'OWNED', coins: l.coins };
+      if (item.kind === 'wear' && !(item.reward && config.rewards[item.reward])) return { ok: false, reason: 'BAD_ITEM', coins: l.coins };
+      if (l.coins < item.price) return { ok: false, reason: 'NO_COINS', coins: l.coins };
+      l.coins -= item.price;
+      if (item.kind === 'book') l.books.push(item.book);
+      else if (item.kind === 'wear') {
+        l.rewards.push(item.reward);
+        const r = config.rewards[item.reward];
+        if (r.type === 'accessory') l.equipped[r.slot] = item.reward;           // put it on straight away
+        if (r.type === 'outfit') l.outfit = item.reward;
+      } else l.bag[item.id] = (l.bag[item.id] || 0) + 1;
+      persist();
+      return { ok: true, coins: l.coins };
+    },
+    /** Books and clothes are bought once; food, toys and pet food can be bought again. */
+    owns(learnerId, item) {
+      const l = api.wallet(learnerId);
+      if (!l || !item) return false;
+      if (item.kind === 'book') return l.books.includes(item.book);
+      if (item.kind === 'wear') return l.rewards.includes(item.reward);
+      return false;
+    },
+    bagCount(learnerId, itemId) { const l = api.wallet(learnerId); return l ? l.bag[itemId] || 0 : 0; },
+    /** Eats a food / feeds a pet (uses one up). Toys are kept. Returns false if there is none. */
+    useItem(learnerId, item) {
+      const l = api.wallet(learnerId);
+      if (!l || !item || !(l.bag[item.id] > 0)) return false;
+      if (item.kind === 'food' || item.kind === 'pet') { l.bag[item.id] -= 1; if (!l.bag[item.id]) delete l.bag[item.id]; persist(); }
+      return true;
+    },
+    /** The first time a child reads a fact board or finishes a book, they get a coin. Returns true that first time. */
+    markFact(learnerId, factId) {
+      const l = api.wallet(learnerId);
+      if (!l || l.factsSeen.includes(factId)) return false;
+      l.factsSeen.push(factId);
+      persist();
+      return true;
+    },
+    markBookRead(learnerId, bookId) {
+      const l = api.wallet(learnerId);
+      if (!l || l.booksRead.includes(bookId)) return false;
+      l.booksRead.push(bookId);
+      persist();
+      return true;
     },
     exportActivitiesCSV(scope, lang, T, nameOf = (x) => x) {
       const sessionId = data.currentSessionId;

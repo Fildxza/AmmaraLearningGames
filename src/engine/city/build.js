@@ -16,6 +16,9 @@ import { createSign } from '../world/signs.js';
 import { poiMarker } from '../world/zones.js';
 import { addBox, addCircle, removeItems } from '../core/collision.js';
 import { unicorn, kidCar, animal, bus as busModel } from './models.js';
+import { props2 } from './props2.js';
+import { createSignAtlas, SignGeo } from './signatlas.js';
+import { drawBuilding2, minarets, shopSign, trafficLightPole, createLightLamps, createCoins, jogTrack, runway, jetty, boat, createJoggers, createCoaster } from './build2.js';
 
 const C = {
   asphalt: '#878c9a', lane: '#ffffff', laneY: '#ffd23f', walk: '#efe2c9', walkEdge: '#d9c6a6', paved: '#f5e9d2', zebra: '#ffffff',
@@ -67,7 +70,9 @@ function door(G, b, face, w = 1.6, h = 2.4, hex = C.door) {
 }
 function drawBuilding(G, b) {
   const x0 = b.x - b.w / 2, x1 = b.x + b.w / 2, z0 = b.z - b.d / 2, z1 = b.z + b.d / 2;
+  if (b.kind === 'kampung') { drawBuilding2(G, b, windowsOnFace); return; }      // on stilts: no box from the ground
   G.box(x0, 0, z0, x1, b.h, z1, b.color);
+  drawBuilding2(G, b, windowsOnFace);
   const floors = Math.floor(b.h / 3.2);
   if (b.kind === 'tower' || b.kind === 'flats' || b.kind === 'civic' || b.kind === 'school') {
     G.box(x0 - 0.12, 0, z0 - 0.12, x1 + 0.12, 3.0, z1 + 0.12, b.trim || tint(b.color, -0.12));               // ground-floor band
@@ -93,6 +98,7 @@ function drawBuilding(G, b) {
     G.cyl(b.x, b.h + 0.5, b.z, Math.min(b.w, b.d) * 0.28, 1.4, tint(b.color, -0.03), 14);
     G.dome(b.x, b.h + 1.9, b.z, Math.min(b.w, b.d) * 0.28, b.roofColor || '#3aa98f', 14, 6);
     G.cyl(b.x, b.h + 1.9 + Math.min(b.w, b.d) * 0.28, b.z, 0.12, 1.4, '#ffd23f', 6, 0.05);
+    if (b.minarets === 4) minarets(G, b);
     if (b.minaret) {
       const mx = x1 + 6, mz = z0 - 6;
       G.cyl(mx, 0, mz, 1.4, b.h + 9, '#f4fbf8', 10); G.cyl(mx, b.h + 9, mz, 1.8, 0.6, tint(b.color, -0.06), 10);
@@ -115,11 +121,7 @@ function drawParkedCar(G, c) {
   for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) G.cbox(c.x + sx * (along ? hx * 0.62 : hx + 0.05), 0, c.z + sz * (along ? hz + 0.05 : hz * 0.62), along ? 0.7 : 0.25, 0.7, along ? 0.25 : 0.7, '#3d3436');
 }
 function lamp(G, x, z) { G.cyl(x, 0, z, 0.1, 4.2, C.lamp, 6); G.cbox(x, 4.2, z, 0.5, 0.18, 0.5, C.lamp); G.ball(x, 4.0, z, 0.32, C.lampHead); }
-function trafficLight(G, x, z) {
-  G.cyl(x, 0, z, 0.12, 3.4, '#4a4350', 6);
-  G.cbox(x, 3.4, z, 0.6, 1.7, 0.6, '#3d3436');
-  G.ball(x, 4.75, z, 0.2, '#ff5a5a'); G.ball(x, 4.25, z, 0.2, '#ffd23f'); G.ball(x, 3.75, z, 0.2, '#4cc46a');
-}
+function trafficLight(G, x, z) { trafficLightPole(G, x, z); }
 
 // ------------------------------------------------------------------------------------------------ camera blockers
 // Boxes [x0, y0, z0, x1, y1, z1] the follow camera must not look through: tall buildings, and overhead structures
@@ -230,6 +232,13 @@ export function createCity(scene, collision, { iconSvg }) {
   const railByChunk = new Map(), pillarsByChunk = new Map();
   const put = (m, k, v) => { if (!m.has(k)) m.set(k, []); m.get(k).push(v); };
 
+  // ---- shop-sign atlas (painted once, on first use), coins already picked up (id -> time), boats out at sea
+  let atlas = null;
+  const signAtlas = () => atlas || (atlas = createSignAtlas(iconSvg));
+  const takenCoins = new Map();
+  const COIN_BACK = 240;                       // a picked-up coin comes back after four minutes
+  const boats = [0, 1, 2, 3].map((k) => { const b = boat(['#ff6b6b', '#4a90e2', '#ffd23f', '#5cc46a'][k]); b.position.set(-1600 + k * 900, 0, SEA_Z + 60 + k * 18); b.rotation.y = Math.PI / 2; root.add(b); return b; });
+
   // ---- tree instancing parts (shared)
   const trunkGeo = new CylinderGeometry(0.22, 0.32, 1, 7); trunkGeo.translate(0, 0.5, 0);
   const crownGeo = new IcosahedronGeometry(1, 1);
@@ -271,6 +280,8 @@ export function createCity(scene, collision, { iconSvg }) {
     const signs = [];
     const myUpdaters = [];
     const blockers = [];                    // what the camera must not look through (see segmentHit)
+    const lights = [], coinsHere = [], sgeo = new SignGeo();
+    let coaster = null, joggers = null;
     const addB = (b) => items.push(addBox(collision, b[0], b[1], b[2], b[3], 'city'));
     const addC = (c) => items.push(addCircle(collision, c[0], c[1], c[2], 'city'));
 
@@ -300,7 +311,7 @@ export function createCity(scene, collision, { iconSvg }) {
           }
         } else for (let x = s.a + 14; x < s.b - 14; x += 7) paved.flat(x, s.z - 0.13, x + 3.2, s.z + 0.13, 0.045, C.laneY);
         if (near700((s.a + s.b) / 2, s.z) || hw) for (const xc of [s.a + 11, s.b - 13]) for (let k = 0; k < Math.floor((2 * h - 1.2) / 1.95); k++) paved.flat(xc, s.z - h + 0.6 + k * 1.95, xc + 2.6, s.z - h + 1.6 + k * 1.95, 0.05, C.zebra);
-        if (hasTrafficLight(s.a, s.z)) { const tl = trafficLightSpot(s.a, s.z); trafficLight(bld, tl.x, tl.z); addC([tl.x, tl.z, 0.3]); }
+        if (hasTrafficLight(s.a, s.z)) { const tl = trafficLightSpot(s.a, s.z); trafficLight(bld, tl.x, tl.z); addC([tl.x, tl.z, 0.3]); lights.push({ x: tl.x, z: tl.z, nx: s.a, nz: s.z }); }
       }
     }
     // the train line overhead: deck, rails, purple stripe; pillars in the street middles
@@ -334,9 +345,21 @@ export function createCity(scene, collision, { iconSvg }) {
       if (campus) { buildCampus(paved, props, trees, addB, addC, signs, grp); continue; }
       if (bp.ground === 'paved' && bp.landmark) landmarkGround(paved, lot, bp.landmark);
       else if (bp.ground === 'paved') paved.flat(lot.x0, lot.z0, lot.x1, lot.z1, 0.05, C.paved);
-      for (const b of bp.buildings) { drawBuilding(bld, b); if (b.h > 3) blockers.push([b.x - b.w / 2, 0, b.z - b.d / 2, b.x + b.w / 2, b.h + 2.5, b.z + b.d / 2]); }
+      if (bp.track) jogTrack(paved, bp.track);
+      if (bp.runway) runway(paved, bp.runway);
+      if (bp.jetty) { jetty(bld, bp.jetty.x, BEACH.z0, SEA_Z + 45); for (const [dx, dz, col] of [[-5, SEA_Z + 20, '#ff6b6b'], [5, SEA_Z + 34, '#4a90e2']]) { const bt = live(boat(col)); bt.position.set(bp.jetty.x + dx, 0, dz); props.add(bt); myUpdaters.push((t, r) => { bt.position.y = r ? 0 : Math.sin(t * 1.2 + dx) * 0.15; bt.rotation.z = r ? 0 : Math.sin(t * 0.9 + dz) * 0.04; }); } }
+      for (const b of bp.buildings) {
+        drawBuilding(bld, b);
+        if (b.kind === 'shophouse') shopSign(sgeo, b, signAtlas());
+        if (b.h > 3) blockers.push([b.x - b.w / 2, b.kind === 'kampung' ? 1.8 : 0, b.z - b.d / 2, b.x + b.w / 2, b.h + (b.kind === 'kampung' ? 1.5 : 2.5), b.z + b.d / 2]);
+      }
       for (const c of bp.parked) drawParkedCar(bld, c);
       for (const t of bp.trees) trees.push(t);
+      for (const st of bp.street) { if (st.kind === 'tree') trees.push(st); else if (st.kind === 'hydrant') { bld.cyl(st.x, 0, st.z, 0.18, 0.6, '#ff5a5a', 8); bld.ball(st.x, 0.65, st.z, 0.2, '#ff5a5a'); } }
+      bp.streetCircles.forEach(addC);
+      for (const c of bp.coins) coinsHere.push(c);
+      if (bp.coaster) { coaster = createCoaster(bld, bp.coaster); grp.add(coaster.obj); }
+      if (bp.joggers && bp.track) { joggers = createJoggers(bp.track); grp.add(joggers.obj); }
       for (const pr of bp.props) props.add(propModel(pr, myUpdaters));
       bp.boxes.forEach(addB); bp.circles.forEach(addC);
       // landmark sign at the street side and markers on its learning places
@@ -405,13 +428,22 @@ export function createCity(scene, collision, { iconSvg }) {
         const pink = !t.palm && ((Math.round(t.x * 3) + Math.round(t.z)) % 9 === 0);
         cm.setColorAt(k, cc.set(t.palm ? '#5cc46a' : pink ? '#ffb3d4' : ['#5cc46a', '#68cf6e', '#4fb862', '#7ad66f'][Math.abs(Math.round(t.x + t.z)) % 4]));
       });
-      tm.castShadow = cm.castShadow = true; cm.receiveShadow = true;
+      tm.castShadow = cm.castShadow = true; cm.receiveShadow = true; co.userData.isOutline = true;
       grp.add(tm, cm, co);
     }
+    if (!sgeo.empty) { const m = new Mesh(sgeo.geometry(), signAtlas().material); m.userData.chunkGeometry = true; grp.add(m); }
+    const lamps = lights.length ? createLightLamps(lights) : null;
+    if (lamps) grp.add(lamps.mesh);
+    const coinSet = coinsHere.length ? createCoins(coinsHere, takenCoins) : null;
+    if (coinSet) grp.add(coinSet.mesh);
+    if (joggers) myUpdaters.push((t, r) => joggers.update(t, r));
     mergeStatic(props);
     grp.add(props);
     root.add(grp);
-    chunks.set(key, { key, cx, cz, grp, items, signs, blockers, updaters: myUpdaters });
+    // the soft outlines of a square far away are lost in the haze: they are only drawn near the child (see update)
+    const outlines = [];
+    grp.traverse((o) => { if (o.isMesh && o.userData.isOutline) outlines.push(o); });
+    chunks.set(key, { key, cx, cz, grp, items, signs, blockers, updaters: myUpdaters, lamps, coinSet, coaster, outlines, outlinesOn: true });
     myUpdaters.forEach((u) => updaters.add(u));
   }
 
@@ -420,6 +452,8 @@ export function createCity(scene, collision, { iconSvg }) {
     if (!c) return;
     removeItems(collision, c.items);
     c.signs.forEach((s) => s.dispose());
+    if (c.coinSet) c.coinSet.mesh.dispose();
+    if (c.lamps) c.lamps.mesh.dispose();
     c.updaters.forEach((u) => updaters.delete(u));
     for (const [k, r] of rides) if (r.chunk === key && !r.taken && !r.loose) rides.delete(k);
     root.remove(c.grp);
@@ -494,7 +528,8 @@ export function createCity(scene, collision, { iconSvg }) {
     }
     return built;
   }
-  let seaT = 0;
+  let seaT = 0, lampTimer = 0, outlineTimer = 0;
+  const OUTLINE_NEAR = 140;
   return {
     root, groundMeshes, rides, looseRides,
     get loaded() { return chunks.size; },
@@ -505,7 +540,44 @@ export function createCity(scene, collision, { iconSvg }) {
       if (timer <= 0) { timer = 0.12; stream(px, pz, 1); }
       for (const u of updaters) u(t, reduced);
       if (!reduced) { seaT += dt; seaTex.offset.set(seaT * 0.004, Math.sin(seaT * 0.3) * 0.01); }
+      lampTimer -= dt;
+      const lampsNow = lampTimer <= 0;
+      if (lampsNow) lampTimer = 0.25;
+      outlineTimer -= dt;
+      if (outlineTimer <= 0) {
+        outlineTimer = 0.5;
+        for (const c of chunks.values()) {
+          const x0 = CITY.minX + c.cx * CHUNK, z0 = CITY.minZ + c.cz * CHUNK;
+          const on = Math.hypot(Math.max(x0 - px, 0, px - x0 - CHUNK), Math.max(z0 - pz, 0, pz - z0 - CHUNK)) < OUTLINE_NEAR;
+          if (on !== c.outlinesOn) { c.outlinesOn = on; for (const o of c.outlines) o.visible = on; }
+        }
+      }
+      for (const c of chunks.values()) {
+        if (lampsNow && c.lamps) c.lamps.update(t);
+        if (c.coinSet) {
+          const x0 = CITY.minX + c.cx * CHUNK, z0 = CITY.minZ + c.cz * CHUNK;
+          if (Math.hypot(Math.max(x0 - px, 0, px - x0 - CHUNK), Math.max(z0 - pz, 0, pz - z0 - CHUNK)) < 160) c.coinSet.update(t, reduced);
+        }
+        if (c.coaster) c.coaster.update(dt, reduced);
+      }
+      for (const [id, at0] of takenCoins) if (t - at0 > COIN_BACK) takenCoins.delete(id);
+      boats.forEach((b, k) => { if (!reduced) { b.position.x = ((b.position.x + 2600 + dt * (3 + k)) % 5200) - 2600; b.position.y = Math.sin(t * 1.1 + k) * 0.2; } });
     },
+    /** Picks up the coins within r metres of (x, z). Returns how many. */
+    collectCoins(x, z, r, t) {
+      let n = 0;
+      for (const c of chunks.values()) {
+        if (!c.coinSet) continue;
+        for (const coin of c.coinSet.coins) if (!takenCoins.has(coin.id) && Math.abs(coin.x - x) < r && Math.abs(coin.z - z) < r && Math.hypot(coin.x - x, coin.z - z) < r) { takenCoins.set(coin.id, t); n++; }
+      }
+      return n;
+    },
+    /** The roller coaster whose station is within d metres, if any. */
+    coasterNear(x, z, d) {
+      for (const c of chunks.values()) if (c.coaster && Math.hypot(c.coaster.stationPoint.x - x, c.coaster.stationPoint.z - z) < d) return c.coaster;
+      return null;
+    },
+    get coinsTaken() { return takenCoins.size; },
     /** A ride the child can get on: within `gap` metres of its edge. */
     nearRide(x, z, gap) {
       let best = null, bd = Infinity;
@@ -542,13 +614,19 @@ export function createCity(scene, collision, { iconSvg }) {
       cam.set(head.x + hx * d, head.y + dy * d, head.z + hz * d);
       return t;
     },
-    stats() { let tris = 0; return { chunks: chunks.size, rides: rides.size, colliders: collision.boxes.length + collision.circles.length, tris }; }
+    stats() {
+      let coins = 0, lights = 0;
+      for (const c of chunks.values()) { if (c.coinSet) coins += c.coinSet.coins.length; if (c.lamps) lights += c.lamps.mesh.count / 4; }
+      return { chunks: chunks.size, rides: rides.size, colliders: collision.boxes.length + collision.circles.length, coins, coinsTaken: takenCoins.size, lights };
+    }
   };
 }
 
 // ------------------------------------------------------------------------------------------------ props
 function propModel(p, updaters) {
   const o = (obj) => at(obj, p.x, 0, p.z, p.yaw || 0);
+  const second = props2(p, updaters);
+  if (second) return second;
   switch (p.kind) {
     case 'fountain': { const f = fountain(2.8); return o(f); }
     case 'bench': return o(benchWood(2, '#e0b988'));

@@ -1,5 +1,5 @@
 {
- "total": 453,
+ "total": 513,
  "perCategory": {
   "abc": {
    "questions": 29,
@@ -120,23 +120,31 @@
    "factChecked": 2,
    "lowRiskVisual": 23,
    "needsHumanReview": 2
+  },
+  "town": {
+   "questions": 60,
+   "distinctQuestionAnswerPairs": 60,
+   "objectives": 23,
+   "factChecked": 0,
+   "lowRiskVisual": 0,
+   "needsHumanReview": 60
   }
  },
  "perAge": {
-  "2-3": 170,
-  "3-4": 311,
-  "4+": 233
+  "2-3": 199,
+  "3-4": 358,
+  "4+": 266
  },
  "perDifficulty": {
-  "1": 170,
-  "2": 195,
-  "3": 88
+  "1": 199,
+  "2": 219,
+  "3": 95
  },
  "perInteractionType": {
-  "choose": 328,
+  "choose": 381,
   "match": 47,
-  "count": 23,
-  "compare": 12,
+  "count": 29,
+  "compare": 13,
   "sequence": 4,
   "sound": 13,
   "sort": 6,
@@ -146,8 +154,8 @@
  },
  "perVerificationStatus": {
   "visual-identification-low-risk": 225,
-  "needs-human-review": 205,
+  "needs-human-review": 265,
   "fact-checked-against-source": 23
  },
- "objectivesUsed": 72
+ "objectivesUsed": 93
 }

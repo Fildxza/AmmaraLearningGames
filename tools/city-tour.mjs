@@ -12,7 +12,8 @@ const SPOTS = [
   ['campus-gate', 40, 30], ['stable', 92, -4], ['parking', -86, 40], ['busstop', 40, 50], ['street', 120, 75], ['downtown', 420, -420],
   ['zoo', -300, 150], ['market', 300, 40], ['masjid', -180, -84], ['lake', 180, 160], ['fire', 180, -80], ['themepark', 420, 150],
   ['school', 60, 260], ['space', 60, -200], ['farm', -540, 270], ['library', -180, 40], ['beach', 540, 1790], ['houses', 1000, 900], ['forest', 200, -1850],
-  ['hw-road', 300, -652], ['hw-station', 132, -641], ['stn-tadika', 52, -74], ['stn-barat', -466, -368], ['rail-street', 260, -48], ['hw-far', -1500, -645]
+  ['hw-road', 300, -652], ['hw-station', 132, -641], ['stn-tadika', 52, -74], ['stn-barat', -466, -368], ['rail-street', 260, -48], ['hw-far', -1500, -645],
+  ['mall', 50, 160], ['foodcourt', -70, 150], ['funfair', 520, 270], ['coaster', 500, 230], ['jogging', -420, 160], ['grandmosque', -540, 40], ['shophouse', 630, -300], ['terrace', 1000, 600], ['kampung', 1700, 1200], ['dino', -300, 280], ['clocktower', -60, 400], ['waterpark', 300, 400], ['heritage', -660, 280], ['aquarium', 540, 160], ['petshop', 420, 400], ['airport', 1020, -230]
 ];
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: true, args: ['--autoplay-policy=no-user-gesture-required'] });
 const page = await browser.newPage();

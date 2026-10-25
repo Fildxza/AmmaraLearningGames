@@ -101,3 +101,68 @@ img, svg, canvas { -webkit-user-drag: none; user-drag: none; }
 .item-name small { display: block; font-size: 12px; font-weight: 500; opacity: .8; }
 .sticker .st-pic .st-lock svg.glyph { width: 18px !important; height: 18px !important; filter: none !important; position: static; }
 .sticker .st-pic .st-lock { width: 28px; height: 28px; right: 2px; bottom: 2px; z-index: 1; }
+
+/* ---------- the town: coins, shops, my bag, book reader, did-you-know and clock cards ---------- */
+#town { z-index: 23; }
+.coin-dot { display: inline-block; width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff3a0, #ffd23f 45%, #f2b632); border: 2.5px solid #b8860b; flex: none; }
+.learner-chip .coins { min-width: 1.4em; display: inline-block; }
+.learner-chip .coins.bump { animation: coinBump .5s ease; }
+@keyframes coinBump { 0% { transform: scale(1); } 40% { transform: scale(1.5); color: #e3ae1f; } 100% { transform: scale(1); } }
+.town-card { width: min(1000px, 96vw); max-height: 94vh; overflow: auto; padding: 16px 20px 18px; }
+.town-head { display: flex; align-items: center; gap: 12px; border-bottom: 4px solid var(--tc); padding-bottom: 8px; margin-bottom: 8px; }
+.town-head h2 { flex: 1; margin: 0; font-size: clamp(22px, 3vw, 32px); }
+.town-head .th-ic, .shop-item .si-pic, .bag-item .si-pic { display: grid; place-items: center; }
+.town-head .th-ic svg { width: 52px; height: 52px; }
+.wallet { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; background: var(--butter-l); border: 3px solid var(--butter-d); font: 700 24px var(--font); }
+.coin-ic svg { width: 30px; height: 30px; display: block; }
+.town-msg { font-size: 20px; margin: 6px 0 12px; min-height: 1.3em; }
+.shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+.shop-item { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px; border-radius: 22px; background: #fffdf8; border: 3px solid var(--line); text-align: center; }
+.shop-item.owned { border-color: var(--mint); background: var(--mint-l); }
+.shop-item.poor { opacity: .82; }
+.shop-item .si-pic svg { width: 84px; height: 84px; }
+.si-name { font: 700 18px var(--font); line-height: 1.1; }
+.si-have { font: 600 15px var(--font); color: var(--ink-soft); }
+.coin-row { display: inline-flex; align-items: center; gap: 1px; }
+.coin-row .coin-ic svg { width: 22px; height: 22px; }
+.coin-row b { margin-left: 6px; font: 700 20px var(--font); }
+.shop-item .btn, .bag-item .btn { min-height: 48px; font-size: 19px; padding: 0 16px; width: 100%; }
+.btn-grey { --b: #c9c4d6; --bd: #a39db3; --fg: var(--ink); text-shadow: none; }
+.town-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 14px; }
+.town-actions .btn { min-height: 56px; font-size: 21px; padding: 0 22px; }
+.bag-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.bag-item { display: grid; grid-template-columns: 64px 1fr; grid-template-rows: auto auto; align-items: center; gap: 4px 10px; padding: 8px; border-radius: 18px; background: #fffdf8; border: 3px solid var(--line); }
+.bag-item .si-pic { grid-row: span 2; } .bag-item .si-pic svg { width: 60px; height: 60px; }
+.bag-item .btn { grid-column: 1 / -1; }
+.reader-card { width: min(900px, 96vw); }
+.reader-pic { display: flex; justify-content: center; gap: 18px; padding: 10px; background: #fffaf1; border-radius: 26px; border: 3px dashed var(--line); }
+.reader-pic .rp svg { width: clamp(120px, 22vw, 210px); height: clamp(120px, 22vw, 210px); }
+.reader-text { font: 600 clamp(22px, 3.2vw, 34px)/1.35 var(--font); text-align: center; margin: 14px 8px; color: var(--ink); }
+.reader-moral, .reader-reward { display: flex; align-items: center; justify-content: center; gap: 8px; font: 700 20px var(--font); color: var(--mint-d); margin: 4px 0; }
+.reader-moral svg { width: 26px; height: 26px; }
+.reader-nav { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.reader-nav .big-arrow { min-width: 90px; min-height: 64px; font-size: 22px; }
+.reader-nav .btn svg { width: 32px; height: 32px; }
+.page-dots { display: inline-flex; gap: 6px; } .page-dots i { width: 12px; height: 12px; border-radius: 50%; background: var(--line); } .page-dots i.on { background: var(--pink); }
+.reader-src { font-size: 14px; color: var(--ink-soft); text-align: center; margin: 10px 0 0; }
+.fact-card, .clock-card { width: min(640px, 94vw); text-align: center; }
+.fact-pic svg { width: 170px; height: 170px; }
+.fact-text { font: 600 clamp(22px, 3vw, 30px)/1.35 var(--font); margin: 8px 6px 4px; }
+.clock-wrap { display: flex; align-items: center; justify-content: center; gap: 24px; }
+.clock-svg { width: 200px; height: 200px; }
+.clock-digits { font: 700 56px var(--font); color: #8f86e8; margin: 0; }
+@media (max-width: 640px) { .shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .shop-item .si-pic svg { width: 64px; height: 64px; } .clock-wrap { flex-direction: column; } }
+
+.town-group { grid-column: 1 / -1; margin: 8px 2px 0; font: 700 18px var(--font); color: var(--ink-soft); border-bottom: 2px dashed var(--line); }
+
+/* narrow screens: the top bar also holds the coin counter and the bag button, so it is made more compact */
+@media (max-width: 900px) {
+  .learner-chip { padding-left: 8px; padding-right: 8px; gap: 4px; }
+  .learner-chip .ln { max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hud-actions .icon-btn { width: 42px; height: 42px; }
+  .hud-actions { gap: 4px; }
+}
+@media (max-width: 480px) {
+  .learner-chip .ln, .learner-chip .sep:first-of-type { display: none; }
+  .station-dots { gap: 3px; }
+}

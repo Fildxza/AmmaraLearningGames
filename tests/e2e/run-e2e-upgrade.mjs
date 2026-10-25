@@ -83,7 +83,10 @@ await check('U3', 'Every indoor corner and garden area can be visited, with its 
   const spots = [['mengaji', -17.5, -4.5, 'islamic'], ['arcade', -26.5, -3, 'arcade'], ['music', -44.5, 5, 'playroom'], ['rest', -53.5, 3, 'calm'], ['gate', 20, 2, 'yard'], ['playground', 53, -10, 'yard']];
   const out = [];
   for (const [zone, x, z, scene] of spots) {
-    await tp(x, z); await sleep(700);
+    await tp(x, z);
+    // wait for the frame that notices the new area (a fixed pause was too short on a busy machine)
+    await page.waitForFunction((zn, sc) => { const w0 = window.AmmaraDebug.world(); return w0.zone === zn && window.AmmaraDebug.game().audio.scene === sc; }, { timeout: 5000 }, zone, scene).catch(() => {});
+    await sleep(200);
     const d = await game(); const w = await world();
     assert(w.zone === zone, `expected ${zone}, got ${w.zone}`);
     assert(d.audio.scene === scene, `${zone}: music ${d.audio.scene}`);

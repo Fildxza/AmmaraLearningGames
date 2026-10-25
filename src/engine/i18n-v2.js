@@ -44,7 +44,18 @@ export const UPGRADE_STRINGS = {
     busComing: 'Bas sedang datang… tunggu di sini ya!', busBoard: 'Naik bas! Tekan "Turun di sini" di hentian yang kamu suka.', onBus: 'Dalam bas… ke hentian seterusnya', busAtStop: 'Hentian: {name}',
     sayHi: 'Kata hai!', kidHi: ['Hai! Saya nak pergi sekolah!', 'Jom main sama-sama!', 'Selamat pagi, kawan!', 'Hati-hati melintas jalan ya!', 'Saya suka belajar!', 'Jom pergi ke zoo!'],
     backToSchool: 'Balik ke tadika!',
-    trainComing: 'Kereta api sedang datang… tunggu di sini ya!', trainBoard: 'Naik kereta api! Tekan "Turun di sini" di stesen yang kamu suka.', onTrain: 'Dalam kereta api… ke stesen seterusnya', trainAtStop: 'Stesen: {name}'
+    trainComing: 'Kereta api sedang datang… tunggu di sini ya!',
+    // town shops, coins, books, fact boards
+    adultHi: ['Selamat pagi, adik!', 'Hati-hati melintas jalan ya!', 'Jom ke taman bersama keluarga!', 'Sudah baca buku hari ini?', 'Jangan lupa minum air ya!'],
+    groupShops: 'Kedai & Makan', groupFun: 'Main & Taman', groupLearn: 'Belajar & Muzium', groupHelp: 'Komuniti & Masjid', groupGo: 'Pengangkutan',
+    coins: 'Syiling', myBag: 'Beg Saya', buy: 'Beli', needCoins: 'Kumpul syiling', owned: 'Sudah ada', readNow: 'Baca', inBag: 'Dalam beg: {n}',
+    bought: 'Terima kasih! {name} masuk ke dalam beg kamu.', boughtBook: 'Terima kasih! Jom baca {name}.', boughtWear: 'Cantiknya! Kamu memakai {name}.',
+    notEnoughCoins: 'Syiling tidak cukup. Perlu {n} lagi. Kutip syiling di kaki lima dan jawab soalan di bandar!',
+    bagHint: 'Pilih untuk membaca, makan atau bermain.', bagEmpty: 'Beg kamu masih kosong. Jom ke kedai!', read: 'Baca', eat: 'Makan', feedPet: 'Beri makan', playToy: 'Main',
+    wearingIt: 'Kamu sedang memakainya. Cantik!', next: 'Seterusnya', theEnd: 'Tamat', bookCoin: 'Tamat membaca! +1 syiling', didYouKnow: 'Tahukah Kamu?', factCoin: 'Hebat! +1 syiling',
+    whatTime: 'Pukul Berapa?', clockHint: 'Jarum pendek menunjukkan jam. Jarum panjang menunjukkan minit.',
+    coinGot: '+{n} syiling!', quizCoins: 'Betul! +{n} syiling', coasterWait: 'Roller coaster sedang datang… tunggu sebentar!', coasterBoard: 'Pegang kuat! Wheee!', coasterDone: 'Seronoknya! Jom naik lagi?',
+    rideCoaster: 'Naik roller coaster!', actKind_book: 'Membaca buku', actKind_shop: 'Membeli', cinemaShow: 'Tayangan cerita: {name}', trainBoard: 'Naik kereta api! Tekan "Turun di sini" di stesen yang kamu suka.', onTrain: 'Dalam kereta api… ke stesen seterusnya', trainAtStop: 'Stesen: {name}'
   },
   en: {
     mapSchoolTab: 'Preschool', mapTownTab: 'Town', mapTownTitle: 'Happy Town Map', townTapHint: 'Tap a place to go there quickly!',
@@ -81,6 +92,16 @@ export const UPGRADE_STRINGS = {
     busComing: 'The bus is coming… wait here!', busBoard: 'On the bus! Press "Get off here" at any stop you like.', onBus: 'On the bus… to the next stop', busAtStop: 'Stop: {name}',
     sayHi: 'Say hi!', kidHi: ["Hi! I'm going to school!", "Let's play together!", 'Good morning, friend!', 'Be careful crossing the road!', 'I love learning!', "Let's go to the zoo!"],
     backToSchool: 'Back to the preschool!',
-    trainComing: 'The train is coming… wait here!', trainBoard: 'On the train! Press "Get off here" at any station you like.', onTrain: 'On the train… to the next station', trainAtStop: 'Station: {name}'
+    trainComing: 'The train is coming… wait here!',
+    adultHi: ['Good morning, little one!', 'Be careful crossing the road!', "Let's go to the park with your family!", 'Have you read a book today?', 'Remember to drink some water!'],
+    groupShops: 'Shops & Food', groupFun: 'Play & Parks', groupLearn: 'Learn & Museums', groupHelp: 'Community & Mosques', groupGo: 'Getting Around',
+    coins: 'Coins', myBag: 'My Bag', buy: 'Buy', needCoins: 'Collect coins', owned: 'Got it', readNow: 'Read', inBag: 'In the bag: {n}',
+    bought: 'Thank you! {name} is in your bag.', boughtBook: "Thank you! Let's read {name}.", boughtWear: 'Lovely! You are wearing the {name}.',
+    notEnoughCoins: 'Not enough coins. You need {n} more. Pick up coins on the pavements and answer questions in town!',
+    bagHint: 'Choose something to read, eat or play with.', bagEmpty: "Your bag is empty. Let's go to the shops!", read: 'Read', eat: 'Eat', feedPet: 'Feed', playToy: 'Play',
+    wearingIt: 'You are wearing it. Lovely!', next: 'Next', theEnd: 'The End', bookCoin: 'You finished the book! +1 coin', didYouKnow: 'Did you know?', factCoin: 'Great! +1 coin',
+    whatTime: 'What Time Is It?', clockHint: 'The short hand shows the hour. The long hand shows the minutes.',
+    coinGot: '+{n} coins!', quizCoins: 'Correct! +{n} coins', coasterWait: 'The roller coaster is coming… wait a moment!', coasterBoard: 'Hold on tight! Wheee!', coasterDone: 'What fun! Ride again?',
+    rideCoaster: 'Ride the roller coaster!', actKind_book: 'Reading', actKind_shop: 'Shopping', cinemaShow: 'Story time: {name}', trainBoard: 'On the train! Press "Get off here" at any station you like.', onTrain: 'On the train… to the next station', trainAtStop: 'Station: {name}'
   }
 };

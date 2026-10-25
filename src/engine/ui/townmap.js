@@ -20,6 +20,14 @@ function blockTypes() {
 }
 const lmAt = new Map(LANDMARKS.map((l) => [`${l.x0},${l.z0}`, l]));
 
+/** The town map lists the places in groups (ids of plan.js and landmarks2.js). */
+export const PLACE_GROUPS = [
+  ['groupShops', ['mall', 'foodcourt', 'supermarket', 'market', 'toyshop', 'petshop']],
+  ['groupFun', ['funfair', 'themepark', 'playpark', 'waterpark', 'zoo', 'birdpark', 'lake', 'jogging', 'sports', 'stadium', 'kitepark', 'musicpark', 'flowergarden', 'farm']],
+  ['groupLearn', ['library', 'science', 'space', 'dino', 'aquarium', 'butterfly', 'art', 'school', 'recycle', 'clocktower', 'cinema', 'heritage', 'windfarm']],
+  ['groupHelp', ['grandmosque', 'masjid', 'hospital', 'clinic', 'fire', 'police', 'postoffice', 'bank']],
+  ['groupGo', ['stn-tadika', 'stn-lebuhraya', 'stn-barat', 'stn-timur', 'busdepot', 'airport', 'harbour']]
+];
 /** Where a landmark is drawn (its middle) and where a fast trip there arrives (the pavement in front of it). */
 export const landmarkSpot = (l) => ({ x: l.x0 + PITCH / 2, z: l.z0 + PITCH / 2 });
 export const landmarkArrival = (l) => ({ x: l.x0 + PITCH / 2 + 6, z: l.z0 + PITCH - (CURB + ROAD_HALF) / 2 });

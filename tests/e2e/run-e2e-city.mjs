@@ -1,5 +1,6 @@
 // End-to-end checks for the town "Bandar Ceria": size, streaming, unicorns, cars, the bus, school children,
-// landmarks with their learning places and music, the town map with quick trips, the highway and the train.
+// landmarks with their learning places and music, the town map with quick trips, the highway and the train,
+// coins, shops, books, fact boards, the roller coaster, traffic lights, the clock tower and the cinema.
 // Usage: node tests/e2e/run-e2e-city.mjs [edge]
 import puppeteer from 'puppeteer-core';
 import path from 'node:path';
@@ -7,7 +8,7 @@ import fs from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { CHROME, EDGE } from '../../tools/lib/browsers.mjs';
 import { STRINGS } from '../../src/engine/i18n.js';
-import { landmarkById, BUS_ROUTES, routePath, HIGHWAY, railPath, LANDMARKS } from '../../src/engine/city/plan.js';
+import { landmarkById, BUS_ROUTES, routePath, HIGHWAY, railPath, LANDMARKS, cityPois, blockPlan, XS, ZS, districtAt } from '../../src/engine/city/plan.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const EDGE_RUN = process.argv.includes('edge');
@@ -80,7 +81,7 @@ await check('C2', 'Out of the garden gate into the town: campus area, then a str
   assert(g.audio.scene === 'yard', 'music ' + g.audio.scene);
   await tp(420, -420); await sleep(900);
   w = await world(); g = await game();
-  assert(w.zone === 'city-tower', 'zone ' + w.zone);
+  assert(w.zone === districtAt(420, -420).id, 'zone ' + w.zone);
   assert(g.audio.scene === 'town', 'music ' + g.audio.scene);
   return `${w.zone} with "${g.audio.scene}" music`;
 });
@@ -159,8 +160,9 @@ await check('C6', 'Say hello to a school child walking on the pavement', async (
   const n0 = await page.evaluate(() => window.__spoken.length);
   await page.keyboard.press('KeyE'); await sleep(300);
   const said = await page.evaluate((n) => window.__spoken.slice(n).map((s) => s.text), n0);
-  assert(said.some((s) => L.kidHi.includes(s)), 'nothing said: ' + JSON.stringify(said));
-  return `child said "${said.find((s) => L.kidHi.includes(s))}"`;
+  const hi = [...L.kidHi, ...L.adultHi];
+  assert(said.some((s) => hi.includes(s)), 'nothing said: ' + JSON.stringify(said));
+  return `they said "${said.find((s) => hi.includes(s))}"`;
 });
 
 await check('C7', 'Landmarks: own area, music and learning place (mosque, zoo quiz)', async () => {
@@ -277,6 +279,151 @@ await check('C14', 'The two trains keep going round and never run into each othe
   }
   assert(minGap > 50, 'trains only ' + minGap.toFixed(0) + ' m apart');
   return `closest ${minGap.toFixed(0)} m apart`;
+});
+
+// ---- the busy town (2.2): coins, shops, books, fact boards, roller coaster, traffic lights, clock, cinema
+const poiById = (id) => cityPois().find((q) => q.id === id);
+const goPoi = async (id, dz = 1.6) => { const p = poiById(id); await tp(p.x, p.z + dz); await sleep(900); return p; };
+const coinsNow = async () => +(await page.$eval('[data-testid=hud-coins]', (b) => b.textContent));
+const closeTown = async () => { const b = await page.$('[data-testid=town-close]'); if (b) await b.click(); await sleep(300); };
+
+await check('C15', 'Coins on the pavement: arriving on one picks it up and the counter goes up', async () => {
+  // the first coins of the block just south of the preschool campus
+  const plan = blockPlan(XS.indexOf(0), ZS.indexOf(60));
+  const c = plan.coins[0];
+  assert(c, 'no coin there');
+  const before = await coinsNow();
+  await tp(c.x, c.z); await sleep(300);
+  await page.waitForFunction((n) => +document.querySelector('[data-testid=hud-coins]').textContent > n, { timeout: 4000 }, before);
+  const after = await coinsNow();
+  const w = await world();
+  assert(w.city.coinsTaken >= 1, 'coin not taken');
+  return `coins ${before} -> ${after}; ${w.city.coins} coins near the child`;
+});
+
+await check('C16', 'Bookshop: buy a picture book with coins, it opens, read it to the end (+1 coin), it is in My Bag', async () => {
+  await goPoi('mall-shop-books');
+  assert((await label()) === 'Masuk Kedai Buku!' || (await label()) === 'Visit the bookshop!', 'label ' + (await label()));
+  await page.keyboard.press('KeyE'); await sleep(700);
+  const c0 = await coinsNow();
+  await page.click('[data-testid="buy-buy-bk-planet"]');
+  await page.waitForSelector('[data-testid=reader-text]', { timeout: 5000 });
+  const c1 = await coinsNow();
+  assert(c1 === c0 - 2, `price: ${c0} -> ${c1}`);
+  const n0 = await page.evaluate(() => window.__spoken.length);
+  for (let k = 0; k < 8; k++) { const nx = await page.$('[data-testid=reader-next]'); if (!nx) break; await nx.click(); await sleep(200); }
+  assert(await page.$('[data-testid=reader-reward]'), 'no coin for finishing');
+  const read = await page.evaluate((n) => window.__spoken.slice(n).length, n0);
+  assert(read >= 5, 'pages were not read aloud: ' + read);
+  await page.screenshot({ path: path.join(shotDir, 'book-reader.png') });
+  await page.click('[data-testid=reader-done]'); await sleep(300);
+  const c2 = await coinsNow();
+  assert(c2 === c1 + 1, `book coin: ${c1} -> ${c2}`);
+  await page.click('[data-testid=hud-bag]'); await sleep(400);
+  assert(await page.$('[data-testid="read-bk-planet"]'), 'book not in the bag');
+  await closeTown();
+  return `paid 2 coins, read ${read} pages aloud, +1 coin, book kept in My Bag`;
+});
+
+await check('C17', 'Boutique: clothes bought with coins are worn straight away', async () => {
+  await goPoi('mall-shop-clothes');
+  await page.keyboard.press('KeyE'); await sleep(600);
+  const coins = await coinsNow();
+  const affordable = ['w-capred', 'w-bowblue', 'w-glasspink'];
+  assert(coins >= 3, 'not enough coins for the test: ' + coins);
+  await page.click(`[data-testid="buy-${affordable[0]}"]`); await sleep(500);
+  const st = await game();
+  const ch = (await world()).character;
+  assert(st.learner && st.learner.rewards.includes('cap_red'), 'not owned');
+  assert(ch && ch.accessories.head === 'cap', 'not worn: ' + JSON.stringify(ch && ch.accessories));
+  await page.screenshot({ path: path.join(shotDir, 'boutique.png') });
+  await closeTown();
+  return 'red cap bought and worn';
+});
+
+await check('C18', 'Sweet shop: not enough coins says so kindly; a lollipop can be bought and eaten (with a teeth tip)', async () => {
+  await goPoi('mall-shop-candy');
+  await page.keyboard.press('KeyE'); await sleep(600);
+  const c0 = await coinsNow();
+  assert(c0 >= 1 && c0 < 3, 'coins for the test: ' + c0);
+  await page.click('[data-testid="buy-cake"]'); await sleep(300);
+  const msg0 = await page.$eval('[data-testid=town-msg]', (e) => e.textContent);
+  assert(/Syiling tidak cukup|Not enough coins/.test(msg0), 'no kind message: ' + msg0);
+  await page.click('[data-testid="buy-lollipop"]'); await sleep(300);
+  assert((await coinsNow()) === c0 - 1, 'lollipop price');
+  await page.click('[data-testid=town-bag]'); await sleep(300);
+  await page.click('[data-testid="useitem-lollipop"]'); await sleep(300);
+  const tip = await page.$eval('[data-testid=town-msg]', (e) => e.textContent);
+  assert(/gigi|teeth/i.test(tip), 'tip: ' + tip);
+  await closeTown();
+  return `"${tip}"`;
+});
+
+await check('C19', 'Fact board: reading it the first time gives a coin, the second time not', async () => {
+  const f = cityPois().find((q) => q.action === 'fact' && q.id.startsWith('mall'));
+  await tp(f.x, f.z + 1.2); await sleep(800);
+  assert(/Tahukah Kamu|Did you know/.test(await label()), 'label ' + (await label()));
+  const c0 = await coinsNow();
+  await page.keyboard.press('KeyE'); await sleep(500);
+  assert(await page.$('[data-testid=fact-text]'), 'no fact card');
+  assert(await page.$('[data-testid=fact-reward]'), 'no coin the first time');
+  await page.click('[data-testid=fact-ok]'); await sleep(300);
+  const c1 = await coinsNow();
+  await page.keyboard.press('KeyE'); await sleep(500);
+  assert(!(await page.$('[data-testid=fact-reward]')), 'coin given twice');
+  await page.click('[data-testid=fact-ok]'); await sleep(300);
+  assert(c1 === c0 + 1 && (await coinsNow()) === c1, `coins ${c0} -> ${c1} -> ${await coinsNow()}`);
+  return `coins ${c0} -> ${c1}, then no more`;
+});
+
+await check('C20', 'Roller coaster: get in at the station, ride one full lap up and down, get out by itself', async () => {
+  await goPoi('funfair-coaster', 1.5);
+  assert(/roller coaster/i.test(await label()), 'label ' + (await label()));
+  await page.keyboard.press('KeyE');
+  await page.waitForFunction(() => window.AmmaraDebug.world().ride === 'coaster', { timeout: 30000 });
+  let top = 0;
+  for (let k = 0; k < 40; k++) { const w = await world(); top = Math.max(top, w.rideY); if (w.ride !== 'coaster') break; if (k === 8) await page.screenshot({ path: path.join(shotDir, 'coaster.png') }); await sleep(1000); }
+  await page.waitForFunction(() => window.AmmaraDebug.world().ride === null, { timeout: 60000 });
+  const w = await world();
+  assert(top > 8, 'the ride never went up: ' + top);
+  assert(w.violations === 0, 'violations ' + w.violations);
+  return `highest point ${top.toFixed(1)} m, back on the ground at ${w.player.x.toFixed(0)}, ${w.player.z.toFixed(0)}`;
+});
+
+await check('C21', 'Traffic lights change colour and town cars stop at red', async () => {
+  await tp(60, 52); await sleep(600);                                   // the busy middle of town
+  let w = await world();
+  assert(w.city.lights > 0, 'no traffic lights loaded');
+  let maxStopped = 0;
+  for (let k = 0; k < 24; k++) { w = await world(); maxStopped = Math.max(maxStopped, w.redLights); if (maxStopped > 0 && k > 6) break; await sleep(500); }
+  assert(maxStopped > 0, 'no car ever waited at a red light');
+  return `${w.city.lights} traffic lights nearby, up to ${maxStopped} cars waiting at red`;
+});
+
+await check('C22', 'Clock tower shows the real time; the cinema shows a story', async () => {
+  await goPoi('clocktower-clock', 1.5);
+  await page.keyboard.press('KeyE'); await sleep(500);
+  const digits = await page.$eval('[data-testid=clock-digits]', (e) => e.textContent);
+  const now = new Date(); const h12 = ((now.getHours() + 11) % 12) + 1;
+  assert(digits.startsWith(h12 + ':'), `clock ${digits} vs ${h12}`);
+  await closeTown();
+  await goPoi('cinema-show', 1.5);
+  await page.keyboard.press('KeyE'); await sleep(600);
+  assert(await page.$('[data-testid=reader-text]'), 'no story');
+  await closeTown();
+  return `clock ${digits}; cinema story opened`;
+});
+
+await check('C23', 'Busy streets: more cars, school children and grown-ups; the town map lists every place in groups', async () => {
+  await tp(420, -420); await sleep(1200);
+  const w = await world();
+  assert(w.traffic >= 30 && w.people >= 60, `traffic ${w.traffic}, people ${w.people}`);
+  await page.click('[data-testid=hud-minimap]'); await sleep(400);
+  const groups = await page.$$eval('.town-group', (h) => h.length);
+  const n = await page.$$eval('.town-go', (b) => b.length);
+  assert(groups === 5 && n === LANDMARKS.length + 1, `groups ${groups}, places ${n}`);
+  await page.click('[data-testid=map-close]'); await sleep(200);
+  return `${w.traffic} cars, ${w.people} people; map: ${groups} groups, ${n} places`;
 });
 
 await check('C11', 'No errors, no network requests, no collision violations', async () => {

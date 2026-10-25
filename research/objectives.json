@@ -1365,6 +1365,414 @@
    "alignmentStrength": null,
    "verification": "designed by the build assistant; not reviewed by a teacher",
    "notes": ""
+  },
+  "dinosaur": {
+   "description": {
+    "en": "Name dinosaurs and simple facts about them (eggs, plant or meat eaters, birds as relatives).",
+    "ms": "Kenal dinosaur dan fakta mudah tentangnya."
+   },
+   "domain": "Science: living things long ago",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017",
+    "elof-headstart"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "sea-life": {
+   "description": {
+    "en": "Recognise sea animals and one feature of each.",
+    "ms": "Kenal haiwan laut dan satu ciri setiap satu."
+   },
+   "domain": "Science: animals",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017",
+    "elof-headstart"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "counting": {
+   "description": {
+    "en": "Count a small group of pictured objects and choose the numeral.",
+    "ms": "Kira sekumpulan kecil objek dan pilih nombor."
+   },
+   "domain": "Mathematics: counting",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017",
+    "cdc-4y"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "money": {
+   "description": {
+    "en": "Recognise a coin, a piggy bank and shopping, the first ideas of money and saving.",
+    "ms": "Kenal syiling, tabung dan membeli-belah."
+   },
+   "domain": "Mathematics / social: money",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "compare": {
+   "description": {
+    "en": "Choose the group with the most objects.",
+    "ms": "Pilih kumpulan yang paling banyak."
+   },
+   "domain": "Mathematics: comparing",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017",
+    "elof-headstart"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "time": {
+   "description": {
+    "en": "Recognise a clock as the tool that tells the time.",
+    "ms": "Kenal jam sebagai alat menunjukkan masa."
+   },
+   "domain": "Mathematics: time",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "week": {
+   "description": {
+    "en": "Know that a week has seven days.",
+    "ms": "Tahu satu minggu ada tujuh hari."
+   },
+   "domain": "Mathematics: time",
+   "recommendedAges": [
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "routine": {
+   "description": {
+    "en": "Order a familiar daily routine (wake up, brush teeth).",
+    "ms": "Susun rutin harian yang biasa."
+   },
+   "domain": "Personal care: routines",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "aap-toothbrushing",
+    "elof-headstart"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "recycling": {
+   "description": {
+    "en": "Match paper, plastic/cans and glass to the blue, orange and brown recycling bins used in Malaysia, and recognise the recycling sign.",
+    "ms": "Padankan kertas, plastik/tin dan kaca dengan tong biru, oren dan perang."
+   },
+   "domain": "Science: caring for the environment",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "tidy": {
+   "description": {
+    "en": "Put rubbish in the bin.",
+    "ms": "Buang sampah ke dalam tong."
+   },
+   "domain": "Citizenship: caring for places",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017",
+    "elof-headstart"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "save-water": {
+   "description": {
+    "en": "Turn off the tap to save water.",
+    "ms": "Tutup paip untuk menjimatkan air."
+   },
+   "domain": "Science: caring for the environment",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "helpers": {
+   "description": {
+    "en": "Match community helpers to their work and vehicles (fire, ambulance, police, post, farm, hospital).",
+    "ms": "Padankan pekerjaan dengan tugas dan kenderaannya."
+   },
+   "domain": "Social: community helpers",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017",
+    "elof-headstart"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "malaysia": {
+   "description": {
+    "en": "Recognise national symbols of Malaysia (Jalur Gemilang, Bunga Raya, Malayan tiger) and well-known local animals and fruit.",
+    "ms": "Kenal lambang negara Malaysia serta haiwan dan buah tempatan."
+   },
+   "domain": "Social: my country",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "life-cycle": {
+   "description": {
+    "en": "Know that a caterpillar rests in a chrysalis and becomes a butterfly.",
+    "ms": "Tahu ulat beluncas menjadi rama-rama melalui kepompong."
+   },
+   "domain": "Science: living things grow and change",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017",
+    "elof-headstart"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "insects": {
+   "description": {
+    "en": "Recognise common insects and one fact (bees make honey, insects have six legs).",
+    "ms": "Kenal serangga biasa dan satu fakta."
+   },
+   "domain": "Science: animals",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "healthy-food": {
+   "description": {
+    "en": "Choose healthy food and know to brush teeth after sweets.",
+    "ms": "Pilih makanan sihat dan gosok gigi selepas makan gula-gula."
+   },
+   "domain": "Health: eating well",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017",
+    "aap-toothbrushing"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "food-source": {
+   "description": {
+    "en": "Know where a familiar food comes from (milk from cows).",
+    "ms": "Tahu asal makanan biasa (susu daripada lembu)."
+   },
+   "domain": "Science: food",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "sport": {
+   "description": {
+    "en": "Recognise sports equipment (basketball, shuttlecock).",
+    "ms": "Kenal alatan sukan."
+   },
+   "domain": "Physical development: games",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "active": {
+   "description": {
+    "en": "Know that moving and drinking water keep the body healthy.",
+    "ms": "Tahu bergerak aktif dan minum air menyihatkan badan."
+   },
+   "domain": "Health: active body",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017",
+    "elof-headstart"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "water-safety": {
+   "description": {
+    "en": "Know that a life jacket keeps children safe in water.",
+    "ms": "Tahu jaket keselamatan melindungi kanak-kanak di dalam air."
+   },
+   "domain": "Safety: water",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
+  },
+  "safety": {
+   "description": {
+    "en": "Wear a helmet when riding a bicycle.",
+    "ms": "Pakai topi keledar ketika menunggang basikal."
+   },
+   "domain": "Safety: road and play",
+   "recommendedAges": [
+    "2-3",
+    "3-4",
+    "4+"
+   ],
+   "sources": [
+    "kspk-2017",
+    "safekids-pedestrian"
+   ],
+   "alignment": null,
+   "alignmentStrength": null,
+   "verification": "designed by the build assistant; not reviewed by a teacher",
+   "notes": "Town quiz board (Bandar Ceria)."
   }
  }
 }

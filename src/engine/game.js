@@ -21,6 +21,10 @@ import { resumeUsable } from './kidlock.js';
 import { canInstall, promptInstall, isHttp } from './pwa.js';
 import { DOOR, zoneById } from './world/layout.js';
 import { landmarkById } from './city/plan.js';
+import { createTownUI } from './ui/town.js';
+import { COIN_RULES } from '../data/shops.js';
+import { factById } from '../data/facts.js';
+import { BOOKS } from '../data/books.js';
 
 export const S = {
   MAIN_MENU: 'MAIN_MENU', WORLD_SELECT: 'WORLD_SELECT', PLAYROOM: 'PLAYROOM', QUIZ: 'QUIZ', STATION_COMPLETE: 'STATION_COMPLETE',
@@ -215,6 +219,7 @@ export function createGame(deps) {
   function refreshHud() {
     const l = learner();
     hud.setLearner(l ? l.name : '', l ? l.stars : 0);
+    hud.setCoins(l ? progress.coins(l.id) : 0);
     hud.setSound(set.sound);
     hud.setMusic(set.music, audio.available);
     hud.setCamera(t({ near: 'camNear', normal: 'camNormal', far: 'camFar' }[set.camera]));
@@ -240,7 +245,7 @@ export function createGame(deps) {
     if (!has3D) return;
     clock += dt;
     if (state === S.PLAYROOM) {
-      const frozen = audioPanel.isOpen || minimap.isOpen;
+      const frozen = audioPanel.isOpen || minimap.isOpen || townUI.isOpen;
       const x = frozen ? 0 : (keys.right || pad.right ? 1 : 0) - (keys.left || pad.left ? 1 : 0);
       const z = frozen ? 0 : (keys.down || pad.down ? 1 : 0) - (keys.up || pad.up ? 1 : 0);
       world.setInput(x, z);
@@ -251,7 +256,7 @@ export function createGame(deps) {
       const canPlay = near >= 0 && r && progress.canPlayStation(r, near);
       // a place to use (arcade, door, a game, a robot friend...) when no station is close
       const ride = world.ride;
-      const auto = !!ride && (ride.kind === 'bus' || ride.kind === 'train');      // the bus and the train drive themselves
+      const auto = !!ride && (ride.kind === 'bus' || ride.kind === 'train' || ride.kind === 'coaster');      // these drive themselves
       const poi = !canPlay && near < 0 && !auto ? world.nearPoi(gap + 0.5) : null;
       cur.poi = poi;
       // in the town: a unicorn or car to get on, a school child to greet, or getting off again
@@ -268,6 +273,7 @@ export function createGame(deps) {
       else if (ride && ride.kind === 'train') hud.setHint(ride.atStop ? t('trainAtStop', { name: tr(ride.atStop.name, set.lang) }) : t('onTrain'), 'info');
       else if (world.waitingBus) hud.setHint(t('busComing'), 'info');
       else if (world.waitingTrain) hud.setHint(t('trainComing'), 'info');
+      else if (world.waitingCoaster) hud.setHint(t('coasterWait'), 'info');
       else if (poi) hud.setHint(tr(poi.label, set.lang), 'info');
       else if (near >= 0 && !canPlay && r) {
         if (r.stations[near].completed) hud.setHint(t('stationDone'), 'done');
@@ -299,7 +305,7 @@ export function createGame(deps) {
     const ride = world.ride;
     if (ride) {
       // on a unicorn or in a car a nearby game still opens; otherwise the button gets the child off
-      const auto = ride.kind === 'bus' || ride.kind === 'train';
+      const auto = ride.kind === 'bus' || ride.kind === 'train' || ride.kind === 'coaster';
       const poi = !auto ? world.nearPoi(gap + 0.5) : null;
       if (poi) { doPoi(poi); return; }
       if (!auto || ride.atStop) { audio.play('tap'); world.dismount(); }
@@ -327,6 +333,11 @@ export function createGame(deps) {
       case 'quiz': startFreeQuiz(p); break;
       case 'bus': callBus(p); break;
       case 'train': callTrain(p); break;
+      case 'shop': ensureSession(); townUI.openShop(p.shop); break;
+      case 'fact': readFact(p); break;
+      case 'coaster': if (world.rideCoaster()) say(t('coasterWait'), 4000); break;
+      case 'cinema': { ensureSession(); const stories = BOOKS.filter((b) => b.kind === 'story'); const b = stories[Math.floor(Math.random() * stories.length)]; toast(t('cinemaShow', { name: tr(b.title, set.lang) }), { icon: G.star }); townUI.openReader(b.id); break; }
+      case 'clock': townUI.openClock(); break;
       default: break;
     }
   }
@@ -340,12 +351,28 @@ export function createGame(deps) {
     if (world.waitingTrain || world.ride) return;
     if (world.callTrain(p.station)) say(t('trainComing'), 6000);
   }
+  // ---- the town: coins, fact boards
+  function addCoins(n) {
+    ensureSession();
+    const l = learner();
+    if (!l || !(n > 0)) return;
+    hud.setCoins(progress.addCoins(l.id, n), true);
+  }
+  function readFact(p) {
+    const f = factById[p.fact];
+    if (!f) return;
+    ensureSession();
+    const l = learner();
+    const first = !!l && progress.markFact(l.id, f.id);
+    if (first) { addCoins(COIN_RULES.fact); audio.play('coin'); }
+    townUI.openFact(f, first);
+  }
   function say(text, ms = 5000) {
     cur.say = { text, until: performance.now() + ms };
     speech.speak(text, set.lang, { kind: 'ui', queue: false });
   }
   function greetKid(k) {
-    const lines = t('kidHi');
+    const lines = t(world.kidIsAdult(k) ? 'adultHi' : 'kidHi');
     const line = lines[(k + cur.greetN++) % lines.length];
     cur.say = { text: line, until: performance.now() + 4500 };
     speech.speak(line, set.lang, { kind: 'greeting' });
@@ -398,7 +425,7 @@ export function createGame(deps) {
     const station = config.stations[q.station] || config.stations[ids[0]];
     const order = q.choices.slice().sort(() => Math.random() - 0.5);
     ensureSession();
-    cur.free = { q, order, solved: false, attempts: 0, startedAt: Date.now(), station };
+    cur.free = { q, order, solved: false, attempts: 0, startedAt: Date.now(), station, town: p.zone === 'city' };
     if (!go(S.QUIZ)) { cur.free = null; return; }
     const prompt = tr(q.prompt, set.lang);
     quiz.open({
@@ -418,6 +445,8 @@ export function createGame(deps) {
       quiz.markCorrect(id, t('praise')[f.attempts % t('praise').length], tr(f.q.explain, set.lang));
       audio.play('correct');
       progress.recordActivity({ kind: 'quiz', game: f.q.id, level: 0, ageGroup: set.age, startedAt: f.startedAt, completed: true, rounds: 1, correct: 1, mistakes: f.attempts - 1 });
+      // town quiz boards pay coins (first try or not: every right answer counts)
+      if (f.town) { addCoins(COIN_RULES.quiz); toast(t('quizCoins', { n: COIN_RULES.quiz }), { icon: G.star, tone: 'reward' }); }
       after('quiz', Math.max(900, set.autoClose), finishFree);
     } else {
       quiz.markWrong(id, t('tryAgain')[(f.attempts - 1) % t('tryAgain').length], tr(f.q.hint, set.lang));
@@ -507,6 +536,7 @@ export function createGame(deps) {
       if (res.reward.type !== 'sticker') refreshAppearance();
     } else toast(t('starEarned'), { icon: G.star, tone: 'reward' });
     hud.setLearner(l.name, l.stars);
+    hud.setCoins(progress.coins(l.id));
     refreshStations();
     after('celebrate', 1700, () => {
       if (res.done) { showComplete(false); return; }
@@ -898,7 +928,7 @@ export function createGame(deps) {
   const hud = createHud({
     sound: toggleSound, music: toggleMusic, pause: openPause, finish: () => safe(confirmFinish), interact,
     wardrobe: () => { colTab = 'wardrobe'; openCollection(); },
-    map: () => { audio.play('tap'); minimap.open(); }, audio: () => { audio.play('tap'); audioPanel.open(); }, goinside: () => goInside(),
+    map: () => { audio.play('tap'); minimap.open(); }, bag: () => { audio.play('tap'); ensureSession(); townUI.openBag(); }, audio: () => { audio.play('tap'); audioPanel.open(); }, goinside: () => goInside(),
     camera: () => { const order = ['near', 'normal', 'far']; applySetting('camera', order[(order.indexOf(set.camera) + 1) % 3]); audio.play('tap'); }
   }, (dir, on) => { pad[dir] = on; if (on) audio.unlock(); });
   const pause = createPause({
@@ -921,6 +951,32 @@ export function createGame(deps) {
   const teacher = createTeacher(teacherApi);
 
   const minimap = createMinimap({ onGo: (g) => safe(() => walkToPlace(g)), iconFor: (k) => iconSvg(k, '', null, true) });
+  const townUI = createTownUI({
+    iconFor: (k) => iconSvg(k, '', null, true),
+    speak: (text) => speech.speak(text, set.lang, { kind: 'ui', queue: false }),
+    coins: () => { const l = learner(); return l ? progress.coins(l.id) : 0; },
+    owns: (it) => { const l = learner(); return !!l && progress.owns(l.id, it); },
+    count: (id) => { const l = learner(); return l ? progress.bagCount(l.id, id) : 0; },
+    buy: (it) => {
+      ensureSession();
+      const l = learner();
+      const r = progress.buy(l.id, it);
+      if (r.ok) {
+        audio.play('reward'); hud.setCoins(r.coins, true);
+        progress.recordActivity({ kind: 'shop', game: it.id, level: 0, ageGroup: set.age, completed: true, rounds: 1, correct: it.price });
+        if (it.kind === 'wear') refreshAppearance();
+      } else audio.play('wrong');
+      return r;
+    },
+    use: (it) => { const l = learner(); if (!l || !progress.useItem(l.id, it)) return null; audio.play('correct'); return tr(it.tip, set.lang); },
+    bookDone: (b) => {
+      const l = learner();
+      progress.recordActivity({ kind: 'book', game: b.id, level: 0, ageGroup: set.age, completed: true, rounds: b.pages.length });
+      if (l && progress.markBookRead(l.id, b.id)) { addCoins(COIN_RULES.book); audio.play('coin'); return true; }
+      return false;
+    },
+    onClose: () => {}
+  });
   const audioPanel = createAudioPanel({
     vm: audioVm,
     close: () => { audioPanel.close(); },
@@ -969,7 +1025,7 @@ export function createGame(deps) {
   const KEYMAP = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right' };
   window.addEventListener('keydown', (e) => {
     audio.unlock();
-    if (dialogOpen() || audioPanel.isOpen || minimap.isOpen || (e.target.closest && e.target.closest('input, textarea, select'))) return;
+    if (dialogOpen() || audioPanel.isOpen || minimap.isOpen || townUI.isOpen || (e.target.closest && e.target.closest('input, textarea, select'))) return;
     const dir = KEYMAP[e.code];
     if (state === S.PLAYROOM && dir) { keys[dir] = true; e.preventDefault(); return; }
     if (state === S.PLAYROOM && (e.code === 'KeyE' || e.code === 'Enter' || e.code === 'Space')) { if (!e.target.closest('button') || e.target.closest('.interact')) { e.preventDefault(); interact(); } return; }
@@ -988,7 +1044,7 @@ export function createGame(deps) {
     const canvas = world.renderer.domElement;
     canvas.addEventListener('pointerdown', (e) => {
       if (state !== S.PLAYROOM || !config.movementSettings.tapToWalk) return;
-      if (world.ride && (world.ride.kind === 'bus' || world.ride.kind === 'train')) return;           // the bus and the train drive themselves
+      if (world.ride && (world.ride.kind === 'bus' || world.ride.kind === 'train' || world.ride.kind === 'coaster')) return;           // these drive themselves
       const hit = world.pick(e.clientX, e.clientY);
       if (!hit) return;
       if (hit.type === 'station') {
@@ -1003,10 +1059,11 @@ export function createGame(deps) {
         world.walkTo(a.x, a.z, (arrived) => { if (arrived && state === S.PLAYROOM) { const n = world.nearPoi(config.movementSettings.interactDistance + 0.6); if (n && n.id === hit.id) doPoi(n); } });
       } else world.walkTo(hit.x, hit.z);
     });
+    world.onCoin((n) => { if (state !== S.PLAYROOM) return; addCoins(n * COIN_RULES.pickup); audio.play('coin'); });
     world.onRide((ev, info, kind) => {
       if (state !== S.PLAYROOM) return;
-      if (ev === 'board') say(t(kind === 'train' ? 'trainBoard' : 'busBoard'), 6000);
-      else if (ev === 'off') say(t('rideOff'), 2500);
+      if (ev === 'board') say(t(kind === 'train' ? 'trainBoard' : kind === 'coaster' ? 'coasterBoard' : 'busBoard'), 6000);
+      else if (ev === 'off') say(t(info === 'coaster' ? 'coasterDone' : 'rideOff'), 2500);
     });
     // walking into a new area: a banner with its name, the right music, and (once) its name spoken
     let townBannerAt = -99;

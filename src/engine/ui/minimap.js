@@ -4,7 +4,7 @@ import { MAP, BUILDING, DOOR, ZONES, POIS, SPAWN, YARD_SPAWN, zoneAt } from '../
 import { t, getLang } from '../i18n.js';
 import { tr } from '../core/labels.js';
 import { G } from './glyphs.js';
-import { drawTown, pickTown, landmarkArrival } from './townmap.js';
+import { drawTown, pickTown, landmarkArrival, PLACE_GROUPS } from './townmap.js';
 import { LANDMARKS } from '../city/plan.js';
 
 const FONT = 'Fredoka, system-ui, sans-serif';
@@ -123,7 +123,7 @@ export function createMinimap({ onGo, onClose, iconFor = () => '' }) {
         <canvas class="map-town" width="620" height="620" data-testid="map-town"></canvas>
         <div class="town-list">
           <button class="town-go home" data-go="home" data-testid="town-go-home"><span class="tg-ic">${iconFor('star')}</span><span>${esc(t('backToSchool'))}</span></button>
-          ${LANDMARKS.map((l) => `<button class="town-go" data-go="${l.id}" data-testid="town-go-${l.id}" style="--lc:${l.color}"><span class="tg-ic">${iconFor(l.icon)}</span><span>${esc(tr(l.name, getLang()))}</span></button>`).join('')}
+          ${PLACE_GROUPS.map(([g, ids]) => `<h3 class="town-group">${esc(t(g))}</h3>` + ids.map((id) => LANDMARKS.find((q) => q.id === id)).filter(Boolean).map((l) => `<button class="town-go" data-go="${l.id}" data-testid="town-go-${l.id}" style="--lc:${l.color}"><span class="tg-ic">${iconFor(l.icon)}</span><span>${esc(tr(l.name, getLang()))}</span></button>`).join('')).join('')}
         </div>
       </div>`;
     root.innerHTML = `<div class="dialog-card map-card" role="dialog" aria-modal="true" aria-labelledby="map-title">

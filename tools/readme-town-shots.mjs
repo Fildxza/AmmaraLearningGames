@@ -6,7 +6,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { CHROME } from './lib/browsers.mjs';
-import { railPath, HIGHWAY } from '../src/engine/city/plan.js';
+import { railPath, HIGHWAY, cityPois } from '../src/engine/city/plan.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const out = path.join(root, 'docs/screenshots');
@@ -35,7 +35,7 @@ await page.screenshot({ path: path.join(out, 'town-unicorn.png') });
 await page.keyboard.press('KeyE'); await sleep(400);
 
 // 2. the highway with its fast traffic and the train line along its middle
-await tp(150, HIGHWAY.z + HIGHWAY.curb - 1.2); await sleep(3500);
+await tp(-1000, HIGHWAY.z + HIGHWAY.curb - 1.2); await sleep(3500);
 await page.screenshot({ path: path.join(out, 'town-highway.png') });
 
 // 3. the train: wait at Stesen Tadika, ride, and take the picture a few seconds after it leaves
@@ -52,6 +52,29 @@ await page.keyboard.press('KeyE'); await sleep(600);
 // 4. the town map
 await page.click('[data-testid=hud-minimap]'); await sleep(700);
 await page.screenshot({ path: path.join(out, 'town-map.png') });
+await page.click('[data-testid=map-close]'); await sleep(300);
+
+// 5. the bookshop and a book being read
+const poi = (id) => cityPois().find((q) => q.id === id);
+const shop = poi('mall-shop-books');
+await tp(shop.x, shop.z + 1.6); await sleep(900);
+await page.keyboard.press('KeyE'); await sleep(900);
+await page.screenshot({ path: path.join(out, 'town-shop.png') });
+await page.click('[data-testid="buy-buy-bk-kancil"]').catch(() => {}); await sleep(1600);
+if (!(await page.$('[data-testid=reader-text]'))) { await page.click('[data-testid="buy-buy-bk-planet"]').catch(() => {}); await sleep(1600); }
+await page.click('[data-testid=reader-next]').catch(() => {}); await sleep(900);
+await page.screenshot({ path: path.join(out, 'town-book.png') });
+await page.click('[data-testid=town-close]').catch(() => {}); await sleep(300);
+
+// 6. the roller coaster, high up
+const co = poi('funfair-coaster');
+await tp(co.x, co.z + 1.5); await sleep(900);
+await page.keyboard.press('KeyE');
+await page.waitForFunction(() => window.AmmaraDebug.world().ride === 'coaster', { timeout: 40000 });
+await page.waitForFunction(() => window.AmmaraDebug.world().rideY > 7.5, { timeout: 40000 });
+await sleep(400);
+await page.screenshot({ path: path.join(out, 'town-coaster.png') });
+await page.waitForFunction(() => window.AmmaraDebug.world().ride === null, { timeout: 60000 });
 const w = await world();
 await browser.close();
 console.log('town screenshots written to', out, '| errors:', w.violations);

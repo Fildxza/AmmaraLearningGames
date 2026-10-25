@@ -10,6 +10,10 @@ import { validated } from '../tests/unit/helpers.mjs';
 import { iconSVG, SVG_DEFS } from '../src/engine/art/icons.js';
 import { POIS, ZONES } from '../src/engine/world/layout.js';
 import { LANDMARKS, DISTRICTS, cityPois } from '../src/engine/city/plan.js';
+import { BOOKS } from '../src/data/books.js';
+import { FACTS } from '../src/data/facts.js';
+import { SHOPS } from '../src/data/shops.js';
+import { SHOP_SIGN_LIST } from '../src/engine/city/signatlas.js';
 import { MEMORY_KEYS, COUNT_ITEMS, FIND_THEMES, SHAPE_SETS, SORT_SETS } from '../src/engine/minigames/logic.js';
 import { GAMES } from '../src/engine/minigames/index.js';
 
@@ -34,6 +38,11 @@ LANDMARKS.forEach((l) => add(l.icon, `town landmark ${l.id}`));
 Object.entries(DISTRICTS).forEach(([id, d]) => add(d.icon, `town district ${id}`));
 cityPois().forEach((p) => add(p.icon, `town place ${p.id}`));
 add('star', 'town map: back to preschool');
+BOOKS.forEach((b) => { add(b.cover, `book ${b.id} (cover)`); b.pages.forEach((pg, k) => (Array.isArray(pg.art) ? pg.art : [pg.art]).forEach((a) => add(a, `book ${b.id} page ${k + 1}`))); });
+FACTS.forEach((f) => add(f.icon, `fact board ${f.id}`));
+Object.entries(SHOPS).forEach(([id, sh]) => { add(sh.icon, `shop ${id}`); sh.items.forEach((it) => add(it.icon, `shop ${id}: ${it.id}`)); });
+SHOP_SIGN_LIST.forEach(([name, key]) => add(key, `shop sign "${name}"`));
+add('coin', 'coin counter'); add('shopping_bag', 'my bag');
 const extra = process.env.AUDIT_EXTRA ? JSON.parse(fs.readFileSync(process.env.AUDIT_EXTRA, 'utf8')) : [];
 extra.forEach(([k, w]) => add(k, w));
 

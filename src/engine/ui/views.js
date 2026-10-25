@@ -83,13 +83,14 @@ export function createHud(actions, onDir) {
   delegate(root, actions);
   root.innerHTML = `
     <div class="hud-top">
-      <div class="chip learner-chip" data-testid="hud-learner">${G.user}<span class="ln"></span><span class="sep"></span>${G.star}<b class="stars">0</b></div>
+      <div class="chip learner-chip" data-testid="hud-learner">${G.user}<span class="ln"></span><span class="sep"></span>${G.star}<b class="stars">0</b><span class="sep"></span><i class="coin-dot" aria-hidden="true"></i><b class="coins" data-testid="hud-coins" aria-label="${esc(t('coins'))}">0</b></div>
       <div class="station-dots" aria-label="${esc(t('station'))}"></div>
       <div class="hud-actions">
         <button class="icon-btn" data-action="sound" data-testid="hud-sound"></button>
         <button class="icon-btn" data-action="music" data-testid="hud-music"></button>
         <button class="icon-btn" data-action="audio" data-testid="hud-audio" aria-label="${esc(t('audioBtn'))}">${G.voice}</button>
         <button class="icon-btn map-open" data-action="map" data-testid="hud-map-btn" aria-label="${esc(t('map'))}">${G.map}</button>
+        <button class="icon-btn" data-action="bag" data-testid="hud-bag" aria-label="${esc(t('myBag'))}">${G.bag}</button>
         <button class="icon-btn" data-action="wardrobe" data-testid="hud-wardrobe">${G.hanger}</button>
         <button class="icon-btn" data-action="pause" data-testid="hud-pause" aria-label="${esc(t('pause'))}">${G.pause}</button>
         <button class="pill-btn finish-btn" data-action="finish" data-testid="hud-finish">${G.flag}<span>${esc(t('finishEarly'))}</span></button>
@@ -121,7 +122,7 @@ export function createHud(actions, onDir) {
     b.addEventListener('contextmenu', (e) => e.preventDefault());
   });
   const el = {
-    ln: $('.ln', root), stars: $('.stars', root), dots: $('.station-dots', root), hint: $('.hud-hint', root), hintText: $('.hint-text', root),
+    ln: $('.ln', root), stars: $('.stars', root), coins: $('.coins', root), dots: $('.station-dots', root), hint: $('.hud-hint', root), hintText: $('.hint-text', root),
     interact: $('.interact', root), ret: $('.return-btn', root), zb: $('.zone-banner', root), zbIcon: $('.zb-icon', root), zbText: $('.zb-text', root), sound: $('[data-action="sound"]', root), music: $('[data-action="music"]', root), cam: $('.cam-btn span', root), tut: $('.tutorial', root)
   };
   let lastHint = null;
@@ -137,6 +138,8 @@ export function createHud(actions, onDir) {
       el.ret.querySelector('span').textContent = t('returnInside');
     },
     setLearner(name, stars) { el.ln.textContent = name; el.stars.textContent = String(stars); },
+    /** the coin counter; bump = a little jump when coins are added */
+    setCoins(n, bump) { el.coins.textContent = String(n); if (bump) { el.coins.classList.remove('bump'); void el.coins.offsetWidth; el.coins.classList.add('bump'); } },
     setDots(states) {
       el.dots.innerHTML = states.map((s, i) => `<span class="sdot ${s}" title="${esc(t('quizStation', { n: i + 1 }))}">${s === 'done' ? G.check : `<b>${i + 1}</b>`}</span>`).join('');
     },

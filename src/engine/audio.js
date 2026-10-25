@@ -239,6 +239,7 @@ export function createAudio(initial, onError = () => {}) {
     correct() { duck(); const t = ctx.currentTime; [72, 76, 79, 84].forEach((m, i) => bell(sfxBus, m, t + i * 0.085, 0.7, 0.2)); [96, 100].forEach((m, i) => tone(sfxBus, 'sine', midiHz(m), t + 0.36 + i * 0.06, 0.004, 0.04, 0.25)); },
     wrong() { duck(); const t = ctx.currentTime; tone(sfxBus, 'triangle', midiHz(67), t, 0.02, 0.13, 0.16, 1400); tone(sfxBus, 'triangle', midiHz(64), t + 0.17, 0.02, 0.11, 0.22, 1200); },
     reward() { const t = ctx.currentTime; [88, 91, 96].forEach((m, i) => bell(sfxBus, m, t + i * 0.07, 0.45, 0.1)); },
+    coin() { const t = ctx.currentTime; bell(sfxBus, 88, t, 0.25, 0.11); bell(sfxBus, 95, t + 0.07, 0.45, 0.12); },
     next() { const t = ctx.currentTime; const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(500, t); o.frequency.exponentialRampToValueAtTime(1100, t + 0.25); env(g, t, 0.01, 0.07, 0.3); o.connect(g); g.connect(sfxBus); o.start(t); o.stop(t + 0.4); },
     pop() { tone(sfxBus, 'sine', 520, ctx.currentTime, 0.003, 0.14, 0.09); tone(sfxBus, 'sine', 780, ctx.currentTime + 0.05, 0.003, 0.1, 0.1); },
     flip() { noise(sfxBus, ctx.currentTime, 0.06, 2400, 0.06); tone(sfxBus, 'triangle', 420, ctx.currentTime, 0.004, 0.07, 0.07); },

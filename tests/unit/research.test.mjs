@@ -20,9 +20,9 @@ test('every question has a research record with the required fields and a correc
   }
 });
 
-test('target: at least 20 questions in each of the 15 categories and at least 300 in total', () => {
+test('target: at least 20 questions in each of the 16 categories (15 worlds + town quizzes) and at least 300 in total', () => {
   const s = summarise(ds);
-  assert.equal(Object.keys(s.perCategory).length, 15);
+  assert.equal(Object.keys(s.perCategory).length, 16);
   for (const [cat, v] of Object.entries(s.perCategory)) {
     assert.ok(v.questions >= 20, `${cat}: ${v.questions}`);
     assert.equal(v.distinctQuestionAnswerPairs, v.questions, `${cat} has repeated question+answer pairs`);

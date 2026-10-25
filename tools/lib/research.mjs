@@ -51,6 +51,9 @@ export function buildDataset() {
   const vocab = config.answerChoices;
   const worldOfStation = {};
   for (const w of config.worlds) if (w.id !== 'adventure') for (const s of w.stations) worldOfStation[s] = w;
+  // the town quiz boards (stations kt-*) are not part of a world: they form their own category
+  const TOWN = { id: 'town', name: { ms: 'Bandar Ceria (kuiz bandar)', en: 'Happy Town (town quizzes)' } };
+  for (const sid of Object.keys(config.stations)) if (sid.startsWith('kt-')) worldOfStation[sid] = TOWN;
   const checksByQ = {};
   for (const c of checks) for (const q of c.questions) (checksByQ[q] = checksByQ[q] || []).push(c);
 

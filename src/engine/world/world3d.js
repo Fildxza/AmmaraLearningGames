@@ -40,7 +40,7 @@ const inMap = (x, z) => x >= MAP.minX && x <= MAP.maxX && z >= MAP.minZ && z <= 
 const inBuilding = (x, z) => x > BUILDING.minX && x < BUILDING.maxX && z > BUILDING.minZ && z < BUILDING.maxZ;
 const angleTo = (a, b) => { let d = b - a; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; return d; };
 // the camera keeps further back on a ride
-const RIDE_CAM = { unicorn: { h: 1.2, b: 2.6 }, car: { h: 2.6, b: 5.5 }, bus: { h: 5, b: 9 }, train: { h: 4, b: 12, y: 9 } };     // y: the ride is up on the viaduct
+const RIDE_CAM = { unicorn: { h: 1.2, b: 2.6 }, car: { h: 2.6, b: 5.5 }, bus: { h: 5, b: 9 }, train: { h: 4, b: 12, y: 9 }, coaster: { h: 2.2, b: 6 } };     // y: the ride is up on the viaduct
 
 // Tall things that can hide the child from the camera (checked with simple geometry, no ray casting).
 const TALL = [
@@ -107,8 +107,8 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
   // the town around the preschool (streamed in squares around the child), its traffic, children and buses
   const city = createCity(scene, collision, { iconSvg });
   city.preload(SPAWN.x, SPAWN.z);
-  const traffic = createTraffic(scene);
-  const people = createPeople(scene);
+  const traffic = createTraffic(scene, 36);
+  const people = createPeople(scene, 64, 18);
   const buses = createBuses(scene);
   const highway = createHighway(scene);
   const trains = createTrains(scene);
@@ -142,7 +142,7 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
     camPos: new Vector3(0, 9, 15), camLook: new Vector3(0, 1, 0), violations: 0, maxPenetration: 0,
     occlTimer: 0, occluded: false, frameTimes: [], lowFpsTime: 0, dpr: 1, shadows: true, fps: 60, lastDowngrade: 0,
     outdoor: 0, doorPassable: false, cullTimer: 0, guideTarget: null, snapCamera: true, visibleZones: 0, zoneId: 'hall', walkFails: 0,
-    ride: null, waitBus: null, waitTrain: null, rideDist: 0
+    ride: null, waitBus: null, waitTrain: null, waitCoaster: null, rideDist: 0
   };
   const tmpV = new Vector3();
   const targetPos = new Vector3();
@@ -217,8 +217,12 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
     if (len > 1) { dx /= len; dz /= len; }
     const ride = state.ride;
     const rad = ride && ride.ud ? ride.ud.radius : r;
-    const auto = !!ride && (ride.kind === 'bus' || ride.kind === 'train');      // rides that drive themselves
-    if (ride && ride.kind === 'train') {
+    const auto = !!ride && (ride.kind === 'bus' || ride.kind === 'train' || ride.kind === 'coaster');      // rides that drive themselves
+    if (ride && ride.kind === 'coaster') {
+      // on the roller coaster: the child sits in the middle car (it is the coaster that moves)
+      const seat = ride.coaster.seat();
+      player.x = seat.x; player.z = seat.z; player.yaw = seat.yaw; ride.y = seat.y; player.vx = player.vz = 0; player.speed = ride.coaster.speed;
+    } else if (ride && ride.kind === 'train') {
       // in the train: the child sits in the middle car, up on the viaduct
       const tr = ride.train;
       player.x = tr.x; player.z = tr.z; player.yaw = tr.yaw; player.vx = player.vz = 0; player.speed = tr.speed;
@@ -288,8 +292,9 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
       root.position.set(player.x + Math.sin(player.yaw) * sz, ud.seatY, player.z + Math.cos(player.yaw) * sz);
       ch.update(dt, t, 0, reduced);
       if (ride.kind === 'unicorn') animateUnicorn(o, t, player.speed, reduced); else spinWheels(o, state.rideDist);
-    } else ch.update(dt, t, Math.min(1, player.speed / Math.max(1, ms.walkSpeed)), reduced);
-    ch.root.visible = !auto;
+    } else if (ride && ride.kind === 'coaster') { root.position.set(player.x, ride.y - 0.25, player.z); ch.update(dt, t, 0, reduced); }     // sitting in the car
+    else ch.update(dt, t, Math.min(1, player.speed / Math.max(1, ms.walkSpeed)), reduced);
+    ch.root.visible = !(ride && (ride.kind === 'bus' || ride.kind === 'train'));
     blob.visible = !ride;
     blob.position.set(player.x, 0.03, player.z);
 
@@ -316,13 +321,16 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
     city.update(player.x, player.z, dt, t, reduced);
     const me = { x: player.x, z: player.z, r: ride ? rad : 0.6 };
     const hwNear = highway.near(player.x, player.z, 260).map((c) => ({ x: c.x, z: c.z, r: 1.0 }));
-    traffic.update(dt, player.x, player.z, auto ? hwNear : [me, ...hwNear]);
+    traffic.update(dt, player.x, player.z, auto ? hwNear : [me, ...hwNear], t);
     people.update(dt, t, player.x, player.z, reduced, !auto);
     buses.update(dt, auto ? [] : [me], player.x, player.z);
-    highway.update(dt, player.x, player.z, auto ? [] : [me], traffic.near(player.x, player.z, 320));
+    highway.update(dt, player.x, player.z, auto ? [] : [me], traffic.near(player.x, player.z, 320), t);
     trains.update(dt);
     updateBusWait();
     updateTrainWait();
+    updateCoaster();
+    // coins on the pavements: walking (or riding) over one picks it up
+    if (state.mode === 'play' && !auto) { const got = city.collectCoins(player.x, player.z, ride ? rad + 0.9 : 1.15, t); if (got && onCoin) onCoin(got); }
     stations.update(t, reduced);
     effects.update(dt, t, reduced);
     occlusion(dt);
@@ -357,7 +365,20 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
       if (onRide) onRide('board', w, 'train');
     }
   }
-  let onRide = null;
+  let onRide = null, onCoin = null;
+  // waiting at the roller coaster: get in when the train stands in the station; get out when the lap is over
+  function updateCoaster() {
+    const rd = state.ride;
+    if (rd && rd.kind === 'coaster') { if (rd.coaster.lapDone) leaveRide(); return; }
+    const c = state.waitCoaster;
+    if (!c) return;
+    if (Math.hypot(player.x - c.stationPoint.x, player.z - c.stationPoint.z) > 30) { state.waitCoaster = null; return; }
+    if (c.atStation && state.mode === 'play' && !rd) {
+      state.waitCoaster = null; finishWalk(false);
+      state.ride = { kind: 'coaster', coaster: c, ud: { radius: r }, y: 1.6 }; c.board();
+      if (onRide) onRide('board', null, 'coaster');
+    }
+  }
 
   function updateDoor(dt) {
     const dd = Math.hypot(player.x - DOOR.x, player.z - DOOR.z);
@@ -399,6 +420,8 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
     state.visibleZones = n;
   }
 
+  /** how high the ride the child is on is (the train deck, the coaster's track) */
+  const rideHeight = () => { const rd = state.ride; if (!rd) return 0; if (rd.y !== undefined) return rd.y; const rc = RIDE_CAM[rd.kind]; return rc && rc.y ? rc.y : 0; };
   const camHead = new Vector3(), camFixed = new Vector3(), camWant = new Vector3(), camOff = new Vector3();
   function updateCamera(dt, t) {
     const preset = cam.distances[state.camPreset] || cam.distances.normal;
@@ -428,10 +451,10 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
         bz = MathUtils.clamp((state.activePos.z - player.z) * 0.62, -1.2, 5.5);
         if (m === 'play' && state.walk === null && Math.hypot(state.activePos.x - player.x, state.activePos.z - player.z) < 3.2) { bx = 0; bz = 0; }
       }
-      const rc = state.ride ? RIDE_CAM[state.ride.kind] : null;
+      const rc = state.ride ? RIDE_CAM[state.ride.kind] : null, ry = rideHeight();
       const town = inMap(player.x, player.z) ? 0 : 1;
-      targetPos.set(player.x + bx, preset.height + out * 1.2 + (rc ? rc.h + (rc.y || 0) : town * 0.8), player.z + preset.back + bz + out * 1.8 + (rc ? rc.b : town * 1.5));
-      targetLook.set(player.x + bx, 0.9 + (rc && rc.y ? rc.y : 0), player.z - 1.6 + bz - (rc ? rc.b * 0.25 : 0));
+      targetPos.set(player.x + bx, preset.height + out * 1.2 + (rc ? rc.h + ry : town * 0.8), player.z + preset.back + bz + out * 1.8 + (rc ? rc.b : town * 1.5));
+      targetLook.set(player.x + bx, 0.9 + ry, player.z - 1.6 + bz - (rc ? rc.b * 0.25 : 0));
       if (inMap(player.x, player.z)) { targetPos.x = MathUtils.clamp(targetPos.x, MAP.minX + 7, MAP.maxX + 40); targetLook.x = MathUtils.clamp(targetLook.x, MAP.minX + 4, MAP.maxX + 40); }
     }
     targetPos.z = Math.min(targetPos.z, CITY.maxZ + 60);
@@ -443,8 +466,7 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
     // in the town: never look through a tall building, a train deck or a platform
     // (moving out of the way is immediate; coming back to the normal view is smooth)
     if (!inMap(player.x, player.z)) {
-      const rc = state.ride ? RIDE_CAM[state.ride.kind] : null;
-      camHead.set(player.x, 1.4 + (rc && rc.y ? rc.y : 0), player.z);
+      camHead.set(player.x, 1.4 + rideHeight(), player.z);
       camFixed.copy(camera.position); city.clipCamera(camHead, camFixed);
       camWant.subVectors(camFixed, camera.position);
       if (camWant.lengthSq() >= camOff.lengthSq() || k === 1) camOff.copy(camWant); else camOff.lerp(camWant, 1 - Math.exp(-5 * dt));
@@ -513,7 +535,12 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
   function leaveRide() {
     const rd = state.ride;
     if (!rd) return false;
-    if (rd.kind === 'train') {
+    if (rd.kind === 'coaster') {
+      // out of the car onto the station platform's steps
+      const c = rd.coaster; c.leave();
+      state.ride = null; collision.skip = WALK_SKIP;
+      setPlayerPos(c.stationPoint.x, c.stationPoint.z + 3);
+    } else if (rd.kind === 'train') {
       // down by the lift to the station's ticket spot (or straight down to the street if the trip is cut short)
       const tr = rd.train, st = tr.dwell > 0 ? tr.atStop : null;
       const spot = st ? st.exit : { x: player.x, z: player.z };
@@ -585,6 +612,16 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
     },
     get waitingBus() { return state.waitBus; },
     get waitingTrain() { return state.waitTrain; },
+    get waitingCoaster() { return !!state.waitCoaster; },
+    /** At the funfair: get in the roller coaster (now, or as soon as the train is back in the station). */
+    rideCoaster() {
+      if (state.ride) return false;
+      const c = city.coasterNear(player.x, player.z, 25);
+      if (!c) return false;
+      state.waitCoaster = c;
+      return true;
+    },
+    onCoin(fn) { onCoin = fn; },
     /** At a train station: a train comes (soon) and the child gets on when it stops. */
     callTrain(id) {
       if (state.ride) return null;
@@ -615,6 +652,8 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
     onRide(fn) { onRide = fn; },
     /** a school child walking close by (to say hello to) */
     nearKid(d = 2.6) { return state.ride ? null : people.near(player.x, player.z, d); },
+    /** is the person found by nearKid a grown-up (rather than a school child)? */
+    kidIsAdult(i) { return !!(people.kids[i] && people.kids[i].adult); },
     player() { return { x: player.x, z: player.z, speed: player.speed, yaw: player.yaw, zone: state.zoneId, area: state.outdoor > 0.5 ? 'outdoor' : 'indoor' }; },
     setAppearance(a) { state.appearance = a; ch.setAppearance(a); },
     celebrate(index) {
@@ -715,7 +754,8 @@ export async function createWorld3D({ canvas, config, quality = 'auto', appearan
         shadows: state.shadows, autoMode: quality === 'auto', lowFpsTime: +state.lowFpsTime.toFixed(2), samples: state.frameTimes.length, calls: renderer.info.render.calls, triangles: renderer.info.render.triangles, occluded: state.occluded,
         camera: { x: camera.position.x, y: camera.position.y, z: camera.position.z }, walking: !!state.walk, mode: state.mode,
         guideArrow: effects.arrowVisible, bounds: CITY, school: WALK, playerRadius: r, zone: state.zoneId,
-        ride: state.ride ? state.ride.kind : null, waitingBus: state.waitBus ? state.waitBus.id : null, waitingTrain: state.waitTrain ? state.waitTrain.id : null, highway: highway.active,
+        ride: state.ride ? state.ride.kind : null, waitingBus: state.waitBus ? state.waitBus.id : null, waitingTrain: state.waitTrain ? state.waitTrain.id : null, waitingCoaster: !!state.waitCoaster, rideY: +rideHeight().toFixed(2), highway: highway.active,
+        redLights: traffic.cars.filter((c) => c.active && c.redLight).length,
         trains: trains.trains.map((t) => ({ s: Math.round(t.s), x: Math.round(t.x), z: Math.round(t.z), speed: +t.speed.toFixed(1), dwell: +Math.max(0, t.dwell).toFixed(1), atStop: t.atStop ? t.atStop.id : null, riding: t.riding })), city: city.stats(), traffic: traffic.active, people: people.active, kids: people.kids.filter((k) => k.active).map((k) => ({ x: +k.x.toFixed(1), z: +k.z.toFixed(1) })),
         buses: buses.buses.map((b) => ({ route: b.rid, x: Math.round(b.x), z: Math.round(b.z), visible: b.model.visible })), myBus: buses.mine ? { x: buses.mine.x, z: buses.mine.z, dwell: +buses.mine.dwell.toFixed(1), atStop: buses.mine.atStop ? buses.mine.atStop.id : null, riding: !!buses.mine.riding } : null,
         player: { x: +player.x.toFixed(2), z: +player.z.toFixed(2), speed: +player.speed.toFixed(2) }, area: state.outdoor > 0.5 ? 'outdoor' : 'indoor', doorOpen: state.doorPassable,

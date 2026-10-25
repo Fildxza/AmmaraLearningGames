@@ -41,6 +41,7 @@ export const G = {
   lock: S('<rect x="11" y="21" width="26" height="19" rx="4"/><path d="M16 21 V15 Q16 7 24 7 Q32 7 32 15 V21"/>'),
   heart: S('<path d="M24 40 C6 28 8 12 18 11 Q22 11 24 15 Q26 11 30 11 C40 12 42 28 24 40 Z" fill="currentColor"/>'),
   sparkle: S('<path d="M24 6 Q26 22 42 24 Q26 26 24 42 Q22 26 6 24 Q22 22 24 6 Z" fill="currentColor"/>'),
+  bag: S('<path d="M10 18 H38 L35 42 H13 Z"/><path d="M17 18 V14 Q17 7 24 7 Q31 7 31 14 V18"/>'),
   map: S('<path d="M6 12 L18 8 L30 12 L42 8 V36 L30 40 L18 36 L6 40 Z"/><path d="M18 8 V36 M30 12 V40"/>'),
   gamepad: S('<rect x="5" y="14" width="38" height="22" rx="11"/><path d="M15 20 V30 M10 25 H20"/><circle cx="31" cy="22" r="2.6" fill="currentColor"/><circle cx="37" cy="27" r="2.6" fill="currentColor"/>'),
   moon: S('<path d="M31 8 A17 17 0 1 0 41 33 A14 14 0 0 1 31 8 Z" fill="currentColor"/><path d="M37 11 L38.4 14.2 L41.8 14.6 L39.2 16.8 L40 20 L37 18.4 L34 20 L34.8 16.8 L32.2 14.6 L35.6 14.2 Z" fill="currentColor"/>'),
