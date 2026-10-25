@@ -17,6 +17,8 @@ import { createAudioPanel } from './ui/audio-panel.js';
 import { createArcade } from './ui/arcade.js';
 import { createIslamic } from './ui/islamic.js';
 import { normaliseNarrator } from './narrator.js';
+import { resumeUsable } from './kidlock.js';
+import { canInstall, promptInstall, isHttp } from './pwa.js';
 import { DOOR, zoneById } from './world/layout.js';
 
 export const S = {
@@ -40,14 +42,15 @@ const ALLOWED = {
 };
 
 export function createGame(deps) {
-  const { config, validation, world, progress, audio, speech, storageOk, iconSvg, version } = deps;
+  const { config, validation, world, progress, audio, speech, storageOk, iconSvg, version, kid } = deps;
   const cfgA = config.accessibilitySettings, cfgAu = config.audioSettings;
   const stored = progress.settings();
   const set = Object.assign({
     lang: config.defaultLanguage, age: config.defaultAgeGroup, sound: cfgAu.enabled, music: cfgAu.musicEnabled, musicStyle: cfgAu.defaultMusic,
     musicVolume: cfgAu.musicVolume, effectsVolume: cfgAu.effectsVolume, readAloud: cfgAu.readQuestionsAloud, autoClose: cfgA.quizAutoCloseMs,
-    camera: config.cameraSettings.defaultDistance, quality: 'auto', motion: cfgA.reducedMotion, lastWorld: null, narrator: null
+    camera: config.cameraSettings.defaultDistance, quality: 'auto', motion: cfgA.reducedMotion, lastWorld: null, narrator: null, kidLock: true
   }, stored);
+  kid.setEnabled(set.kidLock !== false);
   set.narrator = normaliseNarrator(set.narrator);
   speech.configure(set.narrator);
   if (!config.availableLanguages.includes(set.lang)) set.lang = config.defaultLanguage;
@@ -88,6 +91,7 @@ export function createGame(deps) {
     enter(next, prev);
     document.body.dataset.state = next;
     syncScene();
+    saveResume(true);
     return true;
   }
   // background music follows where the child is: the zone in the 3D world, or the screen they are on
@@ -263,6 +267,7 @@ export function createGame(deps) {
       else world.guide(act >= 0 && !canPlay && !poi);
       hud.setReturn(world.outdoor);
       if (clock - mapAt > 0.15) { mapAt = clock; minimap.update(world.player(), world.stationPositions(), clock); }
+      saveResume(false);
       // tutorial progress
       if (cur.tutorial === 'move') { const p = world.player(); if (Math.hypot(p.x - cur.movedFrom.x, p.z - cur.movedFrom.z) > 1.6) setTutorial('follow'); }
       else if (cur.tutorial === 'follow' && canPlay) setTutorial('press');
@@ -497,6 +502,7 @@ export function createGame(deps) {
     switch (key) {
       case 'lang': setLang(value); if (has3D) world.setLanguage(value); relabelAll(); break;
       case 'narrator': set.narrator = normaliseNarrator(value); speech.configure(set.narrator); break;
+      case 'kidLock': kid.setEnabled(value); if (!value) progress.setSetting('resume', null); else saveResume(true); break;
       case 'sound': case 'music': case 'musicStyle': case 'musicVolume': case 'effectsVolume': applyAudio(); break;
       case 'camera': if (has3D) world.setCameraPreset(value); refreshHud(); break;
       case 'quality': if (has3D) world.setQuality(value); break;
@@ -723,6 +729,8 @@ export function createGame(deps) {
       return true;
     },
     downloadCsv, downloadActivities,
+    leaveFullscreen() { kid.leaveFullscreen(); },
+    async installApp() { return promptInstall(); },
     async clearAll() {
       const a = await confirmDialog({ title: t('confirmClearTitle'), text: t('confirmClearText'), yes: t('yes'), no: t('no'), tone: 'danger', icon: 'trash' });
       if (!a) return false;
@@ -769,7 +777,7 @@ export function createGame(deps) {
           const ln = progress.learner(id); const sm = progress.summary(id);
           return { id, name: ln.name, current: s.learnerIds[s.currentIndex] === id, status: s.learnerIds[s.currentIndex] === id ? 'current' : s.finishedLearnerIds.includes(id) ? 'finished' : 'waiting', completion: sm.completion, completed: sm.completed, stations: sm.stations, stars: sm.stars, firstTry: sm.firstTry, attempts: sm.attempts };
         }) : [],
-        settings: Object.assign({}, set),
+        settings: Object.assign({}, set), canInstall: canInstall(), isWeb: isHttp(), lock: kid.stats,
         voiceStatus: speech.voiceFor(set.lang) ? t('voiceFound', { name: speech.voiceFor(set.lang).name }) : t('voiceNone'),
         info: { storageOk, stats: validation.stats, errors: validation.errors, warnings: validation.warnings, log: errorLog(), version, renderer: has3D ? 'WebGL' : 'Card mode' }
       };
@@ -779,6 +787,41 @@ export function createGame(deps) {
     teacherDirty = false;
     await enterWorld(worldId, { fresh: true });
   }
+
+  // ---------------------------------------------------------------- continue after an accidental reload
+  // The place the child is in is written to local storage; when the page is opened again within 6 hours it carries on
+  // there instead of showing the menu. Going Home on purpose clears it.
+  let savedAt = 0;
+  const pendingResume = progress.settings().resume || null;      // read before the menu clears it
+  function saveResume(force) {
+    if (!kid.enabled) return;
+    const now = performance.now();
+    if (!force && now - savedAt < 3500) return;
+    savedAt = now;
+    let snap = null;
+    if ((state === S.PLAYROOM || state === S.QUIZ || state === S.PAUSED || state === S.STATION_COMPLETE) && cur.worldId && progress.session() && has3D) {
+      const p = world.player();
+      snap = { k: 'world', worldId: cur.worldId, x: +p.x.toFixed(2), z: +p.z.toFixed(2) };
+    } else if (state === S.ARCADE || state === S.MINIGAME) snap = { k: 'arcade' };
+    else if (state === S.ISLAMIC) snap = { k: 'islamic' };
+    const old = progress.settings().resume;
+    if (!snap && !old) return;
+    progress.setSetting('resume', snap ? Object.assign(snap, { at: Date.now() }) : null);
+  }
+  async function tryResume() {
+    const snap = pendingResume;
+    if (!kid.active || !resumeUsable(snap, Date.now()) || !progress.session() || state !== S.MAIN_MENU) return false;
+    if (snap.k === 'world') {
+      if (!has3D || !config.worldById[snap.worldId]) return false;
+      await enterWorld(snap.worldId);
+      world.teleport(snap.x, snap.z);
+    } else if (snap.k === 'arcade') openArcade(S.MAIN_MENU);
+    else openIslamic(S.MAIN_MENU);
+    toast(t('resumed'), { icon: G.star });
+    return true;
+  }
+  window.addEventListener('pagehide', () => saveResume(true));
+  document.addEventListener('visibilitychange', () => { if (document.hidden) saveResume(true); });
 
   // ---------------------------------------------------------------- UI construction
   const menu = createMenu({
@@ -930,8 +973,13 @@ export function createGame(deps) {
       go(S.MAIN_MENU);
       // dress the room behind the menu with the last (or first) world
       const w = config.worldById[set.lastWorld] || config.worldById.adventure || config.worlds[0];
-      if (w) safe(async () => { await applyTheme(w); world.setStationStates(['locked', 'locked', 'locked', 'locked'], -1); });
+      if (w) safe(async () => { await applyTheme(w); world.setStationStates(['locked', 'locked', 'locked', 'locked'], -1); await tryResume(); });
     },
+    /** true while a lesson or game is on screen (the browser asks before leaving the page) */
+    isBusy() { return state === S.PLAYROOM || state === S.QUIZ || state === S.PAUSED || state === S.STATION_COMPLETE || state === S.ARCADE || state === S.MINIGAME || state === S.ISLAMIC; },
+    /** the Back button / gesture of the device: same as the Escape key */
+    back() { window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape', key: 'Escape' })); },
+    saveNow() { saveResume(true); },
     update,
     get state() { return state; },
     debug() {
@@ -944,7 +992,7 @@ export function createGame(deps) {
         session: progress.session() ? JSON.parse(JSON.stringify(progress.session())) : null,
         audio: { state: audio.state, available: audio.available, music: audio.musicPlaying, scene: audio.scene, song: audio.song },
         narrator: { settings: speech.settings, muted: speech.muted, history: speech.history.slice(-8), statusMs: speech.status('ms'), statusEn: speech.status('en') },
-        arcade: arcade.debug(), islamic: islamic.debug(),
+        arcade: arcade.debug(), islamic: islamic.debug(), lock: kid.stats, resume: progress.settings().resume || null,
         stationStates: stationStates(r)
       };
     },

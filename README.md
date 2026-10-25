@@ -48,6 +48,7 @@ Bahasa Melayu first, English one tap away.
 | **Jom Mengaji** | 28 Hijaiyah letters, original exercises, and 20 short surahs with verbatim Tanzil Uthmani text and an embedded Arabic font. |
 | **Friendly helpers** | A star mascot, two seated robot friends who say hello, and an optional narrator voice. |
 | **No pressure** | No timers, no lives, no failure screens. Mistakes are free; every effort gets encouragement. |
+| **Kid Lock + installable app** | Full screen, ghost-touch filter, no accidental refresh or zoom, resume after reload; installs from the browser and works offline. |
 | **For classrooms** | Class lists on one shared laptop, per-child progress, CSV export, adult-only teacher area. |
 
 <div align="center">
@@ -120,15 +121,49 @@ Hold the **Cikgu / Ibu Bapa** button for 1.5 s to open the teacher area.
 
 ## Deployment
 
-The build output is a single static file, so any of these work:
+The build produces two things:
 
-| Target | How |
+| Output | What it is | Use it for |
+|---|---|---|
+| `AmmaraGames.html` (also `dist/AmmaraGames.html`) | the whole game in one file | double-click on a classroom laptop, USB stick |
+| `dist/` (`index.html`, `manifest.webmanifest`, `sw.js`, `icons/`) | the **installable web app (PWA)**: opens full screen with no address bar, works offline after the first visit, has a fixed address so saved progress stays put | phones, tablets, school computers, GitHub Pages |
+
+### Publish on GitHub Pages (live link)
+
+1. In the repository: **Settings > Pages > Build and deployment > Source: GitHub Actions** (one time).
+2. Push to `main`. The workflow `.github/workflows/pages.yml` installs, runs the unit tests, builds, and publishes `dist/`.
+3. The game is live at **https://fxfanxy.github.io/AmmaraLearningGames/**.
+
+Any other static host works the same way: upload the contents of `dist/` (no server code, no environment variables). It must be served over **HTTPS** for installing and offline use.
+
+### Install as an app
+
+* **Android (Chrome/Edge):** open the link, menu > *Install app* / *Add to Home screen*.
+* **iPad / iPhone (Safari):** Share > *Add to Home Screen*.
+* **Windows / Mac (Chrome/Edge):** the install icon in the address bar, or Teacher > Settings > *Install as an app*.
+
+The installed app opens in full screen. After the first visit it works with no internet; a new version is picked up the next time it is opened with internet.
+
+### Kid Lock (on by default; Teacher > Settings turns it off)
+
+Built to stop small hands from leaving the game by accident:
+
+* full screen from the first tap (re-entered after an accidental exit); Esc is held back so a tap cannot leave full screen on desktop Chrome/Edge;
+* **ghost-touch filter:** touches on the very edge of the screen, palm-sized touches, 4+ fingers at once and double-fast taps are ignored;
+* no pinch zoom, no long-press menu, no pull-to-refresh; F5, Ctrl+R, Ctrl+P, Ctrl+S, Ctrl+U and browser zoom shortcuts are blocked;
+* the device **Back** button/gesture does not leave the page (it works like the game's own Back);
+* a "leave this page?" warning while a lesson is on screen, and the screen stays awake;
+* **resume after reload:** if the page is refreshed or closed by accident, it opens again in the same place (same corner, same child, same game screen) for up to 6 hours. Pressing Home on purpose clears this.
+
+**What a web page cannot block:** Alt+F4, Ctrl+W, and the device's own home / recent-apps buttons. For a real lock, combine the installed app with the device's built-in child mode:
+
+| Device | Setting |
 |---|---|
-| Classroom laptop / USB stick | copy `AmmaraGames.html` and double-click |
-| GitHub Pages | publish the repository root (or `dist/`); the page is `AmmaraGames.html` |
-| Any static host (Netlify, Vercel, S3, school intranet) | upload `dist/AmmaraGames.html`; no server code, no environment variables |
+| Android tablet/phone | *Screen pinning* (Settings > Security; then pin the app from Recent apps) |
+| iPad | *Guided Access* (Settings > Accessibility; triple-press the side button) |
+| Windows laptop | *Assigned access / kiosk mode* with Edge in kiosk mode, e.g. `msedge --kiosk https://fxfanxy.github.io/AmmaraLearningGames/ --edge-kiosk-type=fullscreen` |
 
-Recommended browsers: current **Chrome** or **Edge** with graphics acceleration on.
+A native Android package (Trusted Web Activity / Capacitor) and a Windows `.exe` (Tauri) can wrap this same web app later if a school needs them; see `research/UPGRADE-RESEARCH-REPORT.md`.
 
 ## Development
 
@@ -140,6 +175,8 @@ npm run build            # writes AmmaraGames.html + dist/AmmaraGames.html, fail
 npm test                 # unit tests (rules, records, layout, narrator, Quran text, icons)
 npm run e2e              # original 41 end-to-end checks in Chrome   (npm run e2e:edge for Edge)
 npm run e2e:upgrade      # 13 checks for the 3D world, narrator, arcade, Jom Mengaji (…:edge for Edge)
+npm run e2e:lock         # 9 checks for Kid Lock, resume after reload, offline web app over http (…:edge for Edge)
+npm run icons:app        # re-renders the app icons in public/icons from the star mascot
 npm run play-games       # plays all ten mini-games with real mouse input and saves screenshots
 npm run tour             # screenshots of every corner of the 3D world
 npm run report           # regenerates TEST-REPORT.md from the last results
@@ -149,6 +186,7 @@ npm run preview          # local server on http://127.0.0.1:5500/
 ### Project structure
 
 ```
+public/                     manifest, service-worker template, app icons (copied into dist/)
 src/
   config/game-config.js     teacher-editable content: worlds, stations, questions, rewards, settings
   data/                     quran-data.js (generated from Tanzil), hijaiyah.js
@@ -158,6 +196,7 @@ src/
     minigames/              logic.js (pure, unit-tested rules) + the ten game screens
     ui/                     menus, HUD, map, voice & sound panel, arcade frame, Jom Mengaji
     narrator.js, audio.js   offline voice service, synthesised music and effects
+    kidlock.js, pwa.js      accidental-exit protection, installable offline web app
     game.js                 state machine (MAIN_MENU, PLAYROOM, QUIZ, ARCADE, MINIGAME, ISLAMIC, …)
   styles/                   main.css, upgrade.css, games.css
 tests/unit, tests/e2e       Node unit tests and puppeteer browser tests

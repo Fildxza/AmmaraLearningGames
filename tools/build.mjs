@@ -44,6 +44,17 @@ for (const p of patterns) { const m = html.match(p); if (m) suspicious.push(`${p
 fs.mkdirSync(r('dist'), { recursive: true });
 fs.writeFileSync(r('dist/AmmaraGames.html'), html);
 fs.writeFileSync(r('AmmaraGames.html'), html);
+// Web-app package for hosting (GitHub Pages, any static host): index.html + manifest + offline service worker + icons.
+// The single-file AmmaraGames.html above stays the double-click version.
+import crypto from 'node:crypto';
+const buildId = crypto.createHash('sha256').update(html).digest('hex').slice(0, 10);
+fs.writeFileSync(r('dist/index.html'), html);
+fs.copyFileSync(r('public/manifest.webmanifest'), r('dist/manifest.webmanifest'));
+fs.writeFileSync(r('dist/sw.js'), fs.readFileSync(r('public/sw.template.js'), 'utf8').replace('__VERSION__', buildId));
+fs.mkdirSync(r('dist/icons'), { recursive: true });
+for (const f of fs.readdirSync(r('public/icons'))) fs.copyFileSync(r('public/icons/' + f), r('dist/icons/' + f));
+fs.writeFileSync(r('dist/.nojekyll'), '');
+fs.writeFileSync(r('dist/version.json'), JSON.stringify({ name: 'AmmaraGames', version: JSON.parse(fs.readFileSync(r('package.json'), 'utf8')).version, build: buildId }) + '\n');
 const kb = (n) => (n / 1024).toFixed(0) + ' KB';
 console.log(`Built AmmaraGames.html  total ${kb(Buffer.byteLength(html))}  (engine ${kb(Buffer.byteLength(engine))}, config ${kb(Buffer.byteLength(config))}, css ${kb(css.length)}, font ${kb(font.length)})  in ${Date.now() - started} ms`);
 if (suspicious.length) { console.log('Network-looking code found (review):'); suspicious.forEach((s) => console.log('  ' + s)); }

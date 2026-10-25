@@ -1,0 +1,21 @@
+{
+  "name": "AmmaraGames",
+  "short_name": "AmmaraGames",
+  "description": "Offline 3D learning world for children aged 2 to 4+: preschool, garden, mini-game arcade and Jom Mengaji.",
+  "id": "./",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#fff3e2",
+  "theme_color": "#ff7eb6",
+  "lang": "ms",
+  "dir": "ltr",
+  "categories": ["education", "kids", "games"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

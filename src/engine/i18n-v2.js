@@ -32,6 +32,10 @@ export const UPGRADE_STRINGS = {
     actCsvHeaders: ['Murid', 'ID sesi', 'Tarikh', 'Jenis aktiviti', 'Aktiviti', 'Aras', 'Umur', 'Selesai', 'Pusingan', 'Betul', 'Silap', 'Masa (saat)', 'Pelekat'],
     actKind_minigame: 'Permainan mini', actKind_islamic: 'Jom Mengaji', actKind_quiz: 'Soalan bebas', csvActFile: 'AmmaraGames_aktiviti',
     downloadActivities: 'Muat turun rekod aktiviti (permainan & mengaji)',
+    resumed: 'Menyambung permainan tadi…', setKidLock: 'Kunci kanak-kanak (skrin penuh, sekat sentuhan tak sengaja)',
+    kidLockNote: 'Menyekat sentuhan di tepi skrin, cubit-zum, muat semula (F5) dan butang Back. Jika halaman dimuat semula, permainan menyambung di tempat yang sama. Tidak boleh menyekat Alt+F4, Ctrl+W atau butang rumah peranti: gunakan Screen Pinning (Android) atau Guided Access (iPad).',
+    leaveFullscreen: 'Keluar skrin penuh', fsLeft: 'Skrin penuh ditamatkan sehingga halaman dimuat semula.', installApp: 'Pasang sebagai aplikasi',
+    installHintWeb: 'Buka menu pelayar dan pilih Install / Add to Home Screen untuk pasang sebagai aplikasi tanpa bar URL.', installHintFile: 'Fail ini dibuka terus dari komputer. Versi web (HTTPS) boleh dipasang sebagai aplikasi.',
     freeQuizDone: 'Bagus! Kamu tahu jawapannya!', stars: 'bintang'
   },
   en: {
@@ -58,6 +62,10 @@ export const UPGRADE_STRINGS = {
     actCsvHeaders: ['Learner', 'Session ID', 'Date', 'Activity type', 'Activity', 'Level', 'Age group', 'Completed', 'Rounds', 'Correct', 'Mistakes', 'Time (seconds)', 'Sticker'],
     actKind_minigame: 'Mini-game', actKind_islamic: 'Quran learning', actKind_quiz: 'Free question', csvActFile: 'AmmaraGames_activities',
     downloadActivities: 'Download activity records (games & Quran learning)',
+    resumed: 'Carrying on where you were…', setKidLock: 'Kid lock (full screen, block accidental touches)',
+    kidLockNote: 'Blocks touches on the screen edge, pinch zoom, refresh (F5) and the Back button. If the page is reloaded, the game carries on in the same place. It cannot block Alt+F4, Ctrl+W or the device home button: use Screen Pinning (Android) or Guided Access (iPad).',
+    leaveFullscreen: 'Leave full screen', fsLeft: 'Full screen is off until the page is reloaded.', installApp: 'Install as an app',
+    installHintWeb: 'Use the browser menu: Install / Add to Home Screen, to get an app without an address bar.', installHintFile: 'This file is opened straight from the computer. The web version (HTTPS) can be installed as an app.',
     freeQuizDone: 'Well done! You know the answer!', stars: 'stars'
   }
 };

@@ -29,6 +29,8 @@ export function createTeacher(api) {
     else if (a === 'finishLearner') { if (await api.finishLearner()) render(); }
     else if (a === 'csv') { message = api.downloadCsv(arg); render(); }
     else if (a === 'csvact') { message = api.downloadActivities(arg); render(); }
+    else if (a === 'exitfs') { api.leaveFullscreen(); message = t('fsLeft'); render(); }
+    else if (a === 'install') { api.installApp().then(() => render()); }
     else if (a === 'clear') { if (await api.clearAll()) { message = t('cleared'); render(); } }
     else if (a === 'tutorial') { api.setSetting('tutorial', true); message = t('tutorialWillShow'); render(); }
   });
@@ -159,6 +161,11 @@ export function createTeacher(api) {
         ${rng('musicVolume', t('setMusicVol'), 0, 1, 0.05, (v) => Math.round(v * 100) + '%')}
         ${rng('effectsVolume', t('setSfxVol'), 0, 1, 0.05, (v) => Math.round(v * 100) + '%')}
         ${tog('readAloud', t('setRead'))}
+        ${tog('kidLock', t('setKidLock'))}
+        <p class="muted small">${esc(t('kidLockNote'))}</p>
+        <div class="t-row"><button class="btn btn-ghost small" data-t="exitfs" data-testid="t-exit-fullscreen">${G.close}<span>${esc(t('leaveFullscreen'))}</span></button>
+        ${vm.canInstall ? `<button class="btn btn-ghost small" data-t="install" data-testid="t-install">${G.download}<span>${esc(t('installApp'))}</span></button>` : ''}</div>
+        <p class="muted small">${esc(vm.isWeb ? t('installHintWeb') : t('installHintFile'))}</p>
         <p class="muted small">${esc(vm.voiceStatus)}</p>
         ${rng('autoClose', t('setAutoClose'), 600, 4000, 100, (v) => t('seconds', { n: (v / 1000).toFixed(1) }))}
         <button class="btn btn-ghost small" data-t="tutorial">${G.refresh}<span>${esc(t('showTutorialAgain'))}</span></button>

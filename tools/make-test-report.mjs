@@ -11,6 +11,10 @@ const chrome = read('qa/e2e-results-chrome.json');
 const edge = read('qa/e2e-results-edge.json');
 const upChrome = read('qa/e2e-upgrade-chrome.json');
 const upEdge = read('qa/e2e-upgrade-edge.json');
+const lkChrome = read('qa/e2e-lock-chrome.json');
+const lkEdge = read('qa/e2e-lock-edge.json');
+const lkRows = (lkChrome ? lkChrome.results : []).map((r) => { const e = lkEdge ? lkEdge.results.find((x) => x.id === r.id) : null; return `| ${r.id} | ${r.name} | ${r.ok ? 'PASS' : 'FAIL'} | ${e ? (e.ok ? 'PASS' : 'FAIL') : 'NOT TESTED'} | ${String(r.info || '').replace(/\|/g, '/').slice(0, 170)} |`; }).join('
+');
 const upPass = (r) => (r ? `${r.results.filter((x) => x.ok).length} passed, ${r.results.filter((x) => !x.ok).length} failed` : 'NOT RUN');
 const upRows = (upChrome ? upChrome.results : []).map((r) => {
   const e = upEdge ? upEdge.results.find((x) => x.id === r.id) : null;
@@ -87,6 +91,8 @@ Generated ${new Date().toISOString()} by \`npm run report\` from the raw results
 | End-to-end, Edge | ${edge ? `${edge.pass} passed, ${edge.fail} failed` : 'NOT RUN'} |
 | Upgrade checks (2.0), Chrome | ${upPass(upChrome)} |
 | Upgrade checks (2.0), Edge | ${upPass(upEdge)} |
+| Kid Lock / web app checks, Chrome | ${upPass(lkChrome)} |
+| Kid Lock / web app checks, Edge | ${upPass(lkEdge)} |
 
 ## Upgrade checks: 3D world, narrator, arcade, Jom Mengaji (2.0)
 
@@ -95,6 +101,14 @@ From \`tests/e2e/run-e2e-upgrade.mjs\`. The speech engine is replaced by a recor
 | Id | Check | Chrome | Edge | What was measured (Chrome) |
 |---|---|---|---|---|
 ${upRows}
+
+## Kid Lock and installable web app (2.0)
+
+From \`tests/e2e/run-e2e-lock.mjs\`: the built \`dist/\` folder is served over http under a sub-path (like GitHub Pages), the service worker caches it, then the network is switched off and the game still opens. Touch events are simulated with the browser's touch API, not a physical screen.
+
+| Id | Check | Chrome | Edge | What was measured (Chrome) |
+|---|---|---|---|---|
+${lkRows}
 
 ## Specification checklist (section 17)
 
@@ -125,6 +139,7 @@ Screenshots of every screen are in \`qa/screenshots/chrome\` and \`qa/screenshot
 
 ## NOT TESTED (written by hand)
 
+* **Kid Lock on real devices.** Android Screen Pinning, iPad Guided Access, Windows kiosk mode, installing the app on a phone/tablet, and a real palm on a real screen were not tried; edge/palm touches were simulated.
 * **Real touch screens and tablets.** Pointer presses and tap-to-walk were tested with a mouse. Pointer events are the same API, but no physical touch device was used.
 * **Real speakers.** The Web Audio graph was confirmed running (state "running", music playing) and the mute logic was tested, but nobody listened to the music or effects, so loudness, pleasantness and balance are unverified.
 * **The narrator's real voice.** Voice choice, settings, mute, queueing and the Arabic refusal were tested with a stub; nobody listened to a real voice, so whether it sounds cute, friendly or female is not verified. Choose a voice by ear in Voice & Sound.

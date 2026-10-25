@@ -5,6 +5,8 @@ import { createProgress } from './core/progress.js';
 import { createAudio } from './audio.js';
 import { createStorage, report, installGlobalHandlers, errorLog } from './system.js';
 import { createNarrator } from './narrator.js';
+import { createKidLock } from './kidlock.js';
+import { initPwa } from './pwa.js';
 import { createGame } from './game.js';
 import { webglAvailable, createWorld3D } from './world/world3d.js';
 import { t, setLang, getLang, addStrings } from './i18n.js';
@@ -39,6 +41,11 @@ async function boot() {
   initOverlays(audio);
   const iconSvg = (key, cls = 'ag-icon', custom = null, standalone = false) => iconSVG(key, { cls, custom, standalone, fx: !standalone && !document.body.classList.contains('lite-fx') });
 
+  // keeps small fingers from leaving the game by accident (full screen, ghost touches, refresh, Back button)
+  let game = null;
+  const kid = createKidLock({ enabled: progress.settings().kidLock !== false, onBack: () => game && game.back(), shouldWarn: () => !!game && game.isBusy() });
+  initPwa();
+
   let world = null;
   const canvas = document.getElementById('scene');
   if (webglAvailable()) {
@@ -59,7 +66,7 @@ async function boot() {
   }
   if (!world) { canvas.style.display = 'none'; document.body.classList.add('no-webgl'); }
 
-  const game = createGame({ config, validation, world, progress, audio, speech, storageOk: storage.available, iconSvg, version: VERSION });
+  game = createGame({ config, validation, world, progress, audio, speech, storageOk: storage.available, iconSvg, version: VERSION, kid });
 
   if (world) {
     let last = performance.now();
@@ -109,6 +116,7 @@ async function boot() {
     breakdown: () => (world ? world.breakdown() : null),
     toScreen: (x, y, z) => (world ? world.toScreen(x, y, z) : null),
     errors: () => errorLog(),
+    lock: () => kid.stats,
     perf: () => ({ updateMs: +perf.update.toFixed(2), renderMs: +perf.render.toFixed(2), frameMs: +perf.frame.toFixed(2) }),
     validation: () => ({ stats: validation.stats, errors: validation.errors.length, warnings: validation.warnings.length })
   });

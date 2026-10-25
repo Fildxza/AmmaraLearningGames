@@ -67,3 +67,9 @@
 .voice-pick .tag.guess { background: var(--pink-l); }
 .aud-note { margin: 8px 0 !important; font-size: 14px !important; color: var(--ink-soft); text-align: left; }
 .audio-card .btn-play { margin-top: 10px; min-height: 64px; font-size: 26px; }
+
+/* ---------- Kid Lock: no pull-to-refresh, no callouts, no accidental selection or zoom ---------- */
+html, body { overscroll-behavior: none; touch-action: manipulation; }
+body { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+#scene, .dpad .dir, .mu-xylo, .rl-board, .dt-board, .tr-ink, .pz-piece, .ct-piece { touch-action: none; }
+img, svg, canvas { -webkit-user-drag: none; user-drag: none; }
