@@ -132,7 +132,7 @@ The build produces two things:
 
 1. In the repository: **Settings > Pages > Build and deployment > Source: GitHub Actions** (one time).
 2. Push to `main`. The workflow `.github/workflows/pages.yml` installs, runs the unit tests, builds, and publishes `dist/`.
-3. The game is live at **https://fxfanxy.github.io/AmmaraLearningGames/**.
+3. The game is live at **https://fildxza.github.io/AmmaraLearningGames/**.
 
 Any other static host works the same way: upload the contents of `dist/` (no server code, no environment variables). It must be served over **HTTPS** for installing and offline use.
 
@@ -161,7 +161,7 @@ Built to stop small hands from leaving the game by accident:
 |---|---|
 | Android tablet/phone | *Screen pinning* (Settings > Security; then pin the app from Recent apps) |
 | iPad | *Guided Access* (Settings > Accessibility; triple-press the side button) |
-| Windows laptop | *Assigned access / kiosk mode* with Edge in kiosk mode, e.g. `msedge --kiosk https://fxfanxy.github.io/AmmaraLearningGames/ --edge-kiosk-type=fullscreen` |
+| Windows laptop | *Assigned access / kiosk mode* with Edge in kiosk mode, e.g. `msedge --kiosk https://fildxza.github.io/AmmaraLearningGames/ --edge-kiosk-type=fullscreen` |
 
 A native Android package (Trusted Web Activity / Capacitor) and a Windows `.exe` (Tauri) can wrap this same web app later if a school needs them; see `research/UPGRADE-RESEARCH-REPORT.md`.
 
