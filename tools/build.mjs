@@ -29,7 +29,9 @@ const config = fs.readFileSync(r('src/config/game-config.js'), 'utf8');
 const safeScript = (s) => s.replace(/<\/script/gi, '<\\/script').replace(/<!--/g, '<\\!--');
 const template = fs.readFileSync(r('src/index.template.html'), 'utf8');
 const licences = `\n<!--\nTHIRD-PARTY LICENCES\n\n=== Three.js (MIT) ===\n${fs.readFileSync(r('node_modules/three/LICENSE'), 'utf8').replace(/--/g, '- -')}\n\n=== Fredoka font (SIL OFL 1.1) ===\n${fs.readFileSync(r('node_modules/@fontsource-variable/fredoka/LICENSE'), 'utf8').replace(/--/g, '- -')}\n\n=== Noto Naskh Arabic font (SIL OFL 1.1) ===\n${fs.readFileSync(r('node_modules/@fontsource/noto-naskh-arabic/LICENSE'), 'utf8').replace(/--/g, '- -')}\n\n=== Quran text: Tanzil Project, Uthmani text (CC BY 3.0) ===\nText from the Tanzil Quran Text (Uthmani), version 1.1, Copyright (C) 2007-2026 Tanzil Project. Licence: Creative Commons Attribution 3.0. The text is included verbatim and unchanged (changing it is not allowed). Source: https://tanzil.net\n-->\n`;
+const favicon = fs.readFileSync(r('public/icons/icon-192.png')).toString('base64');
 let html = template
+  .replace('ICON">', () => favicon + '">')
   .replace('/*@@CONFIG@@*/', () => safeScript(config))
   .replace('/*@@FONT@@*/', () => fontCss + naskhCss)
   .replace('/*@@CSS@@*/', () => css)

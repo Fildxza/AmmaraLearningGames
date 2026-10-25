@@ -1,6 +1,6 @@
 // AmmaraGames service worker: the whole game is cached on first visit, so it opens offline afterwards.
 // Cache name carries the build id; a new build replaces the old cache. Generated into dist/sw.js by tools/build.mjs.
-const CACHE = 'ammaragames-449c6c3fd4';
+const CACHE = 'ammaragames-dbc811e7ed';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => {
