@@ -632,7 +632,7 @@ export function createGame(deps) {
     const l = learner();
     const r = l && cur.worldId ? progress.activeRun(l.id, cur.worldId) : null;
     menu.render({ title: config.gameTitle, subtitle: tr(config.subtitle, set.lang), mascotSvg: mascotSvg(), lang: set.lang, langs: langItems(), age: set.age, ages: ageItems(),
-      soundOn: set.sound, learnerName: l ? l.name : '', hasProgress: !!(r && r.stations.some((s) => s.completed)) });
+      soundOn: set.sound, learnerName: l ? l.name : '', version, hasProgress: !!(r && r.stations.some((s) => s.completed)) });
   }
   function renderWorlds() {
     const l = learner();
@@ -691,6 +691,13 @@ export function createGame(deps) {
     ensureSession();
     const s = progress.session();
     await enterWorld((s && s.worldId) || set.lastWorld || 'adventure');
+  }
+  // the menu's "Explore the Town": straight out of the preschool garden gate, with the unicorn stable and the bus stop in view
+  async function exploreTown() {
+    await play();
+    if (state !== S.PLAYROOM || !has3D) return;
+    world.teleport(40, 36);
+    say(t('townWelcome'), 9000);
   }
   async function confirmHome() {
     const ok = await confirmDialog({ title: t('confirmHomeTitle'), text: t('confirmHomeText'), yes: t('yes'), no: t('no'), icon: 'home' });
@@ -914,7 +921,7 @@ export function createGame(deps) {
 
   // ---------------------------------------------------------------- UI construction
   const menu = createMenu({
-    play: () => safe(play), worlds: () => { audio.play('tap'); openWorlds(); }, collection: () => { audio.play('tap'); openCollection(); },
+    play: () => safe(play), town: () => safe(exploreTown), worlds: () => { audio.play('tap'); openWorlds(); }, collection: () => { audio.play('tap'); openCollection(); },
     teacher: () => safe(openTeacher), sound: toggleSound, audio: () => { audio.play('tap'); audioPanel.open(); },
     arcade: () => { audio.play('tap'); openArcade(S.MAIN_MENU); }, islamic: () => { audio.play('tap'); openIslamic(S.MAIN_MENU); },
     age: (a) => { applySetting('age', a); audio.play('tap'); renderMenu(); toast(t('applyNext')); },

@@ -30,6 +30,7 @@ export function createMenu(actions) {
           ${logoHTML(vm.title, vm.subtitle, vm.mascotSvg)}
           <p class="welcome">${esc(t('welcome'))}</p>
           <button class="btn btn-play" data-action="play" data-testid="menu-play">${G.play}<span>${esc(vm.hasProgress ? t('continuePlay') : t('play'))}</span></button>
+          <button class="btn btn-town" data-action="town" data-testid="menu-town">${G.map}<span>${esc(t('exploreTown'))}</span><i class="new-tag">${esc(t('newBadge'))}</i></button>
           <div class="menu-row">
             <button class="btn btn-sky" data-action="worlds" data-testid="menu-worlds">${G.globe}<span>${esc(t('worlds'))}</span></button>
             <button class="btn btn-mint" data-action="collection" data-testid="menu-collection">${G.sticker}<span>${esc(t('collection'))}</span></button>
@@ -48,6 +49,7 @@ export function createMenu(actions) {
           <button class="pill-btn" data-action="audio" data-testid="menu-audio" aria-label="${esc(t('audioTitle'))}">${G.voice}</button>
           <button class="pill-btn wide" data-action="teacher" data-testid="menu-teacher">${G.teacher}<span>${esc(t('teacher'))}</span></button>
         </div>
+        <div class="version-tag" data-testid="menu-version">v${esc(vm.version || '')}</div>
         ${vm.learnerName ? `<div class="player-chip">${G.user}<span>${esc(t('playingAs'))}: <b>${esc(vm.learnerName)}</b></span></div>` : ''}`;
     },
     show: (on) => show(root, on)

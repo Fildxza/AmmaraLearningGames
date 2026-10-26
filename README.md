@@ -10,7 +10,7 @@ shops that take coins, picture books read aloud, and more than 50 things to see 
 16 learning worlds, a 10-game arcade and a gentle *Jom Mengaji* Quran-learning corner.
 Bahasa Melayu first, English one tap away.
 
-![Version](https://img.shields.io/badge/version-2.2.0-ff7eb6)
+![Version](https://img.shields.io/badge/version-2.2.1-ff7eb6)
 ![Offline](https://img.shields.io/badge/works-100%25%20offline-3aa98f)
 ![Single file](https://img.shields.io/badge/deploy-one%20HTML%20file-9b6bff)
 ![Tests](https://img.shields.io/badge/tests-unit%20%2B%20Chrome%20%2B%20Edge-4a90e2)
@@ -65,6 +65,7 @@ Bahasa Melayu first, English one tap away.
 2. **Double-click it.** It opens in Chrome or Edge. No installation, account or internet.
 3. Press **MAIN / PLAY**. Move with the arrow keys, W-A-S-D, the on-screen arrows, or tap the floor to walk there.
 4. Walk to a glowing station or a place with a coloured ring, then press the big yellow button (or Enter / E).
+5. To go straight into the town, press **Explore the Town** (*Jelajah Bandar*) on the menu. The version number is shown in the bottom-left corner of the menu.
 
 Tip: press **F11** for full screen on a classroom projector. Sound starts after the first tap (a browser rule).
 
@@ -181,7 +182,7 @@ Any other static host works the same way: upload the contents of `dist/` (no ser
 * **iPad / iPhone (Safari):** Share > *Add to Home Screen*.
 * **Windows / Mac (Chrome/Edge):** the install icon in the address bar, or Teacher > Settings > *Install as an app*.
 
-The installed app opens in full screen. After the first visit it works with no internet; a new version is picked up the next time it is opened with internet.
+The installed app opens in full screen. After the first visit it works with no internet. A new version is downloaded in the background and the game reloads itself the next time it is at the main menu (never while a child is playing); if an old copy of the page is open from before this feature, reload it once (Ctrl+Shift+R) to get the new version.
 
 ### Kid Lock (on by default; Teacher > Settings turns it off)
 
@@ -215,7 +216,8 @@ npm test                 # unit tests (rules, records, layout, narrator, Quran t
 npm run e2e              # original 41 end-to-end checks in Chrome   (npm run e2e:edge for Edge)
 npm run e2e:upgrade      # 13 checks for the 3D world, narrator, arcade, Jom Mengaji (…:edge for Edge)
 npm run e2e:lock         # 9 checks for Kid Lock, resume after reload, offline web app over http (…:edge for Edge)
-npm run e2e:city         # 23 checks for the town: rides (unicorn, car, bus, train, roller coaster), coins, shops, books, facts, traffic lights (…:edge)
+npm run e2e:update       # 3 checks: a new version replaces the old one by itself at the menu, never while playing (…:edge)
+npm run e2e:city         # 24 checks for the town: rides (unicorn, car, bus, train, roller coaster), coins, shops, books, facts, traffic lights (…:edge)
 npm run city-tour        # screenshots of town places (landmarks, stations, highway, beach…)
 npm run icons:app        # re-renders the app icons in public/icons from the star mascot
 npm run play-games       # plays all ten mini-games with real mouse input and saves screenshots

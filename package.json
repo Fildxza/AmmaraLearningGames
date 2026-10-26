@@ -1,6 +1,6 @@
 {
   "name": "ammaragames",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "private": true,
   "description": "AmmaraGames - offline 3D preschool learning world: big preschool + garden inside a 4.2 km town (unicorns, cars, buses, highway, elevated train), mini-game arcade, Jom Mengaji, single HTML file",
   "type": "module",
@@ -16,7 +16,7 @@
     "icons": "node tools/icon-sheet.mjs",
     "e2e:upgrade": "node tests/e2e/run-e2e-upgrade.mjs",
     "e2e:upgrade:edge": "node tests/e2e/run-e2e-upgrade.mjs edge",
-    "e2e:all": "node tests/e2e/run-e2e.mjs && node tests/e2e/run-e2e-upgrade.mjs && node tests/e2e/run-e2e-lock.mjs && node tests/e2e/run-e2e-city.mjs",
+    "e2e:all": "node tests/e2e/run-e2e.mjs && node tests/e2e/run-e2e-upgrade.mjs && node tests/e2e/run-e2e-lock.mjs && node tests/e2e/run-e2e-city.mjs && node tests/e2e/run-e2e-update.mjs",
     "play-games": "node tools/play-games.mjs",
     "tour": "node tools/tour.mjs",
     "e2e:lock": "node tests/e2e/run-e2e-lock.mjs",
@@ -24,7 +24,9 @@
     "icons:app": "node tools/make-icons.mjs",
     "e2e:city": "node tests/e2e/run-e2e-city.mjs",
     "e2e:city:edge": "node tests/e2e/run-e2e-city.mjs edge",
-    "city-tour": "node tools/city-tour.mjs"
+    "city-tour": "node tools/city-tour.mjs",
+    "e2e:update": "node tests/e2e/run-e2e-update.mjs",
+    "e2e:update:edge": "node tests/e2e/run-e2e-update.mjs edge"
   },
   "devDependencies": {
     "@fontsource-variable/fredoka": "5.3.0",

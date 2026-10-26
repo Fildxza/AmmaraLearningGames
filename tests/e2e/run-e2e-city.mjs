@@ -426,6 +426,27 @@ await check('C23', 'Busy streets: more cars, school children and grown-ups; the 
   return `${w.traffic} cars, ${w.people} people; map: ${groups} groups, ${n} places`;
 });
 
+await check('C24', 'The menu shows the version and a NEW "Explore the Town" button that goes straight out of the preschool gate', async () => {
+  await tp(11, -1); await sleep(300);
+  await page.keyboard.press('Escape'); await sleep(500);
+  const home = await page.$('[data-testid=pause-home]'); if (home) await home.click();
+  await sleep(400);
+  const yes = await page.$('#dialog [data-answer=yes]'); if (yes) await yes.click();
+  await waitState('MAIN_MENU', 10000);
+  const ver = await page.$eval('[data-testid=menu-version]', (e) => e.textContent);
+  assert(/^v\d+\.\d+\.\d+$/.test(ver), 'version tag ' + ver);
+  const tag = await page.$eval('[data-testid=menu-town] .new-tag', (e) => e.textContent);
+  assert(tag === 'BAHARU' || tag === 'NEW', 'tag ' + tag);
+  await page.screenshot({ path: path.join(shotDir, 'menu.png') });
+  await page.click('[data-testid=menu-town]');
+  await waitState('PLAYROOM', 15000);
+  await sleep(1200);
+  const w = await world();
+  assert(w.zone === 'city-campus' && w.area === 'outdoor', `zone ${w.zone} area ${w.area}`);
+  assert(Math.hypot(w.player.x - 40, w.player.z - 36) < 3, 'player at ' + JSON.stringify(w.player));
+  return `${ver}, "${tag}" button, child at the garden gate (${w.player.x}, ${w.player.z})`;
+});
+
 await check('C11', 'No errors, no network requests, no collision violations', async () => {
   const w = await world();
   assert(errors.length === 0, errors.slice(0, 3).join(' | '));

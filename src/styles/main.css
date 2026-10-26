@@ -532,3 +532,31 @@ body[data-state="STATION_COMPLETE"] #hud .interact { display: none; }
 }
 body.reduced-motion *, body.reduced-motion *::before, body.reduced-motion *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 body.reduced-motion .burst { display: none; }
+
+/* ---------- menu: explore the town, version tag ---------- */
+.btn-town { position: relative; --b: #4fb8e8; --bd: #2f8fc0; min-height: 66px; font-size: 24px; }
+.btn-town .new-tag { position: absolute; top: -10px; right: 10px; background: #ff4f6f; color: #fff; font: 700 13px var(--font); font-style: normal; letter-spacing: .08em; padding: 3px 9px; border-radius: 999px; border: 2px solid #fff; box-shadow: 0 2px 0 #c93354; animation: newPulse 1.6s ease-in-out infinite; }
+@keyframes newPulse { 50% { transform: scale(1.12); } }
+.version-tag { position: absolute; bottom: calc(18px + var(--safe-b)); left: 18px; font: 600 14px var(--font); color: var(--ink-soft); background: rgba(255,251,244,.85); padding: 4px 10px; border-radius: 999px; border: 2px solid var(--line); }
+@media (prefers-reduced-motion: reduce) { .btn-town .new-tag { animation: none; } }
+
+/* the menu now has one more button: compact it on screens that are not tall */
+@media (max-height: 820px) {
+  .menu-card { gap: 8px; padding: 12px 22px 14px; }
+  .logo-mascot { width: 62px; height: 62px; margin-bottom: -10px; }
+  .logo-title { font-size: min(46px, calc(8.4vw / var(--n, 11) * 11)); }
+  .logo-sub { margin-top: 4px; } .logo-sub span { font-size: 14px; padding: 3px 12px; }
+  .welcome { font-size: 17px; margin: 0; }
+  .btn-play { min-height: 58px; font-size: 28px; }
+  .btn-town { min-height: 52px; font-size: 21px; }
+  .menu-row .btn { min-height: 48px; font-size: 17px; }
+  .menu-opts { gap: 6px; margin-top: 0; } .opt-label { font-size: 16px; }
+}
+@media (max-height: 460px) {
+  .menu-card { width: min(520px, 94vw); padding: 8px 16px 10px; gap: 6px; }
+  .logo-mascot, .welcome, .logo-sub, .logo-title { display: none; }
+  .menu-corner { top: 6px; right: 6px; gap: 6px; } .menu-corner .pill-btn { min-height: 38px; height: 38px; padding: 0 10px; font-size: 14px; } .menu-corner .pill-btn .glyph { width: 20px; height: 20px; }
+  .menu-card { margin-top: 48px; max-height: calc(100vh - 56px); }
+  .btn-play { min-height: 46px; font-size: 22px; } .btn-town { min-height: 42px; font-size: 18px; } .menu-row .btn { min-height: 40px; font-size: 15px; }
+  .menu-opts { grid-template-columns: 1fr 1fr; } .opt { flex-wrap: nowrap; }
+}

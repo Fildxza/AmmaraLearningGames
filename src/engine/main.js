@@ -14,7 +14,7 @@ import { initOverlays, loaderStep, toast } from './ui/overlays.js';
 import { RAINBOW_DEF } from './ui/thumbs.js';
 import { show } from './ui/dom.js';
 
-const VERSION = '2.2.0';
+const VERSION = '2.2.1';
 const perf = { on: false, update: 0, render: 0, frame: 16 };
 
 async function boot() {
@@ -44,7 +44,7 @@ async function boot() {
   // keeps small fingers from leaving the game by accident (full screen, ghost touches, refresh, Back button)
   let game = null;
   const kid = createKidLock({ enabled: progress.settings().kidLock !== false, onBack: () => game && game.back(), shouldWarn: () => !!game && game.isBusy() });
-  initPwa();
+  initPwa({ canReload: () => !!game && game.state === 'MAIN_MENU' });
 
   let world = null;
   const canvas = document.getElementById('scene');

@@ -46,6 +46,7 @@ export const UPGRADE_STRINGS = {
     backToSchool: 'Balik ke tadika!',
     trainComing: 'Kereta api sedang datang… tunggu di sini ya!',
     // town shops, coins, books, fact boards
+    exploreTown: 'Jelajah Bandar', newBadge: 'BAHARU', townWelcome: 'Selamat datang ke Bandar Ceria! Tunggang unicorn, naik bas atau kereta api, kutip syiling dan pergi ke kedai. Tekan butang Peta untuk melihat semua tempat.',
     adultHi: ['Selamat pagi, adik!', 'Hati-hati melintas jalan ya!', 'Jom ke taman bersama keluarga!', 'Sudah baca buku hari ini?', 'Jangan lupa minum air ya!'],
     groupShops: 'Kedai & Makan', groupFun: 'Main & Taman', groupLearn: 'Belajar & Muzium', groupHelp: 'Komuniti & Masjid', groupGo: 'Pengangkutan',
     coins: 'Syiling', myBag: 'Beg Saya', buy: 'Beli', needCoins: 'Kumpul syiling', owned: 'Sudah ada', readNow: 'Baca', inBag: 'Dalam beg: {n}',
@@ -93,6 +94,7 @@ export const UPGRADE_STRINGS = {
     sayHi: 'Say hi!', kidHi: ["Hi! I'm going to school!", "Let's play together!", 'Good morning, friend!', 'Be careful crossing the road!', 'I love learning!', "Let's go to the zoo!"],
     backToSchool: 'Back to the preschool!',
     trainComing: 'The train is coming… wait here!',
+    exploreTown: 'Explore the Town', newBadge: 'NEW', townWelcome: 'Welcome to Happy Town! Ride a unicorn, take a bus or the train, pick up coins and visit the shops. Press the Map button to see every place.',
     adultHi: ['Good morning, little one!', 'Be careful crossing the road!', "Let's go to the park with your family!", 'Have you read a book today?', 'Remember to drink some water!'],
     groupShops: 'Shops & Food', groupFun: 'Play & Parks', groupLearn: 'Learn & Museums', groupHelp: 'Community & Mosques', groupGo: 'Getting Around',
     coins: 'Coins', myBag: 'My Bag', buy: 'Buy', needCoins: 'Collect coins', owned: 'Got it', readNow: 'Read', inBag: 'In the bag: {n}',
