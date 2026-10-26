@@ -15,6 +15,8 @@ const lkChrome = read('qa/e2e-lock-chrome.json');
 const lkEdge = read('qa/e2e-lock-edge.json');
 const ctChrome = read('qa/e2e-city-chrome.json');
 const ctEdge = read('qa/e2e-city-edge.json');
+const updChrome = read('qa/e2e-update-chrome.json');
+const updEdge = read('qa/e2e-update-edge.json');
 const pics = read('qa/picture-audit.json');
 const ctRows = (ctChrome ? ctChrome.results : []).map((r) => { const e = ctEdge ? ctEdge.results.find((x) => x.id === r.id) : null; return `| ${r.id} | ${r.name} | ${r.ok ? 'PASS' : 'FAIL'} | ${e ? (e.ok ? 'PASS' : 'FAIL') : 'NOT TESTED'} | ${String(r.info || '').replace(/\|/g, '/').slice(0, 170)} |`; }).join('\n');
 const lkRows = (lkChrome ? lkChrome.results : []).map((r) => { const e = lkEdge ? lkEdge.results.find((x) => x.id === r.id) : null; return `| ${r.id} | ${r.name} | ${r.ok ? 'PASS' : 'FAIL'} | ${e ? (e.ok ? 'PASS' : 'FAIL') : 'NOT TESTED'} | ${String(r.info || '').replace(/\|/g, '/').slice(0, 170)} |`; }).join('\n');
@@ -98,6 +100,8 @@ Generated ${new Date().toISOString()} by \`npm run report\` from the raw results
 | Kid Lock / web app checks, Edge | ${upPass(lkEdge)} |
 | Town checks (2.1–2.2), Chrome | ${upPass(ctChrome)} |
 | Town checks (2.1–2.2), Edge | ${upPass(ctEdge)} |
+| Self-update checks (2.2.1), Chrome | ${upPass(updChrome)} |
+| Self-update checks (2.2.1), Edge | ${upPass(updEdge)} |
 | Picture audit (every picture the game can show) | ${pics ? `${pics.total} pictures, ${pics.problems.length} problems` : 'NOT RUN'} |
 
 ## Upgrade checks: 3D world, narrator, arcade, Jom Mengaji (2.0)
